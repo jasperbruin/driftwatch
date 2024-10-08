@@ -9,5 +9,9 @@ setup(
         'pandas',
         'numpy',
         'scikit-learn',
+        'river',
+        'evidently',
+        'matplotlib',
+        'seaborn',
     ],
 )
