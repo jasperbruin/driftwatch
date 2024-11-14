@@ -166,6 +166,5 @@ skaffold delete
 
 We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved.
 
-## License
-
-This project is licensed under the terms of the [Apache 2.0 License](LICENSE).
+## Acknowledgment
+This project utilizes components and microservices derived from the [GoogleCloudPlatform/microservices-demo](https://github.com/GoogleCloudPlatform/microservices-demo) repository. These resources are used exclusively for academic and experimental purposes to facilitate research and exploration in drift detection methodologies.
