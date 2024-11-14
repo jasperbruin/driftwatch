@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: erbdetector
+  labels:
+    app: erbdetector
+spec:
+  selector:
+    matchLabels:
+      app: erbdetector
+  template:
+    metadata:
+      labels:
+        app: erbdetector
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: server
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+        image: erbdetector
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: erbdetector
+  labels:
+    app: erbdetector
+spec:
+  type: ClusterIP
+  selector:
+    app: erbdetector
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000

@@ -1,0 +1,6 @@
+opentelemetry-distro
+opentelemetry-instrumentation-grpc
+opentelemetry-exporter-otlp-proto-grpc
+numpy<2
+scikit-multiflow
+flask

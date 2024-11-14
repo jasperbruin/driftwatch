@@ -1,0 +1,1 @@
+model_formatted_fashion_cpu_v2 filter=lfs diff=lfs merge=lfs -text
