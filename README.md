@@ -79,10 +79,15 @@ DriftWatch supports **Skaffold** to simplify the build and deployment process, r
 2. Ensure Skaffold is installed and configured:
 
    ```bash
+   sudo snap install skaffold
    skaffold version
    ```
 
 3. Build and deploy DriftWatch:
+
+```bash
+skaffold build
+```
 
    ```bash
    skaffold dev
@@ -100,68 +105,6 @@ DriftWatch supports **Skaffold** to simplify the build and deployment process, r
    ```
 
    Visit `http://<EXTERNAL_IP>` in your browser.
-
-#### Alternative Deployment Profiles
-
-- **Google Cloud Build (GCB)**: Build images using Google Cloud Build:
-  ```bash
-  skaffold run -p gcb
-  ```
-- **Debugging**: Enable debugging for cartservice:
-  ```bash
-  skaffold debug
-  ```
-- **Network Policies**: Deploy with Kubernetes network policies:
-  ```bash
-  skaffold run -p network-policies
-  ```
-
-#### Cleaning Up
-
-To remove all resources:
-
-```bash
-skaffold delete
-```
-
----
-
-### Quickstart with GKE for Cloud Deployment
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/your-org/driftwatch.git
-   cd driftwatch
-   ```
-
-2. Set up your Google Cloud project:
-
-   ```bash
-   export PROJECT_ID=<PROJECT_ID>
-   export REGION=<REGION>
-   gcloud services enable container.googleapis.com \
-       --project=${PROJECT_ID}
-   ```
-
-3. Deploy DriftWatch:
-
-   ```bash
-   gcloud container clusters create-auto driftwatch-cluster \
-       --region=${REGION} --project=${PROJECT_ID}
-
-   kubectl apply -f ./release/kubernetes-manifests.yaml
-   ```
-
-4. Access the dashboard:
-
-   ```bash
-   kubectl get service frontend-external | awk '{print $4}'
-   ```
-
-5. Visit `http://<EXTERNAL_IP>` in your browser.
-
----
 
 ## Documentation
 
