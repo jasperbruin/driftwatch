@@ -37,6 +37,7 @@ COPY --from=builder /usr/local /usr/local
 # Copy application code
 COPY locustfile.py .
 COPY products.json .
+COPY product_id_mapper.json .
 COPY model_formatted_fashion_cpu_v2 .
 
 # Enable gevent support in debugger
