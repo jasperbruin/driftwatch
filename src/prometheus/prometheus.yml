@@ -1,11 +1,15 @@
+# src/prometheus/prometheus.yml
+
 remote_write:
 - url: http://localhost:9090/v1/api/write
 
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: "prometheus"
+  # Scrape the Flask app
+  - job_name: "erbdetector"
+    static_configs:
+      - targets: ["erbdetector:5000"]
 
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
+  # Scrape Prometheus itself
+  - job_name: "prometheus"
     static_configs:
       - targets: ["0.0.0.0:9090"]
