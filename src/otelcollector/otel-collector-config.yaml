@@ -1,3 +1,5 @@
+# src/otelcollector/otel-collector-config.yaml
+
 receivers:
   otlp: # the OTLP receiver the app is sending metrics to
     protocols:
