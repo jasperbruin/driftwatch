@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# kubernetes-manifests/frontend.yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -68,6 +70,8 @@ spec:
             value: "8080"
           - name: PRODUCT_CATALOG_SERVICE_ADDR
             value: "productcatalogservice:3550"
+          - name: FRONTEND_ADDR
+            value: frontend.default.svc.cluster.local:80
           - name: CURRENCY_SERVICE_ADDR
             value: "currencyservice:7000"
           - name: CART_SERVICE_ADDR

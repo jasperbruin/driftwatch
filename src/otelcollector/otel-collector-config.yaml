@@ -19,4 +19,5 @@ service:
     metrics:
       receivers: [otlp]
       processors: []
-      exporters: [prometheusremotewrite,debug]
+#       exporters: [prometheusremotewrite,debug]
+        exporters: [prometheusremotewrite]
