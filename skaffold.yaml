@@ -32,6 +32,8 @@ build:
       context: src/jaeger
     - image: prometheus
       context: src/prometheus
+    - image: grafana
+      context: src/grafana
     - image: otelcollector
       context: src/otelcollector
     - image: erbdetector

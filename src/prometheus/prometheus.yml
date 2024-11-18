@@ -1,7 +1,4 @@
-# src/prometheus/prometheus.yml
-
-remote_write:
-- url: http://localhost:9090/v1/api/write
+# TARGET: src/prometheus/prometheus.yml
 
 scrape_configs:
   # Scrape the Flask app
@@ -13,3 +10,9 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["0.0.0.0:9090"]
+
+#   # Scrape OTel Collector
+#   - job_name: "otelcollector"
+#     static_configs:
+#       - targets: ["otelcollector:8889"]
+
