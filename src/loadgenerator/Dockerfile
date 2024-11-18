@@ -43,5 +43,8 @@ COPY model_formatted_fashion_cpu_v2 .
 # Enable gevent support in debugger
 ENV GEVENT_SUPPORT=True
 
-# Set entrypoint
-ENTRYPOINT ["locust", "--host=http://${FRONTEND_ADDR}", "--headless", "-u", "${USERS:-10}"]
+# Set a default value for USERS
+ENV USERS 10
+
+# Correct JSON-formatted ENTRYPOINT
+ENTRYPOINT ["sh", "-c", "locust --host=http://${FRONTEND_ADDR} --headless -u ${USERS}"]
