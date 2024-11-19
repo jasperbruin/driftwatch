@@ -1,5 +1,8 @@
 # TARGET: src/prometheus/prometheus.yml
 
+global:
+  scrape_interval: 15s
+
 scrape_configs:
   # Scrape the Flask app
   - job_name: "erbdetector"
@@ -10,9 +13,4 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["0.0.0.0:9090"]
-
-#   # Scrape OTel Collector
-#   - job_name: "otelcollector"
-#     static_configs:
-#       - targets: ["otelcollector:8889"]
 
