@@ -39,7 +39,7 @@ spec:
             cpu: 200m
             memory: 512Mi
         args:
-#           - "--web.enable-remote-write-receiver"
+          - "--web.enable-remote-write-receiver"
           - "--web.enable-otlp-receiver" # This will cause Prometheus to serve OTLP metrics receiving on HTTP /api/v1/otlp/v1/metrics path.
           - "--config.file=/etc/prometheus/prometheus.yml"
 ---

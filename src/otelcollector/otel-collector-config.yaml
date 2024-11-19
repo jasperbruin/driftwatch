@@ -1,21 +1,21 @@
 # INITIATOR: src/otelcollector/otel-collector-config.yaml
 
-# receivers:
-#   otlp: # the OTLP receiver the app is sending metrics to
-#     protocols:
-#       grpc:
-#     endpoint: 0.0.0.0:4317
-#
-# exporters:
-#   prometheusremotewrite: # the PRW exporter, to ingest metrics to backend
-#     endpoint: 'http://prometheus:9090/api/v1/write'
-#     tls:
-#       insecure: true
-#
-# service:
-#   pipelines:
-#     metrics:
-#       receivers: [prometheus]
-#       processors: [batch]
-#       exporters: [prometheusremotewrite]
+receivers:
+  otlp: # the OTLP receiver the app is sending metrics to
+    protocols:
+      grpc:
+    endpoint: 0.0.0.0:4317
+
+exporters:
+  prometheusremotewrite: # the PRW exporter, to ingest metrics to backend
+    endpoint: 'http://prometheus:9090/api/v1/write'
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus]
+      processors: [batch]
+      exporters: [prometheusremotewrite]
 
