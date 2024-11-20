@@ -1,11 +1,10 @@
-# /src/erbdetector/detector.py
-
 from flask import Flask, request, jsonify, abort
 from prometheus_flask_exporter import PrometheusMetrics
 import numpy as np
 np.float = float
 from skmultiflow.drift_detection.adwin import ADWIN
 from collections import deque
+from prometheus_client import Counter, Gauge, Histogram
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
@@ -14,15 +13,15 @@ adwin = ADWIN()
 queue = deque(maxlen=1000)
 
 # Metrics
-current_accuracy = metrics.gauge("detector_current_accuracy_ratio", "Current accuracy of the detector (ratio)")
-adwin_alerts_counter = metrics.counter("detector_adwin_alerts_total", "Total number of ADWIN drift alerts")
-accuracy_histogram = metrics.histogram(
+current_accuracy = Gauge("detector_current_accuracy_ratio", "Current accuracy of the detector (ratio)")
+adwin_alerts_counter = Counter("detector_adwin_alerts_total", "Total number of ADWIN drift alerts")
+accuracy_histogram = Histogram(
     'detector_accuracy_histogram',
     'Histogram of accuracy values',
     buckets=[i * 0.1 for i in range(11)]
 )
-queue_size = metrics.gauge("detector_queue_size", "Current size of the accuracy queue")
-total_predictions = metrics.counter("detector_total_predictions", "Total number of predictions processed")
+queue_size = Gauge("detector_queue_size", "Current size of the accuracy queue")
+total_predictions = Counter("detector_total_predictions", "Total number of predictions processed")
 
 @app.route('/', methods=['GET'])
 def detection():
@@ -49,4 +48,5 @@ def detection():
 
     return jsonify({'message': 'success'})
 
-app.run(host='0.0.0.0')
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')

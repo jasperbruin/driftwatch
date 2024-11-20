@@ -87,7 +87,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 8,
+      "id": 10,
       "options": {
         "legend": {
           "calcs": [],
@@ -100,12 +100,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0+security-01",
+      "pluginVersion": "11.3.1",
       "targets": [
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "detector_queue_size",
+          "expr": "prometheus_http_requests_total",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -114,7 +114,7 @@
           "useBackend": false
         }
       ],
-      "title": "Detector Queue Size",
+      "title": "HTTP Requests Total ",
       "type": "timeseries"
     },
     {
@@ -196,7 +196,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0+security-01",
+      "pluginVersion": "11.3.1",
       "targets": [
         {
           "expr": "detector_current_accuracy_ratio",
@@ -272,7 +272,7 @@
         "x": 0,
         "y": 8
       },
-      "id": 5,
+      "id": 9,
       "options": {
         "legend": {
           "calcs": [],
@@ -285,12 +285,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0+security-01",
+      "pluginVersion": "11.3.1",
       "targets": [
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "detector_total_predictions_total",
+          "expr": "drift_score",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -299,7 +299,7 @@
           "useBackend": false
         }
       ],
-      "title": "ERBDetector Total Predictions",
+      "title": "Drift Score:  Hellinger Distance",
       "type": "timeseries"
     },
     {
@@ -368,7 +368,7 @@
         "x": 12,
         "y": 8
       },
-      "id": 4,
+      "id": 6,
       "options": {
         "legend": {
           "calcs": [],
@@ -381,12 +381,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0+security-01",
+      "pluginVersion": "11.3.1",
       "targets": [
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "adwin_alerts_total",
+          "expr": "flask_http_request_total",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -395,7 +395,7 @@
           "useBackend": false
         }
       ],
-      "title": "Total Adwin Alerts",
+      "title": "Total HTTP Requests",
       "type": "timeseries"
     },
     {
@@ -464,7 +464,7 @@
         "x": 0,
         "y": 16
       },
-      "id": 7,
+      "id": 5,
       "options": {
         "legend": {
           "calcs": [],
@@ -477,12 +477,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.0+security-01",
+      "pluginVersion": "11.3.1",
       "targets": [
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "flask_http_request_exceptions_total",
+          "expr": "detector_total_predictions_total",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -491,103 +491,7 @@
           "useBackend": false
         }
       ],
-      "title": "HTTP Request Exceptions",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 16
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0+security-01",
-      "targets": [
-        {
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "flask_http_request_total",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "title": "Total HTTP Requests",
+      "title": "ERBDetector Total Predictions",
       "type": "timeseries"
     }
   ],

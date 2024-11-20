@@ -51,19 +51,22 @@ spec:
   ports:
     - name: http-zipkin
       port: 9411
-      targetPort: 0
+      targetPort: 9411
     - name: grpc-http
       port: 14250
-      targetPort: 0
+      targetPort: 14250
     - name: c-tchan-trft
       port: 14267
-      targetPort: 0
+      targetPort: 14267
     - name: http-c-binary-trft
       port: 14268
-      targetPort: 0
+      targetPort: 14268
     - name: otlp-grpc
       port: 4317
-      targetPort: 0
+      targetPort: 4317
     - name: otlp-http
       port: 4318
-      targetPort: 0
+      targetPort: 4318
+    - name: jaeger-dashboard
+      port: 16686
+      targetPort: 16686 # Expose the Jaeger dashboard
