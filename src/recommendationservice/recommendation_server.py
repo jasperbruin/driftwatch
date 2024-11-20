@@ -210,14 +210,14 @@ class Telemetry:
             metrics.set_meter_provider(meterProvider)
             meter = metrics.get_meter("recommendation_meter")
 
-            # Create an Observable Gauge for drift_score
+            # Create an Observable Gauge for drift_score with updated description
             def drift_score_callback(options: CallbackOptions):
                 return [Observation(value=self.signal.get_current_value(),
                                     attributes={})]
 
             meter.create_observable_gauge(
                 name="drift_score",
-                description="The drift score",
+                description="Drift score calculated using the Hellinger distance statistical test",
                 callbacks=[drift_score_callback],
             )
 
