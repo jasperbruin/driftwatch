@@ -1,3 +1,4 @@
+# src/recommendationservice/Dockerfile
 # Use Python 3.10-slim as the base image
 FROM python:3.10-slim as base
 
