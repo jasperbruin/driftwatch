@@ -1,4 +1,5 @@
 # kubernetes-manifests/prometheus.yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -40,8 +41,10 @@ spec:
             memory: 512Mi
         args:
           - "--web.enable-remote-write-receiver"
-          - "--web.enable-otlp-receiver" # This will cause Prometheus to serve OTLP metrics receiving on HTTP /api/v1/otlp/v1/metrics path.
           - "--config.file=/etc/prometheus/prometheus.yml"
+        env:
+          - name: enable-feature
+            value: "otlp-write-receiver"
 ---
 apiVersion: v1
 kind: Service
@@ -54,6 +57,6 @@ spec:
   selector:
     app: prometheus
   ports:
-    - name: otlp
-      port: 9090
+    - port: 9090
       targetPort: 9090
+      protocol: TCP

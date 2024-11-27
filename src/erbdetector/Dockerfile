@@ -1,5 +1,3 @@
-# src/erbdetector/Dockerfile
-
 FROM python:3.10-slim as base
 
 FROM base as builder
@@ -12,7 +10,6 @@ RUN apt-get -qq update \
 # get packages
 COPY requirements.txt .
 RUN pip install numpy==1.26.4
-RUN pip install prometheus-flask-exporter
 RUN pip install -r requirements.txt
 
 FROM base

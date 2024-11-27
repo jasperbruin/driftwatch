@@ -1,24 +1,15 @@
-# TARGET: src/prometheus/prometheus.yml
-
-
-global:
-  scrape_interval: 15s
+# src/prometheus/prometheus.yml
 
 scrape_configs:
-  # Scrape the Flask app
-  - job_name: "erbdetector"
-    static_configs:
-      - targets: ["erbdetector:5000"]
-
   # Scrape Prometheus itself
   - job_name: "prometheus"
     static_configs:
       - targets: ["0.0.0.0:9090"]
 
-  - job_name: 'recommendation_service'
-    metrics_path: '/metrics'
-    scrape_interval: 5s
+  # Scrape OpenTelemetry Collector's Prometheus Exporter endpoint
+  - job_name: "otelcol"
     static_configs:
-      - targets: ['recommendationservice:9464']
-
+      - targets: ["otelcollector:8888"]
+    scrape_interval: 30s
+    scrape_timeout: 10s  # Extend timeout
 

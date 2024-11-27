@@ -1,36 +1,31 @@
 #!/bin/bash
 
-# Variables
-NAMESPACE="default" # Change this if your pod is in a different namespace
-SERVICE_NAME="recommendationservice"
-LOCAL_PORT=9464
-POD_PORT=9464
+# Script to port-forward and curl metrics from otelcollector
 
-# Step 1: Identify the Pod Name
-echo "Fetching the pod name for service: $SERVICE_NAME..."
-POD_NAME=$(kubectl get pods -n $NAMESPACE --no-headers -o custom-columns=":metadata.name" | grep $SERVICE_NAME)
+# Pod name
+POD_NAME=$(kubectl get pods -l app=otelcollector -o jsonpath='{.items[0].metadata.name}')
 
-if [ -z "$POD_NAME" ]; then
-    echo "Error: No pod found for service $SERVICE_NAME in namespace $NAMESPACE."
+# Port forward in the background
+echo "Setting up port forwarding to pod $POD_NAME..."
+kubectl port-forward "$POD_NAME" 8888:8888 > /dev/null 2>&1 &
+PORT_FORWARD_PID=$!
+
+# Give port-forward some time to establish
+sleep 3
+
+# Check if port forwarding succeeded
+if ! nc -z localhost 8888; then
+    echo "Port forwarding failed. Please check the pod status and configuration."
+    kill $PORT_FORWARD_PID
     exit 1
 fi
 
-echo "Found pod: $POD_NAME"
+# Curl the /metrics endpoint
+echo "Fetching metrics from http://localhost:8888/metrics..."
+curl http://localhost:8888/metrics
 
-# Step 2: Port Forward
-echo "Setting up port forwarding from localhost:$LOCAL_PORT to pod $POD_NAME:$POD_PORT..."
-kubectl port-forward -n $NAMESPACE $POD_NAME $LOCAL_PORT:$POD_PORT &
-
-# Save the process ID of the background job
-PORT_FORWARD_PID=$!
-
-echo "Port forwarding established. Access the service at http://localhost:$LOCAL_PORT/metrics"
-echo "To stop port forwarding, use: kill $PORT_FORWARD_PID"
-
-# Wait for user to terminate
-read -p "Press [Ctrl+C] to stop port forwarding or wait for termination..."
-
-# Cleanup on exit
-echo "Stopping port forwarding..."
+# Cleanup: Kill port-forward process
+echo "Cleaning up..."
 kill $PORT_FORWARD_PID
-echo "Port forwarding stopped."
+
+echo "Done."
