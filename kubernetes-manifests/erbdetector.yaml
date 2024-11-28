@@ -52,3 +52,6 @@ spec:
     - name: prometheus
       port: 5005
       targetPort: 5005
+    - name: http
+      port: 5000
+      targetPort: 5000

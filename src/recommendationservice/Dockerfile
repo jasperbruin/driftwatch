@@ -28,7 +28,7 @@ FROM base
 
 # Enable unbuffered logging
 ENV PYTHONUNBUFFERED=1
-ENV ENABLE_TRACING=1
+ENV ENABLE_TRACING=0
 ENV COLLECTOR_SERVICE_ADDR=jaeger:4317
 
 # Set the working directory

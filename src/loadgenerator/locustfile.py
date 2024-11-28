@@ -1,19 +1,5 @@
 #!/usr/bin/python
-#
-# Copyright 2018 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+import os
 import random
 import pandas as pd
 import numpy as np
@@ -24,13 +10,33 @@ import re
 import torch
 import json
 
+# Initialize Faker and data
 fake = Faker()
 product_json = pd.read_json("products.json")
-products = np.asarray(product_json["products"].apply(lambda x : x["id"]).astype(str))
+products = np.asarray(product_json["products"].apply(lambda x: x["id"]).astype(str))
 model = torch.load("./model_formatted_fashion_cpu_v2")
 with open("./product_id_mapper.json") as user_file:
     product_mapper = json.load(user_file)
 
+# Parse environment variable for drift generation
+ENABLE_DRIFT = os.getenv('ENABLE_DRIFT', 'false').lower() == 'true'
+
+def apply_drift(product_ids):
+    """
+    Applies drift to the given list of product IDs.
+    This function simulates changes to product distributions.
+    """
+    if ENABLE_DRIFT:
+        # Example: Shuffle product IDs to mimic drift
+        drifted_products = random.sample(list(product_ids), len(product_ids))
+        print("Drift applied: Product IDs shuffled.")
+        return drifted_products
+    return product_ids
+
+# Apply drift to products if enabled
+products = apply_drift(products)
+
+# Define tasks
 def index(l):
     l.client.get("/")
 
@@ -38,7 +44,6 @@ def setCurrency(l):
     currencies = ['EUR', 'USD', 'JPY', 'CAD', 'GBP', 'TRY']
     l.client.post("/setCurrency",
         {'currency_code': random.choice(currencies)})
-
 
 def browseProduct(l):
     product_page = l.client.get(url="/product/" + random.choice(products),
@@ -49,7 +54,6 @@ def browseProduct(l):
     for i in range(4):
         recommendations.append(shown_products[i])
 
-    # Ensure the recommendation exists in product_mapper
     if recommendations[0] not in product_mapper:
         print(f"KeyError: '{recommendations[0]}' not found in product_mapper")
         return  # Skip this task if the key is missing
@@ -69,27 +73,26 @@ def browseProduct(l):
     else:
         addToCart(l)
 
-
-def browseRecommendation(l,rec):
-    l.client.get(url = "/product/" + rec, headers = {"recommendation": "true"})
+def browseRecommendation(l, rec):
+    l.client.get(url="/product/" + rec, headers={"recommendation": "true"})
 
 def viewCart(l):
     l.client.get("/cart")
 
 def addToCart(l):
     product = random.choice(products)
-    l.client.get(url = "/product/" + product,
-                 headers = {"recommendation": "false"})
+    l.client.get(url="/product/" + product,
+                 headers={"recommendation": "false"})
     l.client.post("/cart", {
         'product_id': product,
-        'quantity': random.randint(1,10)})
-    
+        'quantity': random.randint(1, 10)})
+
 def empty_cart(l):
     l.client.post('/cart/empty')
 
 def checkout(l):
     addToCart(l)
-    current_year = datetime.datetime.now().year+1
+    current_year = datetime.datetime.now().year + 1
     l.client.post("/cart/checkout", {
         'email': fake.email(),
         'street_address': fake.street_address(),
@@ -102,22 +105,15 @@ def checkout(l):
         'credit_card_expiration_year': random.randint(current_year, current_year + 70),
         'credit_card_cvv': f"{random.randint(100, 999)}",
     })
-    
-def logout(l):
-    l.client.get('/logout')  
 
+def logout(l):
+    l.client.get('/logout')
 
 class UserBehavior(TaskSet):
-
     def on_start(self):
         index(self)
 
-    tasks = {#index: 1,
-        #setCurrency: 2,
-        browseProduct: 10,
-        #addToCart: 2,
-        #viewCart: 3,
-        checkout: 1}
+    tasks = {browseProduct: 10, checkout: 1}
 
 class WebsiteUser(HttpUser):
     tasks = [UserBehavior]

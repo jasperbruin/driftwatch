@@ -46,5 +46,8 @@ ENV GEVENT_SUPPORT=True
 # Set a default value for USERS
 ENV USERS 10
 
+# Add ENABLE_DRIFT environment variable with default value
+ENV ENABLE_DRIFT true
+
 # Correct JSON-formatted ENTRYPOINT
 ENTRYPOINT ["sh", "-c", "locust --host=http://${FRONTEND_ADDR} --headless -u ${USERS}"]
