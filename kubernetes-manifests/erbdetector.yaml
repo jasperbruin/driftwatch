@@ -49,6 +49,6 @@ spec:
   selector:
     app: erbdetector
   ports:
-    - name: http
-      port: 5000
-      targetPort: 5000
+    - name: prometheus
+      port: 5005
+      targetPort: 5005

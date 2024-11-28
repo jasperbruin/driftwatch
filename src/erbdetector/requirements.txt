@@ -41,7 +41,7 @@ markupsafe==2.1.5
     #   werkzeug
 matplotlib==3.9.2
     # via scikit-multiflow
-numpy==1.26.4
+numpy==1.23.5
     # via
     #   -r requirements.in
     #   contourpy

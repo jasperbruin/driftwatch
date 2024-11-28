@@ -1,16 +1,18 @@
 # src/prometheus/prometheus.yml
 
-# # http://prometheus:9090/api/v1/read
-remote_read:
-  - url: "http://prometheus:9090/api/v1/read"
-    read_recent: true
-    remote_timeout: 30s  # Extend timeout to handle larger queries
-
-
 scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["0.0.0.0:9090"]
+
+
+  - job_name: recommendationservice
+    static_configs:
+      - targets: ['recommendationservice:9090']
+
+  - job_name: erbdetector
+    static_configs:
+      - targets: ['erbdetector:5005']
 
 
 

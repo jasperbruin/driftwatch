@@ -44,6 +44,8 @@ spec:
         env:
         - name: PORT
           value: "8080"
+        - name: PROMETHEUS_PORT
+          value: "9464"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: "productcatalogservice:3550"
         - name: DISABLE_PROFILER

@@ -24,19 +24,11 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
     OTLPSpanExporter
 
-from opentelemetry import metrics
-from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import \
-    OTLPMetricExporter
-from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
-from opentelemetry.exporter.prometheus import PrometheusMetricReader
-from opentelemetry.metrics import CallbackOptions, Observation
-
 from evidently.calculations.stattests import hellinger_stat_test
-from evidently.metric_preset import DataDriftPreset
-from evidently.options.data_drift import DataDriftOptions
+
 from evidently.core import ColumnType
-from prometheus_client import start_http_server
+from prometheus_client import start_http_server, Gauge
+
 
 import numpy as np
 
@@ -266,20 +258,22 @@ class RecommendationServer:
             self.tracer = trace.get_tracer("Recommendation")
 
     def initMetrics(self):
-        # Prepare Metric export
-        reader = PeriodicExportingMetricReader(
-            OTLPMetricExporter(endpoint="otelcollector:4317", insecure=True), 5
+        # Prometheus Metrics
+        self.drift_score_gauge = Gauge(
+            'drift_score', 'Current drift score', ['attribute']
         )
-        meterProvider = MeterProvider(resource=self.resource, metric_readers=[reader])
-        metrics.set_meter_provider(meterProvider)
-        meter = metrics.get_meter("recommendation_meter")
 
-        # Callback function for gauge export
-        def read_gauge(options: CallbackOptions):
-            yield Observation(self.signal.get_current_value(),
-                              {"attribute": self.signal.attribute})
+        # Start Prometheus HTTP server on a given port
+        prometheus_port = int(os.getenv('PROMETHEUS_PORT', '9464'))
+        start_http_server(prometheus_port)
+        self.logger.info(
+            f"Prometheus exporter running on port {prometheus_port}")
 
-        ddb_gauge = meter.create_observable_gauge("drift_score", [read_gauge])
+    def updateMetrics(self):
+        # Update drift score in Prometheus gauge
+        drift_score = self.signal.get_current_value()
+        self.drift_score_gauge.labels(attribute=self.signal.attribute).set(drift_score)
+        self.logger.info(f"Updated drift score in Prometheus: {drift_score}")
 
     def startServer(self):
         port = os.environ.get('PORT', "8080")
@@ -295,10 +289,12 @@ class RecommendationServer:
         self.server.add_insecure_port('[::]:' + port)
         self.server.start()
 
-        # keep alive
+        # Keep alive
         try:
             while True:
-                time.sleep(10000)
+                # Periodically update metrics
+                self.updateMetrics()
+                time.sleep(10)
         except KeyboardInterrupt:
             self.server.stop(0)
 

@@ -1,111 +1,48 @@
 import json
 from flask import Flask, request, jsonify
+from prometheus_client import Counter, Gauge, start_http_server
 import numpy as np
-
-np.float = float
 from skmultiflow.drift_detection.adwin import ADWIN
 from collections import deque
-from opentelemetry import metrics
-from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import \
-    OTLPMetricExporter
-from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.metrics import CallbackOptions, Observation
 
-# configure OTLP service name
-resource = Resource(attributes={
-    "service.name": "erbdetector"
-})
-
-# configure server name
+# Initialize Flask app
 app = Flask(__name__)
 
-# initialize ADWIN
+# Initialize ADWIN for drift detection
 adwin = ADWIN()
-# queue for accuracy calculation
-queue = deque(maxlen=1000)
+queue = deque(maxlen=1000)  # Queue for accuracy calculation
 
-current_accuracy = 0
+# Prometheus metrics
+adwin_alerts = Counter('adwin_alerts_total', 'Total number of ADWIN drift alerts')
+accuracy_metric = Gauge('model_accuracy', 'Current model accuracy')
 
+# Start Prometheus exporter on port 5005
+start_http_server(5005)
 
+# API route
 @app.route('/', methods=['GET'])
 def detection():
-    # store argument
-    is_correct = int(request.args.get('value'))
+    # Get the 'value' parameter
+    is_correct = request.args.get('value', type=int)
 
-    # ensure only 0 and 1 are accepted
-    if is_correct != 0 and is_correct != 1:
-        return jsonify({'error': 'only send the values 0 and 1'})
+    # Validate input (only 0 or 1 are allowed)
+    if is_correct not in [0, 1]:
+        return jsonify({'error': 'Only send the values 0 and 1'}), 400
 
-    # append for accuracy calculation
+    # Append value to the queue for accuracy calculation
     queue.append(is_correct)
 
-    # append value to adwin for drift detection
+    # Update ADWIN and check for drift
     adwin.add_element(is_correct)
-
-    # increase alert counter if ADWIN detected change
     if adwin.detected_change():
-        adwin_alerts.add(1)
-    else:
-        adwin_alerts.add(0)
+        adwin_alerts.inc()  # Increment alert counter if drift is detected
 
-    # calculate current accuracy
-    signal.set_current_value(np.mean(queue))
+    # Calculate accuracy and update Prometheus metric
+    current_accuracy = np.mean(queue)
+    accuracy_metric.set(current_accuracy)
 
-    # success message
-    return jsonify({'message': 'success'})
+    return jsonify({'message': 'success', 'accuracy': current_accuracy})
 
-
-# callback function for gauge metric
-def get_accuracy(options: CallbackOptions):
-    yield Observation(current_accuracy)
-
-
-# initialize metric reader
-reader = PeriodicExportingMetricReader(
-    OTLPMetricExporter(endpoint="otelcollector:4317", insecure=True), 5
-)
-
-# configure meterProvider
-meterProvider = MeterProvider(resource=resource, metric_readers=[reader])
-
-# set prefered meterProvider
-metrics.set_meter_provider(meterProvider)
-
-# create meter
-meter = metrics.get_meter("erb-detector")
-
-# create counter metric for the alerts
-adwin_alerts = meter.create_counter(name="adwin_alert_counter")
-
-
-# observable class for drift score export
-class Signal:
-    current_value = 0
-
-    def __init__(self, attribute):
-        self.attribute = attribute
-
-    def set_current_value(self, i):
-        self.current_value = i
-
-    def get_current_value(self):
-        return self.current_value
-
-
-# init class for observation
-signal = Signal("accuracy_attribute")
-
-
-# callback function for gauge export
-def read_gauge(options: CallbackOptions):
-    yield Observation(signal.get_current_value(),
-                      {"attribute": signal.attribute})
-
-
-# create gauge metric for the accuracy
-ddb_gauge = meter.create_observable_gauge("accuracy", [read_gauge])
-
-# listen on all ips so that other containers can reach
-app.run(host='0.0.0.0')
+# Run Flask app on all IPs
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
