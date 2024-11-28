@@ -1,15 +1,17 @@
 # src/prometheus/prometheus.yml
 
+# # http://prometheus:9090/api/v1/read
+remote_read:
+  - url: "http://prometheus:9090/api/v1/read"
+    read_recent: true
+    remote_timeout: 30s  # Extend timeout to handle larger queries
+
+
 scrape_configs:
-  # Scrape Prometheus itself
   - job_name: "prometheus"
     static_configs:
       - targets: ["0.0.0.0:9090"]
 
-  # Scrape OpenTelemetry Collector's Prometheus Exporter endpoint
-  - job_name: "otelcol"
-    static_configs:
-      - targets: ["otelcollector:8888"]
-    scrape_interval: 30s
-    scrape_timeout: 10s  # Extend timeout
+
+
 

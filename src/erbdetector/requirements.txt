@@ -127,6 +127,7 @@ wrapt==1.16.0
     #   opentelemetry-instrumentation-grpc
 zipp==3.20.0
     # via importlib-metadata
+prometheus_flask_exporter==0.23.1
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

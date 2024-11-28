@@ -1,3 +1,12 @@
+# src/otelcollector/otel-collector-config.yaml
+# https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write
+# https://prometheus.io/docs/guides/opentelemetry/
+# https://prometheus.io/docs/specs/remote_write_spec_2_0/
+# https://prometheus.io/docs/prometheus/2.55/storage/#overview
+# https://prometheus.io/docs/prometheus/2.55/configuration/configuration/#remote_read
+# https://opentelemetry.io/docs/collector/configuration/#exporters
+# https://last9.io/blog/prometheusremotewriteexporter-a-comprehensive-guide/
+
 receivers:
   otlp:
     protocols:
@@ -6,12 +15,17 @@ receivers:
 
 processors:
   batch:
+    send_batch_size: 100
+    timeout: 10s
 
 exporters:
-  # Data sources: metrics
-  prometheus:
-    endpoint: 0.0.0.0:8888
-    namespace: default
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
+    tls:
+      insecure: true
+    timeout: 10s
+    resource_to_telemetry_conversion:
+      enabled: true
 
   debug:
     verbosity: detailed
@@ -21,4 +35,13 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [prometheus, debug]  # Ensure Prometheus Exporter is included
+      exporters: [prometheusremotewrite]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: []
+
+  telemetry:
+    metrics:
+      level: "detailed"
+

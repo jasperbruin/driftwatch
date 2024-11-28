@@ -22,7 +22,7 @@ fi
 
 # Curl the /metrics endpoint
 echo "Fetching metrics from http://localhost:8888/metrics..."
-curl http://localhost:8888/metrics
+curl http://localhost:9090/api/v1/write
 
 # Cleanup: Kill port-forward process
 echo "Cleaning up..."

@@ -30,16 +30,14 @@ spec:
           privileged: false
           readOnlyRootFilesystem: false
         image: otelcollector
-        ports:
-          - name: prometheus
-            containerPort: 8888  # Ensure this matches the exporter config
         resources:
           requests:
-            cpu: 100m
-            memory: 256Mi
+            cpu: 500m
+            memory: 512Mi
           limits:
-            cpu: 200m
-            memory: 256Mi
+            cpu: 1
+            memory: 1Gi
+
 ---
 apiVersion: v1
 kind: Service
@@ -55,6 +53,3 @@ spec:
     - name: otlp-grpc
       port: 4317
       targetPort: 4317
-    - name: prometheus
-      port: 8888  # Update to match the container's Prometheus exporter port
-      targetPort: 8888
