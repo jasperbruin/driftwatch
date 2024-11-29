@@ -13,10 +13,10 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
 
-processors:
-  batch:
-    send_batch_size: 100
-    timeout: 10s
+# processors:
+#   batch:
+#     send_batch_size: 100
+#     timeout: 10s
 
 exporters:
   prometheusremotewrite:
@@ -32,7 +32,7 @@ service:
   pipelines:
     metrics:
       receivers: [otlp]
-      processors: [batch]
+      processors: []
       exporters: [prometheusremotewrite]
     traces:
       receivers: [otlp]

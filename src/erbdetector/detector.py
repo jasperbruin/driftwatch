@@ -16,9 +16,9 @@ app = Flask(__name__)
 # Initialize ADWIN for drift detection
 logging.debug("Initializing ADWIN drift detection.")
 adwin = ADWIN()
-queue = deque(maxlen=1000)  # Queue for accuracy calculation
+queue = deque(maxlen=10)  # Queue for accuracy calculation
 logging.debug(
-    "Queue initialized with max length of 1000 for accuracy calculation.")
+    "Queue initialized with max length of 10 for accuracy calculation.")
 
 # Prometheus metrics
 logging.debug("Initializing Prometheus metrics.")
