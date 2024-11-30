@@ -11,3 +11,4 @@ LAB experiments/datasets/CDs_and_Vinyl.jsonl
 LAB experiments/datasets/product_id_mapper.json
 LAB experiments/models/model_formatted_fashion_cpu_v2
 LAB experiments/models/model_formatted_music_v2_cpu
+cache/raw_reviews.pkl

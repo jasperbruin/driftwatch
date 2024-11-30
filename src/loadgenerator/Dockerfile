@@ -46,8 +46,7 @@ ENV GEVENT_SUPPORT=True
 # Set a default value for USERS
 ENV USERS 10
 
-# Add ENABLE_DRIFT environment variable with default value
-ENV ENABLE_DRIFT true
+# enable gevent support in debugger
+ENV GEVENT_SUPPORT=True
 
-# Correct JSON-formatted ENTRYPOINT
-ENTRYPOINT ["sh", "-c", "locust --host=http://${FRONTEND_ADDR} --headless -u ${USERS}"]
+ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u "${USERS:-10}" 2>&1

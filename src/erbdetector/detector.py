@@ -1,10 +1,60 @@
+# src/erbdetector/detector.py
+
 import json
 import logging
 from flask import Flask, request, jsonify
 from prometheus_client import Counter, Gauge, start_http_server
 import numpy as np
-from skmultiflow.drift_detection.adwin import ADWIN
 from collections import deque
+
+
+class ADWIN:
+    def __init__(self, delta=0.1):
+        self.delta = delta
+        self.window = deque()
+        self.total = 0
+        self.mean = 0
+        self.width = 0
+        self.variance = 0
+        self.drift_detected = False
+
+    def add_element(self, value):
+        self.window.append(value)
+        self.total += value
+        self.width += 1
+        self.update_stats()
+
+        while self.width > 2:
+            self.calculate_variance()
+            epsilon = np.sqrt((2 * self.variance * np.log(2 / self.delta)) / self.width)
+            threshold = epsilon + (4 * np.log(2 / self.delta) / self.width)
+
+            if abs(self.mean - value) > threshold:
+                self.drift_detected = True
+                self.reset()
+                break
+            else:
+                self.drift_detected = False
+
+    def update_stats(self):
+        self.mean = self.total / self.width if self.width > 0 else 0
+
+    def calculate_variance(self):
+        # Use a copy of the deque to prevent mutation during iteration
+        window_copy = list(self.window)
+        mean_square = sum((x - self.mean) ** 2 for x in window_copy) / self.width
+        self.variance = mean_square
+
+    def reset(self):
+        self.window.clear()
+        self.total = 0
+        self.width = 0
+        self.mean = 0
+        self.variance = 0
+
+    def detected_change(self):
+        return self.drift_detected
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG,
@@ -13,12 +63,11 @@ logging.basicConfig(level=logging.DEBUG,
 # Initialize Flask app
 app = Flask(__name__)
 
-# Initialize ADWIN for drift detection
-logging.debug("Initializing ADWIN drift detection.")
+# Initialize custom ADWIN for drift detection
+logging.debug("Initializing custom ADWIN drift detection.")
 adwin = ADWIN()
-queue = deque(maxlen=10)  # Queue for accuracy calculation
-logging.debug(
-    "Queue initialized with max length of 10 for accuracy calculation.")
+queue = deque(maxlen=50)  # Queue for accuracy calculation
+logging.debug("Queue initialized with max length of 10 for accuracy calculation.")
 
 # Prometheus metrics
 logging.debug("Initializing Prometheus metrics.")
@@ -70,3 +119,5 @@ def detection():
 if __name__ == '__main__':
     logging.info("Starting Flask app on host '0.0.0.0', port 5000.")
     app.run(host='0.0.0.0', port=5000)
+
+

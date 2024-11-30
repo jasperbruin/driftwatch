@@ -22,6 +22,7 @@ from faker import Faker
 import datetime
 import re
 import torch
+from deepctr_torch.models import DeepFM
 import json
 
 fake = Faker()
@@ -48,23 +49,15 @@ def browseProduct(l):
                                 headers={"recommendation": "false"}).text
     recommendations = []
     shown_products = re.findall("a href=\"/product/(.+)\"", product_page)
-
     for i in range(4):
         recommendations.append(shown_products[i])
 
-    # Ensure the recommendation exists in product_mapper
-    if recommendations[0] not in product_mapper:
-        print(f"KeyError: '{recommendations[0]}' not found in product_mapper")
-        return  # Skip this task if the key is missing
-
-    ctr_prediction = model.predict({
-        "user_id": pd.Series([random.randrange(100)]),
-        "parent_asin": pd.Series([product_mapper[recommendations[0]]]),
-        "year": pd.Series([random.randrange(10)]),
-        "month": pd.Series([random.randrange(12)]),
-        "day": pd.Series([random.randrange(28)])
-    })
-
+    ctr_prediction = model.predict(
+        {"user_id": pd.Series([random.randrange(100)]),
+         "parent_asin": pd.Series([product_mapper[recommendations[0]]]),
+         "year": pd.Series([random.randrange(10)]),
+         "month": pd.Series([random.randrange(12)]),
+         "day": pd.Series([random.randrange(28)])})
     ctr = np.mean(ctr_prediction)
     getsTaken = random.choices([0, 1], weights=[1 - ctr, ctr])[0]
     if getsTaken == 1:
@@ -132,3 +125,6 @@ class UserBehavior(TaskSet):
 class WebsiteUser(HttpUser):
     tasks = [UserBehavior]
     wait_time = between(1, 10)
+
+
+
