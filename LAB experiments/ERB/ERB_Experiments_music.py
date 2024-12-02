@@ -6,6 +6,7 @@ import numpy as np
 np.float = float
 from river.drift import ADWIN
 import random
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -95,9 +96,9 @@ def find_similar_products(product_id, X, k, metric='cosine', show_distance=False
   return neighbour_ids
 #%%
 #sample reviews from products
-sampled = evaluation_data_with_old_products.sample(100)
+# sampled = evaluation_data_with_old_products.sample(100)
 
-# sampled = evaluation_data_with_old_products.sample(10000)
+sampled = evaluation_data_with_old_products.sample(10000)
 #%%
 #save sample
 sampled.reset_index(inplace=True,drop=True)
@@ -115,7 +116,7 @@ sampled.sort_index(inplace = True)
 #store the recommendations in dataframe
 sampled["recommendation"] = preds
 #%%
-reviews_copy = pd.read_json("/Users/jasperbruin/Documents/driftwatch/LAB experiments/datasets/CDs_and_Vinyl.jsonl/CDs_and_Vinyl.jsonl", lines=True)
+reviews_copy = pd.read_json("/Users/jasperbruin/Documents/driftwatch/LAB experiments/datasets/CDs_and_Vinyl.jsonl", lines=True)
 #%%
 #ensure same strutcture as ctr-predictor training data
 reviews_copy = reviews_copy[reviews_copy["rating"] != 3]
@@ -128,7 +129,7 @@ music_mapper = dict(zip(reviews_copy["parent_asin"].unique(), reviews["parent_as
 music_user_mapper = dict(zip(reviews_copy["user_id"].unique(), reviews["user_id"].unique()))
 #%%
 # load the ctr-predictor
-model = torch.load("./model_formatted_music_v2")
+model = torch.load("/Users/jasperbruin/Documents/driftwatch/LAB experiments/models/model_formatted_music_v2_cpu")
 #%%
 # calculate click-through-rate for the recommendations
 def mean_predicted_ctr():
@@ -155,6 +156,7 @@ for i in range(len(ctr_list)):
 np.mean(means)
 #%%
 series_means = pd.Series(means, index=sampled["timestamp"])
+series_means = series_means.sort_index()
 #%%
 rolling_means = series_means.rolling("30D").mean()
 #%%
@@ -167,21 +169,28 @@ for i in range(len(ctr_list)):
         correct_recommendations.append(random.choices([0,1],weights=[1-ctr_list[i][j][0][0],ctr_list[i][j][0][0]])[0])
 #%%
 
-from river.drift import DDM
-from river.drift import EDDM
 #%%
 #testing the different erb-detectors
 #%%
 adwin = ADWIN()
 entry_number = 0
 entries = []
+
 for i in range(len(correct_recommendations)):
-    adwin.add_element(correct_recommendations[i])
-    if adwin.detected_change():
-        print('Change detected in data: ' + str(correct_recommendations[i]) + ' - at index: ' + str(i) + ' - at entry: '+ str(entry_number))
+    # Update the detector with the current value
+    adwin.update(correct_recommendations[i])
+    
+    # Check if drift is detected
+    if adwin.drift_detected:
+        print(
+            f"Change detected at index {i}, value: {correct_recommendations[i]}, entry: {entry_number}"
+        )
         entries.append(entry_number)
+    
+    # Update entry number every 4 iterations
     if i % 4 == 3:
-        entry_number = entry_number + 1
+        entry_number += 1
+
 #%%
 for i in entries:
     print(sampled["timestamp"][i])
@@ -189,39 +198,6 @@ for i in entries:
 np.datetime64("2019-06-01") +  296 * np.timedelta64(1, 'D')
 #%%
 np.datetime64('2020-07-07') - np.datetime64('2020-03-23')
-#%%
-ddm = DDM(min_num_instances=30)
-alerts_ddm = []
-entry_number = 0
-entries = []
-for i in range(len(correct_recommendations)):
-    ddm.add_element(1 - correct_recommendations[i])
-    #if ddm.detected_warning_zone():
-        #print('Warning zone has been detected in data: ' + str(correct_recommendations[i]) + ' - of index: ' + str(i) + ' - at entry: '+ str(entry_number))
-    if ddm.detected_change():
-        print('Change has been detected in data: ' + str(correct_recommendations[i]) + ' - of index: ' + str(i) + ' - at entry: '+ str(entry_number))
-        entries.append(entry_number)
-    if i % 4 == 3:
-        entry_number = entry_number + 1
-#%%
-for i in entries:
-    print(sampled["timestamp"][i])
-#%%
-np.datetime64('2020-07-07') - np.datetime64('2020-03-23')
-#%%
-ddm = EDDM()
-alerts_ddm = []
-entry_number = 0
-entries = []
-for i in range(len(correct_recommendations)):
-    ddm.add_element(1 - correct_recommendations[i])
-    #if ddm.detected_warning_zone():
-        #print('Warning zone has been detected in data: ' + str(correct_recommendations[i]) + ' - of index: ' + str(i) + ' - at entry: '+ str(entry_number))
-    if ddm.detected_change():
-        print('Change has been detected in data: ' + str(correct_recommendations[i]) + ' - of index: ' + str(i) + ' - at entry: '+ str(entry_number))
-        entries.append(entry_number)
-    if i % 4 == 3:
-        entry_number = entry_number + 1
 #%%
 counter = 0
 for i in entries:
