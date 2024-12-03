@@ -25,7 +25,7 @@ from deepctr_torch.inputs import SparseFeat, VarLenSparseFeat, get_feature_names
 from deepctr_torch.models import DeepFM
 #%%
 #loading the data
-reviews = pd.read_json("/Users/jasperbruin/Documents/driftwatch/LAB experiments/datasets/CDs_and_Vinyl.jsonl", lines=True)
+reviews = pd.read_json("/LAB-experiments/datasets/CDs_and_Vinyl.jsonl", lines=True)
 #%%
 #preparing the data
 reviews = reviews[reviews["rating"] != 3]
@@ -116,7 +116,7 @@ sampled.sort_index(inplace = True)
 #store the recommendations in dataframe
 sampled["recommendation"] = preds
 #%%
-reviews_copy = pd.read_json("/Users/jasperbruin/Documents/driftwatch/LAB experiments/datasets/CDs_and_Vinyl.jsonl", lines=True)
+reviews_copy = pd.read_json("/LAB-experiments/datasets/CDs_and_Vinyl.jsonl", lines=True)
 #%%
 #ensure same strutcture as ctr-predictor training data
 reviews_copy = reviews_copy[reviews_copy["rating"] != 3]
@@ -129,7 +129,7 @@ music_mapper = dict(zip(reviews_copy["parent_asin"].unique(), reviews["parent_as
 music_user_mapper = dict(zip(reviews_copy["user_id"].unique(), reviews["user_id"].unique()))
 #%%
 # load the ctr-predictor
-model = torch.load("/Users/jasperbruin/Documents/driftwatch/LAB experiments/models/model_formatted_music_v2_cpu")
+model = torch.load("/LAB-experiments/models/model_formatted_music_v2_cpu")
 #%%
 # calculate click-through-rate for the recommendations
 def mean_predicted_ctr():
