@@ -1,5 +1,6 @@
 import numpy as np
 from collections import deque
+import matplotlib.pyplot as plt
 
 class TraceDriftEnvironment:
     def __init__(self, trace_length=100, drift_probability=0.1):
@@ -64,13 +65,11 @@ def detect_drift(traces, window_size=5, threshold=0.5):
     # Print or analyze drift scores
     print("\nDrift Scores:", drift_scores)
 
-    return drift_indices
-
-
+    return drift_indices, drift_scores
 
 
 # Example usage with adjusted parameters
-env = TraceDriftEnvironment(trace_length=8, drift_probability=0.3)
+env = TraceDriftEnvironment(trace_length=10, drift_probability=0.3)
 traces = []
 
 # Generate 100 walking traces
@@ -79,6 +78,22 @@ for _ in range(100):
     traces.append(trace)
 
 # Detect drift with adjusted parameters
-drift_indices = detect_drift(traces, window_size=5, threshold=0.6)
+drift_indices, drift_scores = detect_drift(traces, window_size=5, threshold=0.6)
 print("\nDrift Detected at Indices:", drift_indices)
 
+# Plotting the results
+plt.figure(figsize=(12, 6))
+
+# Plot drift scores
+plt.plot(drift_scores, label="Drift Scores", marker="o", linestyle="-", color="blue")
+
+# Highlight drift detection points
+for idx in drift_indices:
+    plt.axvline(x=idx - 5, color="red", linestyle="--", label="Drift Detected" if idx == drift_indices[0] else "")
+
+plt.title("Drift Detection Over Time")
+plt.xlabel("Trace Index (Sliding Window End)")
+plt.ylabel("Drift Score")
+plt.legend()
+plt.grid()
+plt.show()
