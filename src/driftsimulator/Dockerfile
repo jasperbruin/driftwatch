@@ -4,6 +4,7 @@ WORKDIR /driftsimulator
 
 COPY simulator.py .
 
-RUN pip install requests
+RUN pip install numpy requests flask prometheus_client scipy
+
 
 ENTRYPOINT ["python", "simulator.py"]

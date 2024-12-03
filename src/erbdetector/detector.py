@@ -1,60 +1,11 @@
-# src/erbdetector/detector.py
+# src/detector/detector.py
 
-import json
 import logging
 from flask import Flask, request, jsonify
 from prometheus_client import Counter, Gauge, start_http_server
 import numpy as np
 from collections import deque
-
-
-class ADWIN:
-    def __init__(self, delta=0.1):
-        self.delta = delta
-        self.window = deque()
-        self.total = 0
-        self.mean = 0
-        self.width = 0
-        self.variance = 0
-        self.drift_detected = False
-
-    def add_element(self, value):
-        self.window.append(value)
-        self.total += value
-        self.width += 1
-        self.update_stats()
-
-        while self.width > 2:
-            self.calculate_variance()
-            epsilon = np.sqrt((2 * self.variance * np.log(2 / self.delta)) / self.width)
-            threshold = epsilon + (4 * np.log(2 / self.delta) / self.width)
-
-            if abs(self.mean - value) > threshold:
-                self.drift_detected = True
-                self.reset()
-                break
-            else:
-                self.drift_detected = False
-
-    def update_stats(self):
-        self.mean = self.total / self.width if self.width > 0 else 0
-
-    def calculate_variance(self):
-        # Use a copy of the deque to prevent mutation during iteration
-        window_copy = list(self.window)
-        mean_square = sum((x - self.mean) ** 2 for x in window_copy) / self.width
-        self.variance = mean_square
-
-    def reset(self):
-        self.window.clear()
-        self.total = 0
-        self.width = 0
-        self.mean = 0
-        self.variance = 0
-
-    def detected_change(self):
-        return self.drift_detected
-
+from scipy.stats import ks_2samp
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG,
@@ -63,22 +14,22 @@ logging.basicConfig(level=logging.DEBUG,
 # Initialize Flask app
 app = Flask(__name__)
 
-# Initialize custom ADWIN for drift detection
-logging.debug("Initializing custom ADWIN drift detection.")
-adwin = ADWIN()
-queue = deque(maxlen=50)  # Queue for accuracy calculation
-logging.debug("Queue initialized with max length of 10 for accuracy calculation.")
+# Initialize drift detection
+logging.debug("Initializing drift detection.")
+reference_window_size = 50
+detection_window_size = 50
+reference_window = deque(maxlen=reference_window_size)
+detection_window = deque(maxlen=detection_window_size)
+drift_detected = False
 
 # Prometheus metrics
 logging.debug("Initializing Prometheus metrics.")
-adwin_alerts = Counter('adwin_alerts_total',
-                       'Total number of ADWIN drift alerts')
-accuracy_metric = Gauge('model_accuracy', 'Current model accuracy')
+drift_alerts = Counter('drift_alerts_total', 'Total number of drift alerts')
+p_value_metric = Gauge('drift_p_value', 'P-value of the drift test')
 
 # Start Prometheus exporter on port 5005
 logging.info("Starting Prometheus HTTP server on port 5005.")
 start_http_server(5005)
-
 
 # API route
 @app.route('/', methods=['GET'])
@@ -95,29 +46,42 @@ def detection():
             f"Invalid value received: {is_correct}. Must be 0 or 1.")
         return jsonify({'error': 'Only send the values 0 and 1'}), 400
 
-    # Append value to the queue for accuracy calculation
-    queue.append(is_correct)
+    # Append value to the detection window
+    detection_window.append(is_correct)
     logging.debug(
-        f"Appended value {is_correct} to the queue. Current queue size: {len(queue)}")
+        f"Appended value {is_correct} to the detection window. Current size: {len(detection_window)}")
 
-    # Update ADWIN and check for drift
-    adwin.add_element(is_correct)
-    if adwin.detected_change():
-        adwin_alerts.inc()  # Increment alert counter if drift is detected
-        logging.info("ADWIN detected a change. Incremented alert counter.")
+    # Once both windows are full, perform drift detection
+    if len(reference_window) == reference_window_size and len(detection_window) == detection_window_size:
+        # Perform statistical test (e.g., Kolmogorov-Smirnov test)
+        stat, p_value = ks_2samp(reference_window, detection_window)
+        p_value_metric.set(p_value)
+        logging.debug(f"Performed KS test: stat={stat}, p-value={p_value}")
 
-    # Calculate accuracy and update Prometheus metric
-    current_accuracy = np.mean(queue)
-    accuracy_metric.set(current_accuracy)
-    logging.debug(
-        f"Calculated current accuracy: {current_accuracy}. Updated Prometheus gauge.")
+        # If p-value is below a threshold, we detect drift
+        if p_value < 0.05:
+            drift_alerts.inc()
+            logging.warning(f"Drift detected! p-value={p_value}")
+            # Reset reference window to current detection window
+            reference_window.clear()
+            reference_window.extend(detection_window)
+            detection_window.clear()
+        else:
+            # No drift detected; shift the windows
+            # Move half of detection window to reference window
+            half_size = detection_window_size // 2
+            for _ in range(half_size):
+                reference_window.append(detection_window.popleft())
 
-    return jsonify({'message': 'success', 'accuracy': current_accuracy})
+    elif len(reference_window) < reference_window_size:
+        # Fill the reference window first
+        reference_window.append(is_correct)
+        logging.debug(
+            f"Filling reference window. Current size: {len(reference_window)}")
 
+    return jsonify({'message': 'success'})
 
 # Run Flask app on all IPs
 if __name__ == '__main__':
     logging.info("Starting Flask app on host '0.0.0.0', port 5000.")
     app.run(host='0.0.0.0', port=5000)
-
-

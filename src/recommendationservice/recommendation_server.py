@@ -102,130 +102,114 @@ class Signal:
 
 
 class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
-    def __init__(self, model, signal, tracer):
+    def __init__(self, model, signal, tracer, accuracy_gauge):
         self.model = model
         self.signal = signal
         self.tracer = tracer
+        self.accuracy_gauge = accuracy_gauge
+        self.total_predictions = 0
+        self.correct_predictions = 0
 
     def ListRecommendations(self, request, context):
         max_responses = 5
         self.tracer.start_span("ml-model")
 
-        # Logging connection check
-        print("Received request from frontend:", request)
-
+        self.logger.debug(f"Received request: {request}")
         response = demo_pb2.ListRecommendationsResponse()
         with self.tracer.start_span("ml-model"):
             current_span = trace.get_current_span()
             if not list(request.product_ids):
-                current_span.add_event(
-                    "No context for ml-model provided, returning no recommendations")
-                print(
-                    "No product IDs received, returning empty recommendations.")
+                current_span.add_event("No context for ml-model provided, returning no recommendations")
+                self.logger.warning("No product IDs received, returning empty recommendations.")
             else:
-                ids = self.model.find_similar_products(
-                    list(request.product_ids)[0], max_responses)
-                current_span.set_attribute("explanation",
-                                           "these products have a similar review-profile compared to the original product")
-                current_span.set_attribute("input",
-                                           list(request.product_ids)[0])
-                current_span.set_attribute("output", str(ids))
-                print(
-                    f"Generated recommendations: {ids} for product ID: {list(request.product_ids)[0]}")
-                response.product_ids.extend(ids)
+                product_id = list(request.product_ids)[0]
+                self.logger.debug(f"Processing product ID: {product_id}")
+                recommendations = self.model.find_similar_products(product_id, max_responses)
+                actual_products = self.get_actual_products(product_id)  # Simulate ground truth
+                self.update_accuracy(recommendations, actual_products)
 
-            current_span.set_attribute("model-metric",
-                                       self.model.kNN.effective_metric_)
-            current_span.set_attribute("number of features",
-                                       self.model.kNN.n_features_in_)
+                current_span.set_attribute("input", product_id)
+                current_span.set_attribute("output", recommendations)
+                self.logger.info(f"Generated recommendations: {recommendations} for product ID: {product_id}")
+                response.product_ids.extend(recommendations)
 
-        self.signal.set_current_value(
-            hellinger_stat_test(self.model.ratings["rating"],
-                                self.model.ratings_test["rating"],
-                                ColumnType.Numerical, 0.1).drift_score)
-        print(f"Updated drift score: {self.signal.get_current_value()}")
         return response
 
+    def get_actual_products(self, product_id):
+        """Fetch actual user preferences for comparison."""
+        # Fetch products rated highly by the same user who rated `product_id`
+        user_id = next((uid for pid, uid in
+                        zip(self.model.ratings["product_id"],
+                            self.model.ratings["user_id"]) if
+                        pid == product_id), None)
+        if user_id:
+            # Fetch all products rated highly by this user
+            actual_products = self.model.ratings[
+                self.model.ratings["user_id"] == user_id]
+            actual_products = actual_products[actual_products["rating"] >= 4][
+                "product_id"].tolist()
+            return actual_products
+        return []
+
+    def update_accuracy(self, predicted, actual):
+        """Update accuracy based on predictions and actual values."""
+        self.logger.debug(f"Predicted: {predicted}, Actual: {actual}")
+        self.total_predictions += len(predicted)
+        self.correct_predictions += len(set(predicted) & set(actual))
+        if self.total_predictions > 0:
+            accuracy = self.correct_predictions / self.total_predictions
+            self.accuracy_gauge.set(accuracy)
+            self.logger.info(f"Updated model accuracy: {accuracy:.2f}")
+
     def Check(self, request, context):
-        print("Health check request received.")
+        """Implements the health check method."""
         return health_pb2.HealthCheckResponse(
-            status=health_pb2.HealthCheckResponse.SERVING)
-
-    def Watch(self, request, context):
-        print("Watch request received.")
-        return health_pb2.HealthCheckResponse(
-            status=health_pb2.HealthCheckResponse.UNIMPLEMENTED)
-
+            status=health_pb2.HealthCheckResponse.SERVING
+        )
 
 class RecommendationServer:
     def __init__(self):
-        # Initialize logger
         self.logger = getJSONLogger('recommendationservice-server')
-        self.logger.info("initializing recommendationservice")
+        self.logger.info("Initializing recommendationservice")
 
-        # Initialize Stackdriver Profiler
-        self.initStackdriverProfiling()
-
-        # Initialize resource
-        self.resource = Resource(attributes={
-            "service.name": "recommendationservice"
-        })
-
-        # Initialize Signal
         self.signal = Signal("drift_score_attribute")
-
-        # Initialize tracing
+        self.initMetrics()
         self.initTracing()
 
-        # Initialize metrics
-        self.initMetrics()
-
-        # Initialize ML Model
+        self.logger.info("Loading recommendation model...")
         self.model = RecommendationModel()
+        self.logger.info("Recommendation model loaded successfully.")
 
-        # Initialize gRPC server
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
-        # Create RecommendationService
-        self.service = RecommendationService(self.model, self.signal, self.tracer)
+        # Register recommendation service
+        self.logger.info("Registering recommendation service...")
+        self.service = RecommendationService(self.model, self.signal, self.tracer, self.accuracy_gauge)
         demo_pb2_grpc.add_RecommendationServiceServicer_to_server(self.service, self.server)
-        health_pb2_grpc.add_HealthServicer_to_server(self.service, self.server)
+        self.logger.info("Recommendation service registered successfully.")
 
-        # Start server
+        # Register health check service
+        self.logger.info("Registering health check service...")
+        self.health_service = HealthService()
+        health_pb2_grpc.add_HealthServicer_to_server(self.health_service, self.server)
+        self.logger.info("Health check service registered successfully.")
+
         self.startServer()
 
-    def initStackdriverProfiling(self):
-        project_id = None
-        try:
-            project_id = os.environ["GCP_PROJECT_ID"]
-        except KeyError:
-            # Environment variable not set
-            pass
+    def initMetrics(self):
+        """Initialize Prometheus metrics."""
+        # Gauge for model accuracy
+        self.logger.info("Initializing Prometheus metrics...")
+        self.accuracy_gauge = Gauge('model_accuracy', 'Accuracy of the model predictions')
 
-        for retry in range(1, 4):
-            try:
-                if project_id:
-                    googlecloudprofiler.start(service='recommendation_server',
-                                              service_version='1.0.0', verbose=0,
-                                              project_id=project_id)
-                else:
-                    googlecloudprofiler.start(service='recommendation_server',
-                                              service_version='1.0.0', verbose=0)
-                self.logger.info("Successfully started Stackdriver Profiler.")
-                return
-            except (BaseException) as exc:
-                self.logger.info(
-                    "Unable to start Stackdriver Profiler Python agent. " + str(
-                        exc))
-                if (retry < 4):
-                    self.logger.info(
-                        "Sleeping %d seconds to retry Stackdriver Profiler agent initialization" % (
-                            retry * 10))
-                    time.sleep(1)
-                else:
-                    self.logger.warning(
-                        "Could not initialize Stackdriver Profiler after retrying, giving up")
-        return
+        # Gauge for drift score
+        self.drift_score_gauge = Gauge('drift_score', 'Current drift score', ['attribute'])
+
+        # Start Prometheus server
+        prometheus_port = int(os.getenv('PROMETHEUS_PORT', '9464'))
+        start_http_server(prometheus_port)
+        self.logger.info(f"Prometheus exporter running on port {prometheus_port}")
+
 
     def initTracing(self):
         try:
@@ -233,10 +217,9 @@ class RecommendationServer:
             grpc_client_instrumentor.instrument()
             grpc_server_instrumentor = GrpcInstrumentorServer()
             grpc_server_instrumentor.instrument()
-            if os.environ["ENABLE_TRACING"] == "1":
+            if os.environ.get("ENABLE_TRACING", "0") == "1":
                 trace.set_tracer_provider(TracerProvider(resource=self.resource))
-                otel_endpoint = os.getenv("COLLECTOR_SERVICE_ADDR",
-                                          "otelcollector:4317")
+                otel_endpoint = os.getenv("COLLECTOR_SERVICE_ADDR", "otelcollector:4317")
                 trace.get_tracer_provider().add_span_processor(
                     BatchSpanProcessor(
                         OTLPSpanExporter(
@@ -245,58 +228,53 @@ class RecommendationServer:
                         )
                     )
                 )
-                # additional
-                self.tracer = trace.get_tracer("Recommendation")
-            else:
-                self.tracer = trace.get_tracer("Recommendation")
-        except (KeyError, DefaultCredentialsError):
-            self.logger.info("Tracing disabled.")
             self.tracer = trace.get_tracer("Recommendation")
         except Exception as e:
-            self.logger.warn(
-                f"Exception on Cloud Trace setup: {traceback.format_exc()}, tracing disabled.")
+            self.logger.warning(f"Exception during tracing initialization: {e}")
             self.tracer = trace.get_tracer("Recommendation")
 
-    def initMetrics(self):
-        # Prometheus Metrics
-        self.drift_score_gauge = Gauge(
-            'drift_score', 'Current drift score', ['attribute']
-        )
-
-        # Start Prometheus HTTP server on a given port
-        prometheus_port = int(os.getenv('PROMETHEUS_PORT', '9464'))
-        start_http_server(prometheus_port)
-        self.logger.info(
-            f"Prometheus exporter running on port {prometheus_port}")
-
     def updateMetrics(self):
-        # Update drift score in Prometheus gauge
         drift_score = self.signal.get_current_value()
-        self.drift_score_gauge.labels(attribute=self.signal.attribute).set(drift_score)
+        self.logger.debug(f"Drift score before update: {drift_score}")
+        self.drift_score_gauge.labels(attribute=self.signal.attribute).set(
+            drift_score)
         self.logger.info(f"Updated drift score in Prometheus: {drift_score}")
 
     def startServer(self):
-        port = os.environ.get('PORT', "8080")
-        catalog_addr = os.environ.get('PRODUCT_CATALOG_SERVICE_ADDR', '')
-        if catalog_addr == "":
-            raise Exception(
-                'PRODUCT_CATALOG_SERVICE_ADDR environment variable not set')
-        self.logger.info("product catalog address: " + catalog_addr)
+        port = os.getenv('PORT', "8080")
+        catalog_addr = os.getenv('PRODUCT_CATALOG_SERVICE_ADDR', '')
+        if not catalog_addr:
+            raise Exception('PRODUCT_CATALOG_SERVICE_ADDR environment variable not set')
+
+        self.logger.info(f"Product catalog address: {catalog_addr}")
         channel = grpc.insecure_channel(catalog_addr)
         product_catalog_stub = demo_pb2_grpc.ProductCatalogServiceStub(channel)
 
-        self.logger.info("listening on port: " + port)
-        self.server.add_insecure_port('[::]:' + port)
+        self.logger.info(f"Listening on port: {port}")
+        self.server.add_insecure_port(f'[::]:{port}')
         self.server.start()
 
-        # Keep alive
         try:
             while True:
-                # Periodically update metrics
                 self.updateMetrics()
                 time.sleep(10)
         except KeyboardInterrupt:
             self.server.stop(0)
+
+
+class HealthService(health_pb2_grpc.HealthServicer):
+    """Implements gRPC health check."""
+    def __init__(self):
+        super().__init__()
+
+    def Check(self, request, context):
+        return health_pb2.HealthCheckResponse(
+            status=health_pb2.HealthCheckResponse.SERVING
+        )
+
+    def Watch(self, request, context):
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        return None
 
 
 if __name__ == "__main__":
