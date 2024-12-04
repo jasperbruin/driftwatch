@@ -49,9 +49,17 @@ def browseProduct(l):
                                 headers={"recommendation": "false"}).text
     recommendations = []
     shown_products = re.findall("a href=\"/product/(.+)\"", product_page)
+
+    # Ensure there are enough products to recommend
+    if len(shown_products) < 4:
+        l.client.get(
+            "/error")  # Log or handle insufficient products gracefully
+        return
+
     for i in range(4):
         recommendations.append(shown_products[i])
 
+    # The rest of the code remains the same
     ctr_prediction = model.predict(
         {"user_id": pd.Series([random.randrange(100)]),
          "parent_asin": pd.Series([product_mapper[recommendations[0]]]),
