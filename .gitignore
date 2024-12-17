@@ -6,3 +6,8 @@ reports/
 skaffold
 /.vscode
 /.idea
+LAB-experiments/experiment_1/Amazon_Fashion.jsonl
+LAB-experiments/experiment_1/CDs_and_Vinyl.jsonl
+LAB-experiments/experiment_1/model_formatted_fashion_cpu_v2
+LAB-experiments/experiment_1/product_id_mapper.json
+LAB-experiments/experiment_2/model_formatted_music_v2_cpu
