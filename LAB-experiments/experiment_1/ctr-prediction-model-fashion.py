@@ -2,9 +2,8 @@
 import numpy as np
 import pandas as pd
 import torch
-import keras
 from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+
 
 from deepctr_torch.inputs import SparseFeat, VarLenSparseFeat, get_feature_names
 from deepctr_torch.models import DeepFM
