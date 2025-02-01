@@ -1,0 +1,7 @@
+Measure,Base Mean (Drift 0.0),Final Mean (Drift 1.0),Std Dev,Relative Increase (%)
+mmd,0.0343,0.3188,0.0035,828.98
+wasserstein,0.253,1.8438,0.1296,628.75
+kl,59.9022,100.2152,13.2249,67.3
+js,1.9472,2.9081,0.3668,49.35
+hellinger,1.5462,1.9378,0.1342,25.32
+bhattacharyya,-1.805,-1.5731,0.0563,12.85
