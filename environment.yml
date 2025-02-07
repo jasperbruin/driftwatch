@@ -1,0 +1,8 @@
+name: myenv
+channels:
+  - pytorch-nightly
+  - defaults
+dependencies:
+  - pytorch
+  - torchvision
+  - torchaudio

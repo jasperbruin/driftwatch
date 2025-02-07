@@ -1,0 +1,14 @@
+-f https://download.pytorch.org/whl/nightly/cpu
+torch
+torchvision
+torchaudio
+transformers
+accelerate
+datasets
+scikit-learn
+numpy
+matplotlib
+tqdm
+scipy
+seaborn
+pandas
