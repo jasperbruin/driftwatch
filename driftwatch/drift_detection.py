@@ -1,10 +1,5 @@
 import time
-import os
-import json
-from transformers import AutoTokenizer, AutoModel
-from datasets import load_dataset
 from tqdm import tqdm
-from sklearn.decomposition import PCA
 
 from embedding_tracker import *
 from utils import *

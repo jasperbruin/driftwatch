@@ -6,10 +6,8 @@ from sklearn.decomposition import PCA
 from transformers import AutoTokenizer, AutoModel
 import os
 import json
-from collections import defaultdict
 
 from driftwatch.config import args
-from drift_detection import collect_data_single_seed
 
 def set_seed(seed):
     random.seed(seed)
