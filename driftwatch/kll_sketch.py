@@ -1,6 +1,6 @@
 import random
 import math
-
+import bisect
 
 class KLL:
     def __init__(self, k):
@@ -29,15 +29,14 @@ class KLL:
         return max(2, int(math.ceil(self.k * (2 / 3) ** depth)))
 
     def insert(self, item):
-        """Inserts a new item and manages compaction if required."""
-        self.size += 1  # Always increment size
-        self.compactors[0].append(item)
+        self.size += 1
+        # Insert at the bottom compactor in sorted order
+        bisect.insort_left(self.compactors[0], item)
 
         # If we're still below k items in the bottom level, do not compress yet.
         if len(self.compactors[0]) <= self.k:
             return
 
-        # Otherwise, check if we exceed capacity and need to compress
         if len(self.compactors[0]) >= self._capacity(0):
             self._compress()
 
@@ -76,12 +75,13 @@ class KLL:
             self._compress()
 
     def rank(self, value):
-        """Returns the approximate rank of a value."""
+        """Returns the approximate rank of 'value' by binary searching each compactor."""
         r = 0
-        for h, c in enumerate(self.compactors):
-            for item in c:
-                if item <= value:
-                    r += 2 ** h
+        for h, compactor in enumerate(self.compactors):
+            # Find how many items in 'compactor' are <= 'value'
+            idx = bisect.bisect_right(compactor, value)
+            # Each item at level h represents 2^h items from the original stream
+            r += idx * (2 ** h)
         return r
 
     def cdf(self):

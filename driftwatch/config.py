@@ -32,7 +32,7 @@ args = {
     "max_texts": 1000,
     "batch_size": 64,
     "drift_strengths": [0.0, 0.25, 0.5, 0.75, 1.0],
-    "pca_components": 2,
+    "pca_components": 10,
     "output_dir": "data",
     "num_seeds": 1,
 }
