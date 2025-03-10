@@ -2,11 +2,14 @@ import os
 import json
 import matplotlib.pyplot as plt
 import pandas as pd
-import math
+import seaborn as sns
 
 
 def plot_and_save(json_path, output_dir):
-    """Plots and saves final similarity on a log scale with drift strength on x-axis."""
+    """Plots and saves:
+      1. Final similarity on a log scale vs. drift strength.
+      2. Boxplot of final similarity per drift strength, grouped by distance metric.
+    """
 
     # Load JSON data
     with open(json_path, "r") as file:
@@ -25,6 +28,8 @@ def plot_and_save(json_path, output_dir):
                 })
 
     df = pd.DataFrame(data_list)
+
+    # --- 1) Final Similarity (Log Scale) vs. Drift Strength ---
 
     # Aggregate to get mean final similarity per distance_name, drift_strength, and PCA status
     df_aggregated = df.groupby(["distance_name", "drift_strength", "pca"], as_index=False)["final_similarity"].mean()
@@ -70,7 +75,24 @@ def plot_and_save(json_path, output_dir):
     output_path = os.path.join(output_dir, "plot_log_similarity.png")
     plt.savefig(output_path)
     plt.close()
-    print(f"Saved plot to {output_path}")
+    print(f"Saved log similarity plot to {output_path}")
+
+    # --- 2) Boxplot: Similarity Scores per Drift Strength, Grouped by Distance Metric ---
+
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(x="drift_strength", y="final_similarity", hue="distance_name", data=df)
+
+    plt.yscale("log")  # Log scale for better visualization
+    plt.xlabel("Drift Strength")
+    plt.ylabel("Final Similarity (Log Scale)")
+    plt.title("Final Similarity Distribution per Drift Strength (Grouped by Distance Metric)")
+    plt.legend(title="Distance Metric", bbox_to_anchor=(1.05, 1), loc='upper left')
+
+    # Save plot
+    output_path_box = os.path.join(output_dir, "plot_similarity_boxplot.png")
+    plt.savefig(output_path_box, bbox_inches="tight")
+    plt.close()
+    print(f"Saved similarity boxplot to {output_path_box}")
 
 
 def process_all_scores(data_dir):
@@ -79,3 +101,5 @@ def process_all_scores(data_dir):
         if "results.json" in files:
             json_path = os.path.join(root, "results.json")
             plot_and_save(json_path, root)
+
+process_all_scores("data")

@@ -8,6 +8,7 @@ from config import *
 from collections import defaultdict
 from plot_time_overhead import process_all_json_time_overhead
 from plot_all_scores import process_all_scores
+from plot_all_models import run_all_results
 
 
 def run_distance_tracking(
@@ -196,6 +197,7 @@ def main():
 
     process_all_json_time_overhead("data")
     process_all_scores("data")
+    run_all_results("data")
 
 if __name__ == "__main__":
     main()

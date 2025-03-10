@@ -84,5 +84,3 @@ def process_all_json_time_overhead(data_dir):
             json_path = os.path.join(root, "results.json")
             plot_time_overhead(json_path, root)
 
-
-
