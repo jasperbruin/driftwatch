@@ -4,8 +4,6 @@ from tqdm import tqdm
 from embedding_tracker import *
 from utils import *
 from config import *
-
-from collections import defaultdict
 from plot import *
 
 from kll_transform import KLLTransformer
@@ -33,7 +31,7 @@ def run_distance_tracking(
     approaches = ["no_pca", "pca", "kll_sketch"]
     all_results = []
 
-    kll_transformer = KLLTransformer(k=10)
+    kll_transformer = KLLTransformer(k=args["kll_k"])
     kll_transformer.fit(baseline_embs)  # uses all baseline embeddings
 
     for method in approaches:

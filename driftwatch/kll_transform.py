@@ -8,7 +8,7 @@ class KLLTransformer:
     - transform(X): for each dimension, returns the approximate CDF value
       i.e., rank(x) / total_count, preserving the distribution shape.
     """
-    def __init__(self, k=50):
+    def __init__(self, k=10):
         """
         :param k: base buffer size for each KLL. Tune as needed for accuracy/speed.
         """
