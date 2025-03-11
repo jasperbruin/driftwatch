@@ -30,7 +30,22 @@ def flatten_data(results_data):
     return pd.DataFrame(records_list)
 
 def plot_final_similarity(df, output_dir):
+    # Compute mean final_similarity at each group
     df_sim = df.groupby(["distance_name", "drift_strength", "method"], as_index=False)["final_similarity"].mean()
+
+    # For each distance_name, min–max normalize the final_similarity
+    df_sim["final_similarity_norm"] = 0.0
+    for dist_name, group_data in df_sim.groupby("distance_name"):
+        min_val = group_data["final_similarity"].min()
+        max_val = group_data["final_similarity"].max()
+        if max_val - min_val == 0:
+            # Handle edge case where all values are the same
+            df_sim.loc[group_data.index, "final_similarity_norm"] = 0.0
+        else:
+            df_sim.loc[group_data.index, "final_similarity_norm"] = (
+                (group_data["final_similarity"] - min_val) / (max_val - min_val)
+            )
+
     unique_distances = df_sim["distance_name"].unique()
     num_dist = len(unique_distances)
     num_cols = 3
@@ -45,14 +60,21 @@ def plot_final_similarity(df, output_dir):
         subset = df_sim[df_sim["distance_name"] == dist_name]
         for j, method_name in enumerate(subset["method"].unique()):
             sub_m = subset[subset["method"] == method_name]
-            ax.plot(sub_m["drift_strength"], sub_m["final_similarity"], marker='o', label=method_name, color=palette[j])
+            ax.plot(
+                sub_m["drift_strength"],
+                sub_m["final_similarity_norm"],
+                marker='o',
+                label=method_name,
+                color=palette[j]
+            )
         ax.set_title(f"{dist_name} Dist. Similarity")
         ax.set_xlabel("Drift Strength")
-        ax.set_ylabel("Final Similarity (log scale)")
-        ax.set_yscale("log")
+        ax.set_ylabel("Normalized Final Similarity (0 - 1)")
+        # ax.set_ylim(0, 1)
         ax.grid(True)
         ax.legend()
 
+    # Remove extra subplots
     for j in range(num_dist, len(axes)):
         fig.delaxes(axes[j])
 
@@ -61,6 +83,7 @@ def plot_final_similarity(df, output_dir):
     plt.savefig(path_sim)
     plt.close()
     print(f"[Saved] {path_sim}")
+
 
 def plot_avg_overhead(df, output_dir):
     df_overhead = df.groupby(["model_name", "method"], as_index=False)["avg_overhead"].mean()
