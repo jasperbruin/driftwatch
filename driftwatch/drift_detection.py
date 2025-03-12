@@ -51,9 +51,6 @@ def run_distance_tracking(
         distance_scores = []
         time_overhead = []
 
-        # -------------------------------
-        # 1) Initialize tracker with baseline distribution
-        # -------------------------------
         for batch in batch_generator(baseline_texts, batch_size):
             emb = extract_embeddings(model, tokenizer, batch, device)
 
@@ -65,9 +62,7 @@ def run_distance_tracking(
             # Update with the mean of the batch
             tracker.update(emb.mean(axis=0))
 
-        # -------------------------------
-        # 2) Measure drifted/test distribution
-        # -------------------------------
+
         start_time = time.time()
         for batch in tqdm(batch_generator(test_texts, batch_size), leave=False):
             emb = extract_embeddings(model, tokenizer, batch, device)
@@ -113,10 +108,7 @@ def run_experiments_for_model(
     baseline_embs,
     pca
 ):
-    """
-    Runs all distance computations (mahalanobis + any from DISTANCE_FUNCTIONS)
-    for different drift strengths and logs the results.
-    """
+
     partial_results = []
     all_distance_names = ["mahalanobis"] + list(DISTANCE_FUNCTIONS.keys())
 
@@ -152,10 +144,6 @@ def run_experiments_for_model(
 
     return partial_results
 
-
-# -----------------------------------------------------
-# Remainder of your script remains largely unchanged
-# -----------------------------------------------------
 
 def collect_data_single_seed(seed, args):
     set_seed(seed)

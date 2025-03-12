@@ -211,6 +211,65 @@ def plot_overhead_vs_size(df, output_dir):
     print(f"[Saved] {path_overhead_size}")
 
 
+def plot_final_similarity_separate(df, output_dir):
+    """ Creates a 3x6 grid of plots where:
+        - Rows correspond to distance metrics (6 total)
+        - Columns correspond to methods (kll_sketch, PCA, no_PCA)
+    """
+
+    # Compute mean final_similarity at each group
+    df_sim = df.groupby(["distance_name", "drift_strength", "method"], as_index=False)["final_similarity"].mean()
+
+    # Normalize final similarity within each distance metric
+    df_sim["final_similarity_norm"] = 0.0
+    for dist_name, group_data in df_sim.groupby("distance_name"):
+        min_val = group_data["final_similarity"].min()
+        max_val = group_data["final_similarity"].max()
+        if max_val - min_val == 0:
+            df_sim.loc[group_data.index, "final_similarity_norm"] = 0.0  # Handle edge case
+        else:
+            df_sim.loc[group_data.index, "final_similarity_norm"] = (
+                    (group_data["final_similarity"] - min_val) / (max_val - min_val)
+            )
+
+    unique_distances = df_sim["distance_name"].unique()
+    unique_methods = ["kll_sketch", "pca", "no_pca"]
+
+    num_rows = len(unique_distances)
+    num_cols = len(unique_methods)
+
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(5 * num_cols, 4 * num_rows), squeeze=False)
+    palette = sns.color_palette("husl", num_cols)
+
+    for i, dist_name in enumerate(unique_distances):
+        for j, method_name in enumerate(unique_methods):
+            ax = axes[i, j]
+            subset = df_sim[(df_sim["distance_name"] == dist_name) & (df_sim["method"] == method_name)]
+
+            if not subset.empty:
+                ax.plot(
+                    subset["drift_strength"],
+                    subset["final_similarity_norm"],
+                    marker='o',
+                    label=method_name,
+                    color=palette[j]
+                )
+
+            ax.set_title(f"{dist_name} - {method_name}")
+            ax.set_xlabel("Drift Strength")
+            ax.set_ylabel("Normalized Final Similarity")
+            ax.grid(True)
+
+            if j == 0:
+                ax.legend()  # Only show legend in the first column
+
+    plt.tight_layout()
+    path_sim = os.path.join(output_dir, "plot_final_similarity_methods_adjusted.png")
+    plt.savefig(path_sim)
+    plt.close()
+    print(f"[Saved] {path_sim}")
+
+
 def generate_all_plots(json_path, output_dir):
     results_data = load_json_data(json_path)
     df = flatten_data(results_data)
@@ -219,6 +278,7 @@ def generate_all_plots(json_path, output_dir):
     plot_relative_log_increase(df, output_dir)
     plot_avg_time(df, output_dir)
     plot_overhead_vs_size(df, output_dir)
+    plot_final_similarity_separate(df, output_dir)
 
 def run_all_results(data_dir):
     """
