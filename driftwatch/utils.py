@@ -7,7 +7,7 @@ from transformers import AutoTokenizer, AutoModel
 import os
 import json
 
-from driftwatch.config import args
+from config import args
 
 def set_seed(seed):
     random.seed(seed)
@@ -31,7 +31,7 @@ def extract_embeddings(model, tokenizer, texts, device):
         if model.config.model_type == "t5":
             decoder_input_ids = torch.zeros(
                 (input_ids.shape[0], 1), dtype=torch.long, device=device
-            )  # T5 requires decoder_input_ids
+            )
             outputs = model(input_ids, attention_mask=attention_mask, decoder_input_ids=decoder_input_ids)
         else:
             outputs = model(input_ids, attention_mask=attention_mask)

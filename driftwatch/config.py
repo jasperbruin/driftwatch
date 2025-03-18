@@ -35,7 +35,7 @@ args = {
     "pca_components": 50,
     "output_dir": "data",
     "num_seeds": 1,
-    "kll_k": 10
+    "kll_k": 50
 }
 
 # Ensure output directory exists
