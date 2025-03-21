@@ -1,0 +1,10 @@
+models: ['bigscience/bloomz-560m', 'facebook/opt-125m', 'layonsan/google-t5-small', 'openai-community/gpt2', 'distilbert-base-uncased', 'google/mobilebert-uncased']
+datasets: [{'name': 'yelp_review_full', 'config': None, 'split': 'train', 'text_column': 'text'}]
+max_texts: 2500
+batch_size: 64
+drift_strengths: [0.0, 0.25, 0.5, 0.75, 1.0]
+pca_components: 50
+output_dir: data
+num_seeds: 1
+kll_k: 20
+kll_bins: 20
