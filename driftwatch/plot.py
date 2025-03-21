@@ -16,18 +16,28 @@ def flatten_data(results_data):
     for dataset_name, model_dict in results_data.items():
         for model_name, records in model_dict.items():
             for r in records:
-                method_val = r.get("method", "pca" if r.get("pca", False) else "no_pca")
+                distance_type = r.get("distance_type", "vector")
+                pca_applied = r.get("pca_applied", False)
+
+                if distance_type == "vector":
+                    method = "pca" if pca_applied else "no_pca"
+                else:
+                    method = "pca_kll_sketch" if pca_applied else "kll_sketch"
+
                 records_list.append({
                     "dataset": dataset_name,
                     "model_name": model_name,
                     "distance_name": r["distance_name"],
+                    "distance_type": distance_type,
+                    "pca_applied": pca_applied,
+                    "method": method,
                     "drift_strength": r["drift_strength"],
-                    "method": method_val,
                     "final_similarity": r["final_similarity"],
                     "avg_overhead": r.get("avg_overhead", float('nan')),
                     "time_taken": r.get("time_taken", float('nan')),
                 })
     return pd.DataFrame(records_list)
+
 
 def plot_final_similarity(df, output_dir):
     """
@@ -106,7 +116,7 @@ def plot_final_similarity(df, output_dir):
                 label=method_name,
                 color=method_to_color[method_name]
             )
-        ax_left.set_title("Legacy Metrics (Averaged)")
+        ax_left.set_title("Distance-based Metrics (Averaged)")
         ax_left.set_xlabel("Drift Strength")
         ax_left.set_ylabel("Normalized Final Similarity")
         ax_left.grid(True)
@@ -147,60 +157,109 @@ def plot_final_similarity(df, output_dir):
 
 
 def plot_avg_overhead(df, output_dir):
-    df_overhead = df.groupby(["model_name", "method"], as_index=False)["avg_overhead"].mean()
-    pivot_overhead = df_overhead.pivot(index="model_name", columns="method", values="avg_overhead").fillna(0)
+    # Ensure required fields are present
+    if "distance_type" not in df.columns or "pca_applied" not in df.columns:
+        raise ValueError("DataFrame must include 'distance_type' and 'pca_applied' columns.")
 
+    # Step 1: Aggregate
+    df_grouped = (
+        df.groupby(["model_name", "distance_type", "pca_applied"], as_index=False)
+          .agg({"avg_overhead": "mean"})
+    )
+
+    # Step 2: Create combined method name for bar labels
+    df_grouped["method_type"] = df_grouped.apply(
+        lambda row: f"{row['distance_type']}_{'pca' if row['pca_applied'] else 'no_pca'}", axis=1
+    )
+
+    # Step 3: Pivot to have 4 bars per model
+    pivot_df = df_grouped.pivot(index="model_name", columns="method_type", values="avg_overhead").fillna(0)
+
+    # Step 4: Plot
     fig, ax = plt.subplots(figsize=(12, 6))
-    colors = sns.color_palette("pastel", n_colors=len(pivot_overhead.columns))
-    pivot_overhead.plot(kind='bar', logy=True, ax=ax, color=colors)
+    colors = sns.color_palette("pastel", n_colors=4)
+    pivot_df.plot(kind='bar', ax=ax, logy=True, color=colors)
+
     ax.set_xlabel("Model Name", fontsize=12)
     ax.set_ylabel("Avg Overhead (s) [log scale]", fontsize=12)
-    ax.set_title("Average Overhead per Model", fontsize=14, fontweight='bold')
+    ax.set_title("Average Overhead per Model (Vector vs Distribution, PCA vs No PCA)", fontsize=14, fontweight='bold')
     plt.xticks(rotation=30, ha="right", fontsize=10)
     plt.yticks(fontsize=10)
-    ax.legend(title="Method", fontsize=10)
+    ax.legend(title="Method Type", fontsize=10)
     ax.grid(axis='y', linestyle='--', alpha=0.7)
     plt.tight_layout()
 
-    path_overhead = os.path.join(output_dir, "plot_model_avg_overhead_methods.png")
+    path_overhead = os.path.join(output_dir, "plot_model_avg_overhead_4bars.png")
     plt.savefig(path_overhead, dpi=300)
     plt.close()
     print(f"[Saved] {path_overhead}")
 
+
 def plot_relative_log_increase(df, output_dir):
     plot_data = []
+
+    # Step 1: Compute relative log increase per row (compared to baseline for same distance_name + pca_applied)
     for _, row in df.iterrows():
         if row["drift_strength"] >= 0:
-            base_similarity = df[(df["drift_strength"] == 0) & (df["method"] == row["method"]) & (df["distance_name"] == row["distance_name"])]["final_similarity"].mean()
-            if base_similarity:
-                relative_log_increase = np.log(row["final_similarity"] / base_similarity)
-                plot_data.append((row["distance_name"], row["drift_strength"], relative_log_increase))
+            base_similarity = df[
+                (df["drift_strength"] == 0) &
+                (df["distance_name"] == row["distance_name"]) &
+                (df["pca_applied"] == row["pca_applied"])
+            ]["final_similarity"].mean()
 
-    aggregated_data = defaultdict(list)
-    for distance_name, drift_strength, log_increase in plot_data:
-        aggregated_data[distance_name].append((drift_strength, log_increase))
+            if base_similarity and base_similarity > 0:
+                rel_log = np.log(row["final_similarity"] / base_similarity)
+                plot_data.append({
+                    "distance_name": row["distance_name"],
+                    "drift_strength": row["drift_strength"],
+                    "pca_applied": row["pca_applied"],
+                    "rel_log_increase": rel_log
+                })
 
-    aggregated_results = {}
-    for distance_name, values in aggregated_data.items():
-        df_agg = pd.DataFrame(values, columns=["drift_strength", "log_increase"])
-        avg_log_increase = df_agg.groupby("drift_strength")["log_increase"].mean().reset_index()
-        avg_log_increase["log_increase"] = (avg_log_increase["log_increase"] - avg_log_increase["log_increase"].min()) / (avg_log_increase["log_increase"].max() - avg_log_increase["log_increase"].min())
-        aggregated_results[distance_name] = avg_log_increase
+    df_plot = pd.DataFrame(plot_data)
 
-    plt.figure(figsize=(12, 6))
-    for distance_name, df_agg in aggregated_results.items():
-        sns.lineplot(data=df_agg, x="drift_strength", y="log_increase", label=distance_name, marker='o')
-    plt.xlabel("Drift Strength", fontsize=12)
-    plt.ylabel("Normalized Relative Log Increase", fontsize=12)
-    plt.title("Aggregated Relative Increase of Final Similarity vs Drift Strength", fontsize=14, fontweight='bold')
-    plt.legend(loc="best", fontsize=10)
-    plt.grid(True, linestyle='--', alpha=0.7)
-    plt.tight_layout()
+    # Step 2: Group and normalize within each distance_name + pca_applied
+    df_normalized = []
+    for (dist_name, pca_flag), group in df_plot.groupby(["distance_name", "pca_applied"]):
+        df_avg = group.groupby("drift_strength")["rel_log_increase"].mean().reset_index()
+        min_val = df_avg["rel_log_increase"].min()
+        max_val = df_avg["rel_log_increase"].max()
+        if max_val - min_val > 1e-12:
+            df_avg["normalized"] = (df_avg["rel_log_increase"] - min_val) / (max_val - min_val)
+        else:
+            df_avg["normalized"] = 0.0
+        df_avg["distance_name"] = dist_name
+        df_avg["pca_applied"] = pca_flag
+        df_normalized.append(df_avg)
 
-    path_agg = os.path.join(output_dir, "plot_aggregated_relative_log_increase_normalized.png")
-    plt.savefig(path_agg, dpi=300)
+    df_final = pd.concat(df_normalized, ignore_index=True)
+
+    # Step 3: Create 2-subplot figure
+    fig, (ax_pca, ax_nopca) = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
+
+    for pca_flag, ax in zip([True, False], [ax_pca, ax_nopca]):
+        sub_df = df_final[df_final["pca_applied"] == pca_flag]
+        for dist_name in sub_df["distance_name"].unique():
+            d = sub_df[sub_df["distance_name"] == dist_name]
+            ax.plot(d["drift_strength"], d["normalized"], marker='o', label=dist_name)
+
+        ax.set_title("PCA Applied" if pca_flag else "No PCA")
+        ax.set_xlabel("Drift Strength")
+        ax.grid(True)
+        if not pca_flag:
+            ax.legend(title="Distance", fontsize=9)
+        if pca_flag:
+            ax.set_ylabel("Normalized Relative Log Increase")
+
+    fig.suptitle("Relative Log Increase vs Drift Strength (PCA vs No PCA)", fontsize=16, fontweight='bold')
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+    path_out = os.path.join(output_dir, "plot_relative_log_increase_pca_vs_no_pca.png")
+    plt.savefig(path_out, dpi=300)
     plt.close()
-    print(f"[Saved] {path_agg}")
+    print(f"[Saved] {path_out}")
+
+
 
 def plot_avg_time(df, output_dir):
     df_time = df.groupby(["model_name", "method"], as_index=False)["time_taken"].mean()
@@ -273,62 +332,69 @@ def plot_overhead_vs_size(df, output_dir):
 
 
 def plot_final_similarity_separate(df, output_dir):
-    """ Creates a 3x6 grid of plots where:
-        - Rows correspond to distance metrics (6 total)
-        - Columns correspond to methods (kll_sketch, PCA, no_PCA)
+    """
+    Creates 12 subplots (3x4 grid), one per distance_name.
+    Each plot shows two lines: PCA applied vs not.
     """
 
-    # Compute mean final_similarity at each group
-    df_sim = df.groupby(["distance_name", "drift_strength", "method"], as_index=False)["final_similarity"].mean()
+    # Step 1: Compute mean final_similarity for each group
+    df_sim = df.groupby(["distance_name", "drift_strength", "pca_applied"], as_index=False)["final_similarity"].mean()
 
-    # Normalize final similarity within each distance metric
+    # Step 2: Normalize final similarity within each distance metric
     df_sim["final_similarity_norm"] = 0.0
     for dist_name, group_data in df_sim.groupby("distance_name"):
         min_val = group_data["final_similarity"].min()
         max_val = group_data["final_similarity"].max()
         if max_val - min_val == 0:
-            df_sim.loc[group_data.index, "final_similarity_norm"] = 0.0  # Handle edge case
+            df_sim.loc[group_data.index, "final_similarity_norm"] = 0.0
         else:
             df_sim.loc[group_data.index, "final_similarity_norm"] = (
-                    (group_data["final_similarity"] - min_val) / (max_val - min_val)
+                (group_data["final_similarity"] - min_val) / (max_val - min_val)
             )
 
-    unique_distances = df_sim["distance_name"].unique()
-    unique_methods = ["kll_sketch", "pca", "no_pca"]
-
-    num_rows = len(unique_distances)
-    num_cols = len(unique_methods)
+    # Step 3: Prepare subplots
+    unique_distances = sorted(df_sim["distance_name"].unique())
+    num_dists = len(unique_distances)
+    num_cols = 4
+    num_rows = int(np.ceil(num_dists / num_cols))
 
     fig, axes = plt.subplots(num_rows, num_cols, figsize=(5 * num_cols, 4 * num_rows), squeeze=False)
-    palette = sns.color_palette("husl", num_cols)
+    palette = sns.color_palette("Set2", 2)  # 2 colors: PCA applied vs not
 
-    for i, dist_name in enumerate(unique_distances):
-        for j, method_name in enumerate(unique_methods):
-            ax = axes[i, j]
-            subset = df_sim[(df_sim["distance_name"] == dist_name) & (df_sim["method"] == method_name)]
+    # Step 4: Plot each distance
+    for idx, dist_name in enumerate(unique_distances):
+        row = idx // num_cols
+        col = idx % num_cols
+        ax = axes[row][col]
 
+        for i, pca_flag in enumerate([False, True]):
+            subset = df_sim[(df_sim["distance_name"] == dist_name) & (df_sim["pca_applied"] == pca_flag)]
             if not subset.empty:
+                label = "PCA" if pca_flag else "No PCA"
                 ax.plot(
                     subset["drift_strength"],
                     subset["final_similarity_norm"],
                     marker='o',
-                    label=method_name,
-                    color=palette[j]
+                    label=label,
+                    color=palette[i]
                 )
 
-            ax.set_title(f"{dist_name} - {method_name}")
-            ax.set_xlabel("Drift Strength")
-            ax.set_ylabel("Normalized Final Similarity")
-            ax.grid(True)
+        ax.set_title(dist_name)
+        ax.set_xlabel("Drift Strength")
+        ax.set_ylabel("Normalized Final Similarity")
+        ax.grid(True)
+        ax.legend()
 
-            if j == 0:
-                ax.legend()  # Only show legend in the first column
+    # Step 5: Remove unused axes
+    for i in range(num_dists, num_rows * num_cols):
+        fig.delaxes(axes[i // num_cols][i % num_cols])
 
     plt.tight_layout()
-    path_sim = os.path.join(output_dir, "plot_final_similarity_methods_adjusted.png")
+    path_sim = os.path.join(output_dir, "plot_final_similarity_pca_vs_no_pca_by_distance.png")
     plt.savefig(path_sim)
     plt.close()
     print(f"[Saved] {path_sim}")
+
 
 
 def generate_all_plots(json_path, output_dir):

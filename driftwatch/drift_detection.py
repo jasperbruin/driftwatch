@@ -23,20 +23,16 @@ def run_distance_tracking(
     Main entry point for distance tracking experiments.
     """
 
-    # Decide which approaches to use based on the metric
-    # - Distribution-based metrics => KLL sketch
-    # - Vector-based metrics       => no_pca, pca
     if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
-        approaches = ["kll_sketch"]
+        approaches = ["kll_sketch", "pca_kll_sketch"]
     else:
         approaches = ["no_pca", "pca"]
 
     all_results = []
     tracker_dict = {}
 
-    # Create a tracker for each approach
     for method in approaches:
-        if method == "pca":
+        if method in ["pca", "pca_kll_sketch"]:
             embedding_dim = pca_components
         else:
             embedding_dim = baseline_embs.shape[1]
@@ -49,16 +45,14 @@ def run_distance_tracking(
             num_bins=args.get("kll_bins", 20)
         )
 
-    # 1) Fit baseline
     for method in approaches:
         tracker = tracker_dict[method]
         for batch in batch_generator(baseline_texts, batch_size):
             emb = extract_embeddings(model, tokenizer, batch, device)
-            if method == "pca":
+            if method in ["pca", "pca_kll_sketch"]:
                 emb = pca.transform(emb)
             tracker.update(emb)
 
-    # 2) Compute distances on the test data
     for method in approaches:
         tracker = tracker_dict[method]
         distance_scores = []
@@ -67,7 +61,7 @@ def run_distance_tracking(
         start_time = time.time()
         for batch in tqdm(batch_generator(test_texts, batch_size), leave=False):
             emb = extract_embeddings(model, tokenizer, batch, device)
-            if method == "pca":
+            if method in ["pca", "pca_kll_sketch"]:
                 emb = pca.transform(emb)
 
             overhead_start = time.time()
@@ -77,7 +71,6 @@ def run_distance_tracking(
             distance_scores.append(dist)
             overhead_times.append(overhead_end - overhead_start)
 
-            # If the baseline should be updated in real time:
             if realtime_update:
                 tracker.update(emb)
 
@@ -100,13 +93,19 @@ def run_experiments_for_model(
     batch_size,
     drift_strengths,
     baseline_embs,
-    pca
+    pca,
+    seed=None
 ):
     partial_results = []
     all_distance_names = ["mahalanobis"] + list(LEGACY_DISTANCE_FUNCTIONS.keys()) \
                          + ["kl", "js", "hellinger", "bhattacharyya", "mmd", "wasserstein"]
 
     for distance_name in all_distance_names:
+        if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
+            distance_type = "distribution"
+        else:
+            distance_type = "vector"
+
         for drift_strength in drift_strengths:
             drifted_texts = introduce_gradual_drift(drift_texts, fraction_shuffle=drift_strength)
             test_texts = baseline_texts + drifted_texts
@@ -123,22 +122,23 @@ def run_experiments_for_model(
                 batch_size,
                 device,
             )
+
             for (method, final_dist, total_time, avg_overhead) in results:
                 partial_results.append({
+                    "distance_type": distance_type,
                     "distance_name": distance_name,
                     "drift_strength": drift_strength,
-                    "method": method,
+                    "pca_applied": method in ["pca", "pca_kll_sketch"],
                     "final_similarity": final_dist,
                     "time_taken": total_time,
                     "avg_overhead": avg_overhead,
+                    "seed": seed,
                 })
 
     return partial_results
 
+
 def collect_data_single_seed(seed, args):
-    """
-    Unchanged logic. Uses the new run_experiments_for_model() under the hood.
-    """
     set_seed(seed)
     device = get_device()
     print(f"[Seed={seed}] Using device:", device)
@@ -172,19 +172,17 @@ def collect_data_single_seed(seed, args):
                 args["batch_size"],
                 args["drift_strengths"],
                 baseline_embs,
-                pca
+                pca,
+                seed=seed
             )
             for r in partial_results:
-                r["seed"] = seed
                 key = (dataset_name, model_name)
                 results[key].append(r)
 
     return results
 
+
 def collect_data_multiple_seeds():
-    """
-    Collect results for multiple seeds; unchanged in structure.
-    """
     all_results = defaultdict(list)
     for seed in range(args["num_seeds"]):
         seed_results = collect_data_single_seed(seed, args)
@@ -192,6 +190,7 @@ def collect_data_multiple_seeds():
             all_results[key].extend(records)
     print("\nAll seeds complete!")
     return all_results
+
 
 def main():
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -201,6 +200,7 @@ def main():
     save_results(results, output_dir)
 
     run_all_results("data")
+
 
 if __name__ == "__main__":
     main()
