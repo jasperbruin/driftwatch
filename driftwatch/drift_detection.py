@@ -1,13 +1,10 @@
 import time
 from tqdm import tqdm
 
-from embedding_tracker import *
+from embedding_tracker import EmbeddingTracker, LEGACY_DISTANCE_FUNCTIONS, DISTRIBUTION_METRICS
 from utils import *
 from config import *
 from plot import *
-
-from kll_transform import KLLTransformer
-
 
 def run_distance_tracking(
     model,
@@ -20,79 +17,76 @@ def run_distance_tracking(
     pca_components,
     batch_size,
     device,
+    realtime_update=False
 ):
     """
-    Initialize the EmbeddingTracker with the baseline distribution and measure
-    distance on the test_texts for three approaches:
-    1) no_pca
-    2) pca
-    3) kll_sketch
+    Main entry point for distance tracking experiments.
     """
-    approaches = ["no_pca", "pca", "kll_sketch"]
+
+    # Decide which approaches to use based on the metric
+    # - Distribution-based metrics => KLL sketch
+    # - Vector-based metrics       => no_pca, pca
+    if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
+        approaches = ["kll_sketch"]
+    else:
+        approaches = ["no_pca", "pca"]
+
     all_results = []
+    tracker_dict = {}
 
-    kll_transformer = KLLTransformer(k=args["kll_k"])
-    kll_transformer.fit(baseline_embs)  # uses all baseline embeddings
-
+    # Create a tracker for each approach
     for method in approaches:
-        # Decide embedding_dim
         if method == "pca":
             embedding_dim = pca_components
         else:
             embedding_dim = baseline_embs.shape[1]
 
-        # Create an EmbeddingTracker
-        tracker = EmbeddingTracker(
+        tracker_dict[method] = EmbeddingTracker(
             embedding_dim=embedding_dim,
             alpha=0.01,
-            distance_name=distance_name
+            distance_name=distance_name,
+            k=args.get("kll_k", 50),
+            num_bins=args.get("kll_bins", 50)
         )
 
-        distance_scores = []
-        time_overhead = []
-
+    # 1) Fit baseline
+    for method in approaches:
+        tracker = tracker_dict[method]
         for batch in batch_generator(baseline_texts, batch_size):
             emb = extract_embeddings(model, tokenizer, batch, device)
-
             if method == "pca":
                 emb = pca.transform(emb)
-            elif method == "kll_sketch":
-                emb = kll_transformer.transform(emb)
+            tracker.update(emb)
 
-            # Update with the mean of the batch
-            tracker.update(emb.mean(axis=0))
-
+    # 2) Compute distances on the test data
+    for method in approaches:
+        tracker = tracker_dict[method]
+        distance_scores = []
+        overhead_times = []
 
         start_time = time.time()
         for batch in tqdm(batch_generator(test_texts, batch_size), leave=False):
             emb = extract_embeddings(model, tokenizer, batch, device)
-
             if method == "pca":
                 emb = pca.transform(emb)
-            elif method == "kll_sketch":
-                emb = kll_transformer.transform(emb)
-
-            mean_emb = emb.mean(axis=0)
 
             overhead_start = time.time()
-            dist = tracker.compute_distance(mean_emb)
+            dist = tracker.compute_distance(emb)
             overhead_end = time.time()
 
             distance_scores.append(dist)
-            time_overhead.append(overhead_end - overhead_start)
+            overhead_times.append(overhead_end - overhead_start)
 
-            tracker.update(mean_emb)
+            # If the baseline should be updated in real time:
+            if realtime_update:
+                tracker.update(emb)
 
         end_time = time.time()
-
         final_dist = distance_scores[-1] if distance_scores else 0.0
         total_time = end_time - start_time
-        avg_overhead = np.mean(time_overhead)
+        avg_overhead = np.mean(overhead_times) if overhead_times else 0.0
 
-        # Record results
-        all_results.append(
-            (method, final_dist, total_time, avg_overhead)
-        )
+        all_results.append((method, final_dist, total_time, avg_overhead))
 
     return all_results
 
@@ -108,17 +102,15 @@ def run_experiments_for_model(
     baseline_embs,
     pca
 ):
-
     partial_results = []
-    all_distance_names = ["mahalanobis"] + list(DISTANCE_FUNCTIONS.keys())
+    all_distance_names = ["mahalanobis"] + list(LEGACY_DISTANCE_FUNCTIONS.keys()) \
+                         + ["kl", "js", "hellinger", "bhattacharyya", "mmd", "wasserstein"]
 
     for distance_name in all_distance_names:
         for drift_strength in drift_strengths:
-            # Introduce drift
             drifted_texts = introduce_gradual_drift(drift_texts, fraction_shuffle=drift_strength)
             test_texts = baseline_texts + drifted_texts
 
-            # Actually run the tracker for each approach
             results = run_distance_tracking(
                 model_name["model"],
                 model_name["tokenizer"],
@@ -131,12 +123,11 @@ def run_experiments_for_model(
                 batch_size,
                 device,
             )
-            # results is a list of (method, final_distance, total_time, avg_overhead)
             for (method, final_dist, total_time, avg_overhead) in results:
                 partial_results.append({
                     "distance_name": distance_name,
                     "drift_strength": drift_strength,
-                    "method": method,  # Instead of a boolean 'pca', we store the string approach
+                    "method": method,
                     "final_similarity": final_dist,
                     "time_taken": total_time,
                     "avg_overhead": avg_overhead,
@@ -144,8 +135,10 @@ def run_experiments_for_model(
 
     return partial_results
 
-
 def collect_data_single_seed(seed, args):
+    """
+    Unchanged logic. Uses the new run_experiments_for_model() under the hood.
+    """
     set_seed(seed)
     device = get_device()
     print(f"[Seed={seed}] Using device:", device)
@@ -157,7 +150,6 @@ def collect_data_single_seed(seed, args):
         for model_name in args["models"]:
             print(f"[Seed={seed}] --- Using Model: {model_name} ---")
 
-            # Compute baseline embeddings and fit PCA
             model, tokenizer, baseline_embs, pca = compute_baseline_embeddings_and_pca(
                 model_name,
                 baseline_texts,
@@ -171,7 +163,6 @@ def collect_data_single_seed(seed, args):
                 "tokenizer": tokenizer,
             }
 
-            # Run experiments
             partial_results = run_experiments_for_model(
                 model_details,
                 baseline_texts,
@@ -183,8 +174,6 @@ def collect_data_single_seed(seed, args):
                 baseline_embs,
                 pca
             )
-
-            # Attach metadata and store
             for r in partial_results:
                 r["seed"] = seed
                 key = (dataset_name, model_name)
@@ -192,8 +181,10 @@ def collect_data_single_seed(seed, args):
 
     return results
 
-
 def collect_data_multiple_seeds():
+    """
+    Collect results for multiple seeds; unchanged in structure.
+    """
     all_results = defaultdict(list)
     for seed in range(args["num_seeds"]):
         seed_results = collect_data_single_seed(seed, args)
@@ -201,7 +192,6 @@ def collect_data_multiple_seeds():
             all_results[key].extend(records)
     print("\nAll seeds complete!")
     return all_results
-
 
 def main():
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")

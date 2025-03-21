@@ -16,18 +16,18 @@ args = {
             "split": "train",
             "text_column": "text"
         },
-        {
-            "name": "wikitext",
-            "config": "wikitext-2-raw-v1",
-            "split": "train",
-            "text_column": "text"
-        },
-        {
-            "name": "ag_news",
-            "config": None,
-            "split": "train",
-            "text_column": "text"
-        },
+        # {
+        #     "name": "wikitext",
+        #     "config": "wikitext-2-raw-v1",
+        #     "split": "train",
+        #     "text_column": "text"
+        # },
+        # {
+        #     "name": "ag_news",
+        #     "config": None,
+        #     "split": "train",
+        #     "text_column": "text"
+        # },
     ],
     "max_texts": 100,
     "batch_size": 64,

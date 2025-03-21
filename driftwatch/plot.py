@@ -30,59 +30,120 @@ def flatten_data(results_data):
     return pd.DataFrame(records_list)
 
 def plot_final_similarity(df, output_dir):
-    # Compute mean final_similarity at each group
-    df_sim = df.groupby(["distance_name", "drift_strength", "method"], as_index=False)["final_similarity"].mean()
+    """
+    Produce a two-subplot figure:
+      - Left subplot: Legacy metrics (mahalanobis + classical distance functions).
+      - Right subplot: Distribution-based metrics (kl, js, hellinger, etc.).
 
-    # For each distance_name, min–max normalize the final_similarity
+    Each subplot shows how the normalized final similarity varies with drift_strength,
+    with one line per method (e.g., no_pca, pca, kll_sketch). We first min–max normalize
+    final_similarity per distance_name, then average across all distance_names in each
+    category (legacy or distribution-based). This lets us compare trends between the
+    two categories at a high level.
+    """
+
+    # 1) Min–max normalize final_similarity for each distance_name
+    df_sim = df.copy()
+    df_sim = df_sim.groupby(["distance_name", "drift_strength", "method"], as_index=False)["final_similarity"].mean()
+
     df_sim["final_similarity_norm"] = 0.0
     for dist_name, group_data in df_sim.groupby("distance_name"):
         min_val = group_data["final_similarity"].min()
         max_val = group_data["final_similarity"].max()
-        if max_val - min_val == 0:
-            # Handle edge case where all values are the same
+        if max_val - min_val < 1e-12:
+            # Handle edge case where all values are identical
             df_sim.loc[group_data.index, "final_similarity_norm"] = 0.0
         else:
             df_sim.loc[group_data.index, "final_similarity_norm"] = (
                 (group_data["final_similarity"] - min_val) / (max_val - min_val)
             )
 
-    unique_distances = df_sim["distance_name"].unique()
-    num_dist = len(unique_distances)
-    num_cols = 3
-    num_rows = (num_dist + num_cols - 1) // num_cols
+    # 2) Separate the distance metrics into two categories
+    legacy_set = {
+        "mahalanobis", "euclidean", "manhattan", "minkowski", "chebyshev", "canberra"
+    }
+    dist_set = {
+        "kl", "js", "hellinger", "bhattacharyya", "mmd", "wasserstein"
+    }
 
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(5 * num_cols, 4 * num_rows), squeeze=False)
-    axes = axes.flatten()
-    palette = sns.color_palette("husl", len(df_sim["method"].unique()))
+    df_legacy = df_sim[df_sim["distance_name"].isin(legacy_set)].copy()
+    df_dist = df_sim[df_sim["distance_name"].isin(dist_set)].copy()
 
-    for i, dist_name in enumerate(unique_distances):
-        ax = axes[i]
-        subset = df_sim[df_sim["distance_name"] == dist_name]
-        for j, method_name in enumerate(subset["method"].unique()):
-            sub_m = subset[subset["method"] == method_name]
-            ax.plot(
-                sub_m["drift_strength"],
-                sub_m["final_similarity_norm"],
+    # If either subset is empty, handle gracefully
+    if df_legacy.empty and df_dist.empty:
+        print("[Warning] Neither legacy nor distribution-based metrics found in the DataFrame.")
+        return
+
+    # 3) For each category, we average across all distance_names
+    #    so we get a single trend line per method for that category.
+    df_legacy_grouped = (
+        df_legacy.groupby(["method", "drift_strength"], as_index=False)["final_similarity_norm"]
+        .mean()
+    )
+    df_dist_grouped = (
+        df_dist.groupby(["method", "drift_strength"], as_index=False)["final_similarity_norm"]
+        .mean()
+    )
+
+    # 4) Plot them side-by-side
+    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
+
+    # Determine a consistent color palette based on the number of methods
+    all_methods = np.unique(df_sim["method"])
+    palette = sns.color_palette("husl", n_colors=len(all_methods))
+    method_to_color = dict(zip(all_methods, palette))
+
+    # -- Left subplot: Legacy metrics --
+    if not df_legacy_grouped.empty:
+        for method_name in all_methods:
+            subset = df_legacy_grouped[df_legacy_grouped["method"] == method_name]
+            if subset.empty:
+                continue
+            ax_left.plot(
+                subset["drift_strength"],
+                subset["final_similarity_norm"],
                 marker='o',
                 label=method_name,
-                color=palette[j]
+                color=method_to_color[method_name]
             )
-        ax.set_title(f"{dist_name} Dist. Similarity")
-        ax.set_xlabel("Drift Strength")
-        ax.set_ylabel("Normalized Final Similarity (0 - 1)")
-        # ax.set_ylim(0, 1)
-        ax.grid(True)
-        ax.legend()
+        ax_left.set_title("Legacy Metrics (Averaged)")
+        ax_left.set_xlabel("Drift Strength")
+        ax_left.set_ylabel("Normalized Final Similarity")
+        ax_left.grid(True)
+        ax_left.legend()
+    else:
+        ax_left.set_title("No Legacy Metrics Found")
+        ax_left.set_axis_off()
 
-    # Remove extra subplots
-    for j in range(num_dist, len(axes)):
-        fig.delaxes(axes[j])
+    # -- Right subplot: Distribution-based metrics --
+    if not df_dist_grouped.empty:
+        for method_name in all_methods:
+            subset = df_dist_grouped[df_dist_grouped["method"] == method_name]
+            if subset.empty:
+                continue
+            ax_right.plot(
+                subset["drift_strength"],
+                subset["final_similarity_norm"],
+                marker='o',
+                label=method_name,
+                color=method_to_color[method_name]
+            )
+        ax_right.set_title("Distribution-Based Metrics (Averaged)")
+        ax_right.set_xlabel("Drift Strength")
+        ax_right.set_ylabel("Normalized Final Similarity")
+        ax_right.grid(True)
+        ax_right.legend()
+    else:
+        ax_right.set_title("No Distribution-Based Metrics Found")
+        ax_right.set_axis_off()
 
     plt.tight_layout()
-    path_sim = os.path.join(output_dir, "plot_final_similarity_methods.png")
-    plt.savefig(path_sim)
+
+    # 5) Save the figure
+    out_path = os.path.join(output_dir, "final_similarity_legacy_vs_distribution.png")
+    plt.savefig(out_path, dpi=150)
     plt.close()
-    print(f"[Saved] {path_sim}")
+    print(f"[Saved] {out_path}")
 
 
 def plot_avg_overhead(df, output_dir):
