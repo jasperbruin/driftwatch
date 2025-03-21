@@ -45,8 +45,8 @@ def run_distance_tracking(
             embedding_dim=embedding_dim,
             alpha=0.01,
             distance_name=distance_name,
-            k=args.get("kll_k", 50),
-            num_bins=args.get("kll_bins", 50)
+            k=args.get("kll_k", 20),
+            num_bins=args.get("kll_bins", 20)
         )
 
     # 1) Fit baseline
