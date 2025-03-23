@@ -125,7 +125,7 @@ class EmbeddingTracker:
             new_counts = [np.zeros(self.num_bins, dtype=np.float64) for _ in range(self.embedding_dim)]
             for dim_idx in range(self.embedding_dim):
                 col_vals = embeddings[:, dim_idx]
-                range_span = max(self.max_vals[dim_idx3] - self.min_vals[dim_idx], 1e-12)
+                range_span = max(self.max_vals[dim_idx] - self.min_vals[dim_idx], 1e-12)
                 bin_width = range_span / self.num_bins
                 bin_indices = ((col_vals - self.min_vals[dim_idx]) / bin_width).astype(int)
                 bin_indices = np.clip(bin_indices, 0, self.num_bins - 1)
