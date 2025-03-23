@@ -16,20 +16,13 @@ def flatten_data(results_data):
     for dataset_name, model_dict in results_data.items():
         for model_name, records in model_dict.items():
             for r in records:
-                distance_type = r.get("distance_type", "vector")
-                pca_applied = r.get("pca_applied", False)
-
-                if distance_type == "vector":
-                    method = "pca" if pca_applied else "no_pca"
-                else:
-                    method = "pca_kll_sketch" if pca_applied else "kll_sketch"
-
+                method = r.get("method", "unknown")
                 records_list.append({
                     "dataset": dataset_name,
                     "model_name": model_name,
                     "distance_name": r["distance_name"],
-                    "distance_type": distance_type,
-                    "pca_applied": pca_applied,
+                    "distance_type": r.get("distance_type", "vector"),
+                    "pca_applied": r.get("pca_applied", False),
                     "method": method,
                     "drift_strength": r["drift_strength"],
                     "final_similarity": r["final_similarity"],
@@ -37,6 +30,7 @@ def flatten_data(results_data):
                     "time_taken": r.get("time_taken", float('nan')),
                 })
     return pd.DataFrame(records_list)
+
 
 
 def plot_final_similarity(df, output_dir):
@@ -157,42 +151,45 @@ def plot_final_similarity(df, output_dir):
 
 
 def plot_avg_overhead(df, output_dir):
-    # Ensure required fields are present
-    if "distance_type" not in df.columns or "pca_applied" not in df.columns:
-        raise ValueError("DataFrame must include 'distance_type' and 'pca_applied' columns.")
+    """
+    Plots the average overhead per model, with separate bars for each method,
+    including histogram and kll-based approaches (with/without PCA),
+    sorted by descending overall overhead.
+    """
+    if "model_name" not in df.columns or "method" not in df.columns:
+        raise ValueError("DataFrame must include 'model_name' and 'method' columns.")
 
-    # Step 1: Aggregate
-    df_grouped = (
-        df.groupby(["model_name", "distance_type", "pca_applied"], as_index=False)
-          .agg({"avg_overhead": "mean"})
-    )
+    # Step 1: Aggregate average overhead by model and method
+    df_grouped = df.groupby(["model_name", "method"], as_index=False)["avg_overhead"].mean()
 
-    # Step 2: Create combined method name for bar labels
-    df_grouped["method_type"] = df_grouped.apply(
-        lambda row: f"{row['distance_type']}_{'pca' if row['pca_applied'] else 'no_pca'}", axis=1
-    )
+    # Step 2: Pivot: rows = model_name, columns = method
+    pivot_df = df_grouped.pivot(index="model_name", columns="method", values="avg_overhead").fillna(0)
 
-    # Step 3: Pivot to have 4 bars per model
-    pivot_df = df_grouped.pivot(index="model_name", columns="method_type", values="avg_overhead").fillna(0)
+    # Step 3: Sort columns (methods) by descending mean overhead
+    method_means = pivot_df.mean(axis=0).sort_values(ascending=False)
+    sorted_methods = method_means.index.tolist()
+    pivot_df = pivot_df[sorted_methods]
 
     # Step 4: Plot
-    fig, ax = plt.subplots(figsize=(12, 6))
-    colors = sns.color_palette("pastel", n_colors=4)
+    fig, ax = plt.subplots(figsize=(14, 6))
+    colors = sns.color_palette("husl", n_colors=len(sorted_methods))
     pivot_df.plot(kind='bar', ax=ax, logy=True, color=colors)
 
     ax.set_xlabel("Model Name", fontsize=12)
     ax.set_ylabel("Avg Overhead (s) [log scale]", fontsize=12)
-    ax.set_title("Average Overhead per Model (Vector vs Distribution, PCA vs No PCA)", fontsize=14, fontweight='bold')
+    ax.set_title("Average Overhead per Model by Method (Sorted)", fontsize=14, fontweight='bold')
     plt.xticks(rotation=30, ha="right", fontsize=10)
     plt.yticks(fontsize=10)
-    ax.legend(title="Method Type", fontsize=10)
+    ax.legend(title="Method", fontsize=10)
     ax.grid(axis='y', linestyle='--', alpha=0.7)
     plt.tight_layout()
 
-    path_overhead = os.path.join(output_dir, "plot_model_avg_overhead_4bars.png")
+    path_overhead = os.path.join(output_dir, "plot_model_avg_overhead_by_method_sorted.png")
     plt.savefig(path_overhead, dpi=300)
     plt.close()
     print(f"[Saved] {path_overhead}")
+
+
 
 
 def plot_relative_log_increase(df, output_dir):
@@ -412,6 +409,38 @@ def plot_final_similarity_separate(df, output_dir):
     print(f"[Saved] {path_sim}")
 
 
+def plot_avg_overhead_merged(df, output_dir):
+    """
+    Plots a single histogram showing the average overhead per method
+    across all models (merged), sorted from high to low.
+    """
+    if "method" not in df.columns or "avg_overhead" not in df.columns:
+        raise ValueError("DataFrame must include 'method' and 'avg_overhead' columns.")
+
+    # Step 1: Compute average overhead per method across all models
+    method_means = df.groupby("method", as_index=False)["avg_overhead"].mean()
+    method_means_sorted = method_means.sort_values("avg_overhead", ascending=False)
+
+    # Step 2: Plot
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=method_means_sorted, x="method", y="avg_overhead", palette="viridis")
+
+    plt.yscale("log")
+    plt.xlabel("Method", fontsize=12)
+    plt.ylabel("Avg Overhead (s) [log scale]", fontsize=12)
+    plt.title("Average Overhead per Method (All Models Combined)", fontsize=14, fontweight='bold')
+    plt.xticks(rotation=30, ha="right", fontsize=10)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.tight_layout()
+
+    # Step 3: Save
+    out_path = os.path.join(output_dir, "plot_avg_overhead_merged.png")
+    plt.savefig(out_path, dpi=300)
+    plt.close()
+    print(f"[Saved] {out_path}")
+
+
+
 
 def generate_all_plots(json_path, output_dir):
     results_data = load_json_data(json_path)
@@ -422,6 +451,7 @@ def generate_all_plots(json_path, output_dir):
     plot_avg_time(df, output_dir)
     plot_overhead_vs_size(df, output_dir)
     plot_final_similarity_separate(df, output_dir)
+    plot_avg_overhead_merged(df, output_dir)
 
 def run_all_results(data_dir):
     """

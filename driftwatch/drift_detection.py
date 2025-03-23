@@ -23,36 +23,55 @@ def run_distance_tracking(
     Main entry point for distance tracking experiments.
     """
 
+    # 1) Choose approaches based on whether the distance is distribution-based or vector-based.
+    #    We now add "histogram" and "pca_histogram" for distribution-based cases.
     if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
-        approaches = ["kll_sketch", "pca_kll_sketch"]
+        approaches = ["kll_sketch", "histogram", "pca_kll_sketch", "pca_histogram"]
     else:
         approaches = ["no_pca", "pca"]
 
     all_results = []
     tracker_dict = {}
 
+    # 2) Build an EmbeddingTracker for each approach.
     for method in approaches:
-        if method in ["pca", "pca_kll_sketch"]:
+        # Pick embedding dim based on whether we're applying PCA
+        if method in ["pca", "pca_kll_sketch", "pca_histogram"]:
             embedding_dim = pca_components
         else:
             embedding_dim = baseline_embs.shape[1]
 
+        # Decide distribution_impl based on the method
+        if method in ["no_pca", "pca"]:
+            # Vector-based
+            distribution_impl = "none"  # or "kll" is fine if is_distribution_mode is False
+        elif method in ["kll_sketch", "pca_kll_sketch"]:
+            distribution_impl = "kll"
+        elif method in ["histogram", "pca_histogram"]:
+            distribution_impl = "histogram"
+        else:
+            raise ValueError(f"Unknown method: {method}")
+
+        # Instantiate tracker
         tracker_dict[method] = EmbeddingTracker(
             embedding_dim=embedding_dim,
             alpha=0.01,
             distance_name=distance_name,
             k=args.get("kll_k", 20),
-            num_bins=args.get("kll_bins", 20)
+            num_bins=args.get("kll_bins", 20),
+            distribution_impl=distribution_impl
         )
 
+    # 3) Feed baseline data to each approach to initialize stats / distribution
     for method in approaches:
         tracker = tracker_dict[method]
         for batch in batch_generator(baseline_texts, batch_size):
             emb = extract_embeddings(model, tokenizer, batch, device)
-            if method in ["pca", "pca_kll_sketch"]:
+            if method in ["pca", "pca_kll_sketch", "pca_histogram"]:
                 emb = pca.transform(emb)
             tracker.update(emb)
 
+    # 4) For each approach, compute distances on the test set (and optionally update in real-time)
     for method in approaches:
         tracker = tracker_dict[method]
         distance_scores = []
@@ -61,7 +80,7 @@ def run_distance_tracking(
         start_time = time.time()
         for batch in tqdm(batch_generator(test_texts, batch_size), leave=False):
             emb = extract_embeddings(model, tokenizer, batch, device)
-            if method in ["pca", "pca_kll_sketch"]:
+            if method in ["pca", "pca_kll_sketch", "pca_histogram"]:
                 emb = pca.transform(emb)
 
             overhead_start = time.time()
@@ -71,6 +90,7 @@ def run_distance_tracking(
             distance_scores.append(dist)
             overhead_times.append(overhead_end - overhead_start)
 
+            # Real-time update, if desired
             if realtime_update:
                 tracker.update(emb)
 
@@ -97,8 +117,13 @@ def run_experiments_for_model(
     seed=None
 ):
     partial_results = []
-    all_distance_names = ["mahalanobis"] + list(VECTOR_DISTANCE_FUNCTIONS.keys()) \
-                         + ["kl", "js", "hellinger", "bhattacharyya", "mmd", "wasserstein"]
+
+    # Combine your vector-based distances + distribution-based distances
+    all_distance_names = (
+        ["mahalanobis"]
+        + list(VECTOR_DISTANCE_FUNCTIONS.keys())
+        + ["kl", "js", "hellinger", "bhattacharyya", "mmd", "wasserstein"]
+    )
 
     for distance_name in all_distance_names:
         if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
@@ -107,7 +132,10 @@ def run_experiments_for_model(
             distance_type = "vector"
 
         for drift_strength in drift_strengths:
-            drifted_texts = introduce_gradual_drift(drift_texts, fraction_shuffle=drift_strength)
+            drifted_texts = introduce_gradual_drift(
+                drift_texts,
+                fraction_shuffle=drift_strength
+            )
             test_texts = baseline_texts + drifted_texts
 
             results = run_distance_tracking(
@@ -128,7 +156,8 @@ def run_experiments_for_model(
                     "distance_type": distance_type,
                     "distance_name": distance_name,
                     "drift_strength": drift_strength,
-                    "pca_applied": method in ["pca", "pca_kll_sketch"],
+                    "pca_applied": method in ["pca", "pca_kll_sketch", "pca_histogram"],
+                    "method": method,
                     "final_similarity": final_dist,
                     "time_taken": total_time,
                     "avg_overhead": avg_overhead,
@@ -145,7 +174,10 @@ def collect_data_single_seed(seed, args):
 
     results = defaultdict(list)
     for dataset_info in args["datasets"]:
-        dataset_name, baseline_texts, drift_texts = load_and_split_texts(dataset_info, args["max_texts"])
+        dataset_name, baseline_texts, drift_texts = load_and_split_texts(
+            dataset_info,
+            args["max_texts"]
+        )
 
         for model_name in args["models"]:
             print(f"[Seed={seed}] --- Using Model: {model_name} ---")
