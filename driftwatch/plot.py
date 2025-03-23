@@ -198,7 +198,7 @@ def plot_avg_overhead(df, output_dir):
 def plot_relative_log_increase(df, output_dir):
     plot_data = []
 
-    # Step 1: Compute relative log increase per row (compared to baseline for same distance_name + pca_applied)
+    # Step 1: Compute relative log increase per row
     for _, row in df.iterrows():
         if row["drift_strength"] >= 0:
             base_similarity = df[
@@ -213,12 +213,13 @@ def plot_relative_log_increase(df, output_dir):
                     "distance_name": row["distance_name"],
                     "drift_strength": row["drift_strength"],
                     "pca_applied": row["pca_applied"],
+                    "distance_type": row["distance_type"],
                     "rel_log_increase": rel_log
                 })
 
     df_plot = pd.DataFrame(plot_data)
 
-    # Step 2: Group and normalize within each distance_name + pca_applied
+    # Step 2: Normalize per (distance_name, pca_applied)
     df_normalized = []
     for (dist_name, pca_flag), group in df_plot.groupby(["distance_name", "pca_applied"]):
         df_avg = group.groupby("drift_strength")["rel_log_increase"].mean().reset_index()
@@ -230,34 +231,49 @@ def plot_relative_log_increase(df, output_dir):
             df_avg["normalized"] = 0.0
         df_avg["distance_name"] = dist_name
         df_avg["pca_applied"] = pca_flag
+        df_avg["distance_type"] = group["distance_type"].iloc[0]
         df_normalized.append(df_avg)
 
     df_final = pd.concat(df_normalized, ignore_index=True)
 
-    # Step 3: Create 2-subplot figure
-    fig, (ax_pca, ax_nopca) = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
+    # Step 3: Create 4-subplot figure
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharey=True)
+    axes = axes.flatten()
 
-    for pca_flag, ax in zip([True, False], [ax_pca, ax_nopca]):
-        sub_df = df_final[df_final["pca_applied"] == pca_flag]
+    title_map = {
+        (False, "vector"): "Vector-Based (No PCA)",
+        (True, "vector"): "Vector-Based (PCA)",
+        (False, "distribution"): "Distribution-Based (No PCA)",
+        (True, "distribution"): "Distribution-Based (PCA)",
+    }
+
+    for i, (pca_flag, dist_type) in enumerate(title_map.keys()):
+        ax = axes[i]
+        sub_df = df_final[
+            (df_final["pca_applied"] == pca_flag) &
+            (df_final["distance_type"] == dist_type)
+        ]
+
         for dist_name in sub_df["distance_name"].unique():
             d = sub_df[sub_df["distance_name"] == dist_name]
             ax.plot(d["drift_strength"], d["normalized"], marker='o', label=dist_name)
 
-        ax.set_title("PCA Applied" if pca_flag else "No PCA")
+        ax.set_title(title_map[(pca_flag, dist_type)], fontsize=12, fontweight='bold')
         ax.set_xlabel("Drift Strength")
         ax.grid(True)
-        if not pca_flag:
-            ax.legend(title="Distance", fontsize=9)
-        if pca_flag:
+        if i % 2 == 0:
             ax.set_ylabel("Normalized Relative Log Increase")
+        if i == 3:
+            ax.legend(title="Metric", fontsize=9)
 
-    fig.suptitle("Relative Log Increase vs Drift Strength (PCA vs No PCA)", fontsize=16, fontweight='bold')
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.suptitle("Relative Log Increase vs Drift Strength", fontsize=16, fontweight='bold')
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
 
-    path_out = os.path.join(output_dir, "plot_relative_log_increase_pca_vs_no_pca.png")
+    path_out = os.path.join(output_dir, "plot_relative_log_increase_4subplots.png")
     plt.savefig(path_out, dpi=300)
     plt.close()
     print(f"[Saved] {path_out}")
+
 
 
 

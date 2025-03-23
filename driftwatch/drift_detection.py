@@ -1,7 +1,7 @@
 import time
 from tqdm import tqdm
 
-from embedding_tracker import EmbeddingTracker, LEGACY_DISTANCE_FUNCTIONS, DISTRIBUTION_METRICS
+from embedding_tracker import EmbeddingTracker, VECTOR_DISTANCE_FUNCTIONS, DISTRIBUTION_METRICS
 from utils import *
 from config import *
 from plot import *
@@ -97,7 +97,7 @@ def run_experiments_for_model(
     seed=None
 ):
     partial_results = []
-    all_distance_names = ["mahalanobis"] + list(LEGACY_DISTANCE_FUNCTIONS.keys()) \
+    all_distance_names = ["mahalanobis"] + list(VECTOR_DISTANCE_FUNCTIONS.keys()) \
                          + ["kl", "js", "hellinger", "bhattacharyya", "mmd", "wasserstein"]
 
     for distance_name in all_distance_names:

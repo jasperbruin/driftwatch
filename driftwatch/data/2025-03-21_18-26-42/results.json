@@ -1,0 +1,4812 @@
+{
+    "ag_news": {
+        "layonsan/google-t5-small": [
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.7062729978574385,
+                "time_taken": 7.341968774795532,
+                "avg_overhead": 8.992164854019408e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.6831202061802342,
+                "time_taken": 7.857263803482056,
+                "avg_overhead": 6.458115956139942e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 1.421227324740752,
+                "time_taken": 7.145755290985107,
+                "avg_overhead": 8.602747841486855e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.4021944112067006,
+                "time_taken": 7.913172006607056,
+                "avg_overhead": 6.411567566886781e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 2.169531647548001,
+                "time_taken": 6.868051052093506,
+                "avg_overhead": 7.945772201295883e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 2.140644587987053,
+                "time_taken": 8.062182903289795,
+                "avg_overhead": 6.48763444688585e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 2.4328532620715104,
+                "time_taken": 6.864053010940552,
+                "avg_overhead": 7.253601437523252e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 2.3979081921188783,
+                "time_taken": 7.794398069381714,
+                "avg_overhead": 6.305982196141803e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 2.5481682676865423,
+                "time_taken": 6.884353160858154,
+                "avg_overhead": 7.351996406676277e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 2.509664882850558,
+                "time_taken": 7.856064081192017,
+                "avg_overhead": 6.536831931462364e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.6055707335472107,
+                "time_taken": 6.888869047164917,
+                "avg_overhead": 7.450012933640253e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.5883477330207825,
+                "time_taken": 7.820991039276123,
+                "avg_overhead": 5.9298106602260047e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 1.645419955253601,
+                "time_taken": 6.883785009384155,
+                "avg_overhead": 7.453797355530755e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.6347755193710327,
+                "time_taken": 7.962221145629883,
+                "avg_overhead": 5.9873338729616195e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 2.1592681407928467,
+                "time_taken": 6.9401772022247314,
+                "avg_overhead": 7.951448834131634e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 2.1449310779571533,
+                "time_taken": 8.060755968093872,
+                "avg_overhead": 5.824982173859127e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 2.6089656352996826,
+                "time_taken": 6.935845136642456,
+                "avg_overhead": 7.937068030947731e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 2.5896284580230713,
+                "time_taken": 7.906403064727783,
+                "avg_overhead": 5.887046692863343e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 2.5060338973999023,
+                "time_taken": 6.942646026611328,
+                "avg_overhead": 8.426393781389509e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 2.484903573989868,
+                "time_taken": 8.09519910812378,
+                "avg_overhead": 5.861691066196987e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 5.033157825469971,
+                "time_taken": 6.8955979347229,
+                "avg_overhead": 7.214621892051091e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 1.7940258979797363,
+                "time_taken": 7.9408860206604,
+                "avg_overhead": 5.515794905405196e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 8.487455368041992,
+                "time_taken": 6.917393922805786,
+                "avg_overhead": 7.967721848260789e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 3.3932418823242188,
+                "time_taken": 7.858119964599609,
+                "avg_overhead": 5.681174142020089e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 14.266878128051758,
+                "time_taken": 6.9164087772369385,
+                "avg_overhead": 7.40195077563089e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 5.966275691986084,
+                "time_taken": 7.8040807247161865,
+                "avg_overhead": 5.247100951179626e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 13.835543632507324,
+                "time_taken": 6.896151065826416,
+                "avg_overhead": 6.98150150359623e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 6.13138484954834,
+                "time_taken": 7.814072132110596,
+                "avg_overhead": 6.344583299424913e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 15.143836975097656,
+                "time_taken": 6.9657301902771,
+                "avg_overhead": 8.040382748558408e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 6.7738165855407715,
+                "time_taken": 7.9236228466033936,
+                "avg_overhead": 5.5479624914744546e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.5015032291412354,
+                "time_taken": 7.056375026702881,
+                "avg_overhead": 9.80581556047712e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.5478370785713196,
+                "time_taken": 8.977269887924194,
+                "avg_overhead": 6.725296141609313e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 1.2273074388504028,
+                "time_taken": 7.090929269790649,
+                "avg_overhead": 9.487545679485987e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.3853919506072998,
+                "time_taken": 9.522967100143433,
+                "avg_overhead": 6.4827146984282e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 1.5091252326965332,
+                "time_taken": 7.102915048599243,
+                "avg_overhead": 9.844795105949281e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 1.7424343824386597,
+                "time_taken": 10.146754026412964,
+                "avg_overhead": 6.230293758331783e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 1.7412382364273071,
+                "time_taken": 7.074991226196289,
+                "avg_overhead": 7.40384298657614e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 2.0230729579925537,
+                "time_taken": 10.008882761001587,
+                "avg_overhead": 6.261326017833891e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 1.5609627962112427,
+                "time_taken": 6.859835863113403,
+                "avg_overhead": 7.471205696227058e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 1.7876503467559814,
+                "time_taken": 9.737086057662964,
+                "avg_overhead": 6.421028621613033e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.4713134765625,
+                "time_taken": 6.962334871292114,
+                "avg_overhead": 7.465150621202256e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.5451393127441406,
+                "time_taken": 9.782997131347656,
+                "avg_overhead": 6.012311057438926e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.8651647567749023,
+                "time_taken": 7.356288194656372,
+                "avg_overhead": 0.0001224146948920356,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.053568959236145,
+                "time_taken": 7.850091934204102,
+                "avg_overhead": 5.717883034357949e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 1.295553207397461,
+                "time_taken": 7.348478078842163,
+                "avg_overhead": 0.0001278150649297805,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 1.894502878189087,
+                "time_taken": 7.928754091262817,
+                "avg_overhead": 5.764809865800161e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 1.5857772827148438,
+                "time_taken": 7.329593896865845,
+                "avg_overhead": 0.00011970504881843688,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 2.2876176834106445,
+                "time_taken": 7.9283270835876465,
+                "avg_overhead": 6.0293409559461805e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 1.1780786514282227,
+                "time_taken": 7.345480918884277,
+                "avg_overhead": 0.00011499722798665364,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 1.7004064321517944,
+                "time_taken": 8.019721984863281,
+                "avg_overhead": 5.680795699831039e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 119.87640380859375,
+                "time_taken": 7.405469179153442,
+                "avg_overhead": 0.00013407828315855966,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 40.352779388427734,
+                "time_taken": 7.89942193031311,
+                "avg_overhead": 6.251486520918589e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 140.3643341064453,
+                "time_taken": 7.373932123184204,
+                "avg_overhead": 0.00013673494732569134,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 39.81099319458008,
+                "time_taken": 7.879065752029419,
+                "avg_overhead": 6.057724120124938e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 148.06320190429688,
+                "time_taken": 7.373974084854126,
+                "avg_overhead": 0.00013815788995651972,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 41.55500030517578,
+                "time_taken": 8.094863176345825,
+                "avg_overhead": 6.220832703605531e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 166.96551513671875,
+                "time_taken": 7.356040000915527,
+                "avg_overhead": 0.0001315994868202815,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 43.93317413330078,
+                "time_taken": 7.88775897026062,
+                "avg_overhead": 6.075889345199343e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 177.51417541503906,
+                "time_taken": 7.357314109802246,
+                "avg_overhead": 0.0001342826419406467,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 43.22321701049805,
+                "time_taken": 7.865012168884277,
+                "avg_overhead": 6.167472354949467e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 3.687686788560855,
+                "time_taken": 8.414225816726685,
+                "avg_overhead": 0.02484144861735995,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 3.661830275034392,
+                "time_taken": 8.314235210418701,
+                "avg_overhead": 0.0059749361068483385,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 3.6556523715299587,
+                "time_taken": 8.389271974563599,
+                "avg_overhead": 0.024526864763290163,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 4.012886608226645,
+                "time_taken": 8.213752031326294,
+                "avg_overhead": 0.005906649998256138,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 3.79942553068409,
+                "time_taken": 8.384567975997925,
+                "avg_overhead": 0.02440990720476423,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 3.5459788613015997,
+                "time_taken": 8.606833934783936,
+                "avg_overhead": 0.00594601555476113,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 3.761892889458334,
+                "time_taken": 8.395542860031128,
+                "avg_overhead": 0.024690113370380705,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 4.290050416890827,
+                "time_taken": 8.324076175689697,
+                "avg_overhead": 0.006035770688738141,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 3.4552835469682304,
+                "time_taken": 8.4060800075531,
+                "avg_overhead": 0.02453437684074281,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 3.031947664201881,
+                "time_taken": 8.345590829849243,
+                "avg_overhead": 0.006109366341242714,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.16074124062192846,
+                "time_taken": 8.767163753509521,
+                "avg_overhead": 0.029539535916040815,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.1686657430261353,
+                "time_taken": 8.469713926315308,
+                "avg_overhead": 0.007175494754125202,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.16111080046412174,
+                "time_taken": 8.688580751419067,
+                "avg_overhead": 0.029310752475072466,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.16989536592404156,
+                "time_taken": 8.262156963348389,
+                "avg_overhead": 0.007251255095951141,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.1638326442091912,
+                "time_taken": 8.704729080200195,
+                "avg_overhead": 0.02940406496562655,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.17378909490915295,
+                "time_taken": 8.339205741882324,
+                "avg_overhead": 0.0072644589439270985,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.1620861264798626,
+                "time_taken": 8.701155185699463,
+                "avg_overhead": 0.02937270724584186,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.15556355171186909,
+                "time_taken": 8.327165842056274,
+                "avg_overhead": 0.007129207489982484,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.1579823017073851,
+                "time_taken": 8.705634832382202,
+                "avg_overhead": 0.02928726635282002,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.14989929403427246,
+                "time_taken": 10.669097185134888,
+                "avg_overhead": 0.00652094114394415,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.44681297291347494,
+                "time_taken": 8.453989267349243,
+                "avg_overhead": 0.025257708534361826,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.4591671980443462,
+                "time_taken": 9.766914129257202,
+                "avg_overhead": 0.005697080067225865,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.4391332047828131,
+                "time_taken": 8.579675912857056,
+                "avg_overhead": 0.02443731398809524,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.46596335553340124,
+                "time_taken": 9.090090990066528,
+                "avg_overhead": 0.005728903270903088,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.4412465207763201,
+                "time_taken": 8.459821701049805,
+                "avg_overhead": 0.02486433301653181,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.46082907048360894,
+                "time_taken": 10.632810115814209,
+                "avg_overhead": 0.00577832025194925,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.45364247847076705,
+                "time_taken": 8.384407758712769,
+                "avg_overhead": 0.02440818907722594,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.4541589642747351,
+                "time_taken": 10.251936674118042,
+                "avg_overhead": 0.005961240284026615,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.4414271882970916,
+                "time_taken": 8.427058219909668,
+                "avg_overhead": 0.025020512323530895,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.4536704884509528,
+                "time_taken": 9.646777868270874,
+                "avg_overhead": 0.005820361394730825,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.23622459321970504,
+                "time_taken": 8.375757932662964,
+                "avg_overhead": 0.024610133398146855,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.2467570733112521,
+                "time_taken": 10.069462060928345,
+                "avg_overhead": 0.005842943040151444,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.24261917894802787,
+                "time_taken": 8.442206859588623,
+                "avg_overhead": 0.02539748615688748,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.2512210901972102,
+                "time_taken": 10.113314151763916,
+                "avg_overhead": 0.005820244077652219,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.2407383019681927,
+                "time_taken": 8.325788974761963,
+                "avg_overhead": 0.024265399054875448,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.24041250921482493,
+                "time_taken": 10.267155885696411,
+                "avg_overhead": 0.005839608964465913,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.23692681927341608,
+                "time_taken": 8.381534814834595,
+                "avg_overhead": 0.02428668642800952,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.23726159952339715,
+                "time_taken": 9.890412092208862,
+                "avg_overhead": 0.005967106137956891,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.23293399780605015,
+                "time_taken": 8.414922952651978,
+                "avg_overhead": 0.024349961962018694,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.24052449734543113,
+                "time_taken": 11.487611770629883,
+                "avg_overhead": 0.005762622469947452,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.08575017110760844,
+                "time_taken": 9.001260042190552,
+                "avg_overhead": 0.0348236258067782,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.09770359540048769,
+                "time_taken": 10.7470703125,
+                "avg_overhead": 0.008522624061221168,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.08675419987694491,
+                "time_taken": 8.998342990875244,
+                "avg_overhead": 0.03491786926511734,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.09565787958111346,
+                "time_taken": 9.981725931167603,
+                "avg_overhead": 0.00820674215044294,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.08644917587469642,
+                "time_taken": 8.998019933700562,
+                "avg_overhead": 0.03480122202918643,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.09119189877409838,
+                "time_taken": 10.36647915840149,
+                "avg_overhead": 0.008117391949608213,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.08501839375453096,
+                "time_taken": 9.07394790649414,
+                "avg_overhead": 0.03470806469992986,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.093931329597006,
+                "time_taken": 10.026368856430054,
+                "avg_overhead": 0.008550379011366103,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.08639777875820312,
+                "time_taken": 9.053877353668213,
+                "avg_overhead": 0.03482544989812942,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.09174668685187787,
+                "time_taken": 9.783223867416382,
+                "avg_overhead": 0.00838856470017206,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.016069932283563106,
+                "time_taken": 10.768961191177368,
+                "avg_overhead": 0.06195480861361065,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.05237694613683859,
+                "time_taken": 10.648422241210938,
+                "avg_overhead": 0.011139733450753348,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.020319689479726514,
+                "time_taken": 10.74375605583191,
+                "avg_overhead": 0.06201358068557013,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.07325876620332666,
+                "time_taken": 10.16903018951416,
+                "avg_overhead": 0.011563096727643694,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.02633049970702791,
+                "time_taken": 10.812410116195679,
+                "avg_overhead": 0.06154950081355988,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.10669847576919311,
+                "time_taken": 10.088720083236694,
+                "avg_overhead": 0.011258980584523034,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.030171256315860418,
+                "time_taken": 10.935266971588135,
+                "avg_overhead": 0.061991298009478855,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.1263816616725772,
+                "time_taken": 10.505166292190552,
+                "avg_overhead": 0.011242003667922247,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.03336881013155472,
+                "time_taken": 10.747654914855957,
+                "avg_overhead": 0.06188835416521345,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.1397987496714884,
+                "time_taken": 10.525135040283203,
+                "avg_overhead": 0.011186754892742823,
+                "seed": 0
+            }
+        ],
+        "openai-community/gpt2": [
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 1.3449882851952364,
+                "time_taken": 24.937147855758667,
+                "avg_overhead": 7.467042832147508e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 1.2989395065573615,
+                "time_taken": 26.65492296218872,
+                "avg_overhead": 7.176399230957031e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 5.031803599605589,
+                "time_taken": 24.311551094055176,
+                "avg_overhead": 7.467799716525608e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 4.958197785757931,
+                "time_taken": 26.491570949554443,
+                "avg_overhead": 0.0002167376260908823,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 7.64439591636644,
+                "time_taken": 24.822901964187622,
+                "avg_overhead": 7.964694310748388e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 7.545321115918006,
+                "time_taken": 26.485270977020264,
+                "avg_overhead": 7.696757240900917e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 11.700624433649724,
+                "time_taken": 24.148887157440186,
+                "avg_overhead": 8.243227761889261e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 11.361963090091596,
+                "time_taken": 26.685118913650513,
+                "avg_overhead": 7.559761168464781e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 12.289608074389584,
+                "time_taken": 24.195019006729126,
+                "avg_overhead": 7.408005850655692e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 12.081125189773315,
+                "time_taken": 26.33328104019165,
+                "avg_overhead": 6.886134071955605e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 1.241857886314392,
+                "time_taken": 24.51945400238037,
+                "avg_overhead": 7.152178930857825e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 1.2137144804000854,
+                "time_taken": 27.091226816177368,
+                "avg_overhead": 7.680862668960814e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 5.531432151794434,
+                "time_taken": 24.104163885116577,
+                "avg_overhead": 6.817636035737537e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 5.519374370574951,
+                "time_taken": 26.55406618118286,
+                "avg_overhead": 7.757307991148933e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 10.951814651489258,
+                "time_taken": 24.58327603340149,
+                "avg_overhead": 7.938203357514881e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 10.93096923828125,
+                "time_taken": 26.195030212402344,
+                "avg_overhead": 4.608668978252108e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 11.396624565124512,
+                "time_taken": 24.421638250350952,
+                "avg_overhead": 6.662096296037947e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 11.379813194274902,
+                "time_taken": 26.582519054412842,
+                "avg_overhead": 6.072483365497892e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 15.223567008972168,
+                "time_taken": 24.076016187667847,
+                "avg_overhead": 6.749137999519469e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 15.203112602233887,
+                "time_taken": 26.220941066741943,
+                "avg_overhead": 7.109414963495164e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 13.380093574523926,
+                "time_taken": 24.173187971115112,
+                "avg_overhead": 6.858507792154948e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 4.374959945678711,
+                "time_taken": 26.662742137908936,
+                "avg_overhead": 6.556132483103919e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 30.37382698059082,
+                "time_taken": 24.085325002670288,
+                "avg_overhead": 7.616905939011347e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 14.22204875946045,
+                "time_taken": 26.215231895446777,
+                "avg_overhead": 7.001937381804936e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 42.833282470703125,
+                "time_taken": 24.088621139526367,
+                "avg_overhead": 6.973554217626178e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 18.90069580078125,
+                "time_taken": 26.255990028381348,
+                "avg_overhead": 6.263596670968192e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 55.542457580566406,
+                "time_taken": 24.086400032043457,
+                "avg_overhead": 6.721511719718812e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 28.161762237548828,
+                "time_taken": 26.52080726623535,
+                "avg_overhead": 7.879923260401166e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 58.380859375,
+                "time_taken": 24.182364225387573,
+                "avg_overhead": 7.307718670557416e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 29.085790634155273,
+                "time_taken": 26.423829078674316,
+                "avg_overhead": 6.455088418627542e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.8681809902191162,
+                "time_taken": 24.175198078155518,
+                "avg_overhead": 7.336101834736173e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.9625659584999084,
+                "time_taken": 26.475290060043335,
+                "avg_overhead": 7.139311896430122e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 4.944735527038574,
+                "time_taken": 24.1254780292511,
+                "avg_overhead": 7.941609337216331e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 5.599095344543457,
+                "time_taken": 26.49978804588318,
+                "avg_overhead": 6.687451922704303e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 6.696173667907715,
+                "time_taken": 24.10836386680603,
+                "avg_overhead": 7.894304063585069e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 7.968688488006592,
+                "time_taken": 26.498507738113403,
+                "avg_overhead": 8.820730542379712e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 10.418070793151855,
+                "time_taken": 24.09443688392639,
+                "avg_overhead": 7.674807593936012e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 11.933823585510254,
+                "time_taken": 26.388128995895386,
+                "avg_overhead": 7.151422046479725e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 9.862357139587402,
+                "time_taken": 24.076735019683838,
+                "avg_overhead": 7.394381931849889e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 11.563892364501953,
+                "time_taken": 26.47113609313965,
+                "avg_overhead": 7.213865007672991e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.6368331909179688,
+                "time_taken": 24.189547061920166,
+                "avg_overhead": 6.75330086359902e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.857292652130127,
+                "time_taken": 26.376643896102905,
+                "avg_overhead": 5.779190668984065e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 3.016357421875,
+                "time_taken": 24.121481895446777,
+                "avg_overhead": 7.728924826970176e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 4.763207912445068,
+                "time_taken": 26.324817895889282,
+                "avg_overhead": 5.7152339390345984e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 5.090309143066406,
+                "time_taken": 24.142510890960693,
+                "avg_overhead": 7.341778467571925e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 8.733024597167969,
+                "time_taken": 26.88178825378418,
+                "avg_overhead": 6.114112006293403e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 8.412582397460938,
+                "time_taken": 24.102899074554443,
+                "avg_overhead": 6.462278820219494e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 11.443657875061035,
+                "time_taken": 26.515913009643555,
+                "avg_overhead": 6.996260748969184e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 8.654098510742188,
+                "time_taken": 24.126448154449463,
+                "avg_overhead": 7.175263904389881e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 11.906708717346191,
+                "time_taken": 26.41057515144348,
+                "avg_overhead": 7.452283586774553e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 100.65986633300781,
+                "time_taken": 24.203938007354736,
+                "avg_overhead": 7.226732042100694e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 34.60527801513672,
+                "time_taken": 26.474724054336548,
+                "avg_overhead": 6.56407976907397e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 117.54366302490234,
+                "time_taken": 24.063923120498657,
+                "avg_overhead": 7.718328445676773e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 40.13163375854492,
+                "time_taken": 26.530681133270264,
+                "avg_overhead": 6.90354241265191e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 166.3258056640625,
+                "time_taken": 24.059099912643433,
+                "avg_overhead": 7.599876040504092e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 40.52595520019531,
+                "time_taken": 26.55284810066223,
+                "avg_overhead": 6.882349650065105e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 165.8602294921875,
+                "time_taken": 24.0971519947052,
+                "avg_overhead": 7.412168714735244e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 40.85114669799805,
+                "time_taken": 26.429017782211304,
+                "avg_overhead": 6.240133255247086e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 178.84762573242188,
+                "time_taken": 24.10580086708069,
+                "avg_overhead": 8.134236411442833e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 43.678749084472656,
+                "time_taken": 26.831764936447144,
+                "avg_overhead": 6.241268581814236e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 9.85658354024219,
+                "time_taken": 26.901710271835327,
+                "avg_overhead": 0.044048078476436554,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 11.21791759402874,
+                "time_taken": 27.214598894119263,
+                "avg_overhead": 0.004850186998881991,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 10.360477627308175,
+                "time_taken": 26.72742986679077,
+                "avg_overhead": 0.04343091873895554,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 10.937327062914475,
+                "time_taken": 27.14665699005127,
+                "avg_overhead": 0.0045670706128317215,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 10.365718463935217,
+                "time_taken": 26.845973014831543,
+                "avg_overhead": 0.04358038448152088,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 11.107554471034703,
+                "time_taken": 26.59374213218689,
+                "avg_overhead": 0.004687154103839208,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 9.775939079146115,
+                "time_taken": 26.6863911151886,
+                "avg_overhead": 0.043196693299308656,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 11.371293435821102,
+                "time_taken": 27.175125122070312,
+                "avg_overhead": 0.0044995565263051835,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 8.629138036982011,
+                "time_taken": 26.78264617919922,
+                "avg_overhead": 0.04429719940064445,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 8.088168431399955,
+                "time_taken": 27.20286798477173,
+                "avg_overhead": 0.004537343978881836,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.44913324370156565,
+                "time_taken": 27.342577934265137,
+                "avg_overhead": 0.05108741729978531,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.4879679322592855,
+                "time_taken": 27.496196031570435,
+                "avg_overhead": 0.005874372663952056,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.4773426003997326,
+                "time_taken": 27.216065168380737,
+                "avg_overhead": 0.051510784361097545,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.46810432929734547,
+                "time_taken": 27.05821394920349,
+                "avg_overhead": 0.005264308717515733,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.4589359386013549,
+                "time_taken": 27.193188905715942,
+                "avg_overhead": 0.050970119143289236,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.49364464916617784,
+                "time_taken": 27.31439995765686,
+                "avg_overhead": 0.005395261068192739,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.45684314500553763,
+                "time_taken": 27.194045066833496,
+                "avg_overhead": 0.05121870267958868,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.4908689710619719,
+                "time_taken": 27.350750207901,
+                "avg_overhead": 0.005311103094191779,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.47283094711391277,
+                "time_taken": 27.056366205215454,
+                "avg_overhead": 0.04887300824362134,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.4394737140512053,
+                "time_taken": 26.26236081123352,
+                "avg_overhead": 0.005838802882603237,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.7591841258868884,
+                "time_taken": 26.818959951400757,
+                "avg_overhead": 0.04278941381545294,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.8001063697181203,
+                "time_taken": 26.365049839019775,
+                "avg_overhead": 0.004758104445442321,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.7671894282950521,
+                "time_taken": 26.79110288619995,
+                "avg_overhead": 0.04332268427288721,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.7814280712389176,
+                "time_taken": 26.149819135665894,
+                "avg_overhead": 0.005348973804050022,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.7915353683067557,
+                "time_taken": 26.783518075942993,
+                "avg_overhead": 0.04320211259145585,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.7679447597207557,
+                "time_taken": 26.078861951828003,
+                "avg_overhead": 0.004570908016628689,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.7738652293260255,
+                "time_taken": 26.766505002975464,
+                "avg_overhead": 0.04331739365108429,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.8106105824064622,
+                "time_taken": 26.19467806816101,
+                "avg_overhead": 0.004637449506729368,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.7717940844508915,
+                "time_taken": 26.804275035858154,
+                "avg_overhead": 0.043714780656118245,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.7762163976280124,
+                "time_taken": 26.245304822921753,
+                "avg_overhead": 0.004657692379421658,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 2.0357207831549036,
+                "time_taken": 27.00083613395691,
+                "avg_overhead": 0.044333855311075844,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 1.8865751537361688,
+                "time_taken": 26.520401000976562,
+                "avg_overhead": 0.004985222740778847,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 1.8564923104939421,
+                "time_taken": 26.744812965393066,
+                "avg_overhead": 0.042714009209284705,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.7164409887760896,
+                "time_taken": 26.03364610671997,
+                "avg_overhead": 0.00499657222202846,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 1.88208804014423,
+                "time_taken": 26.82082200050354,
+                "avg_overhead": 0.0438373845721048,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 1.8977418810470796,
+                "time_taken": 26.375927686691284,
+                "avg_overhead": 0.004466942378452846,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 1.728081728883578,
+                "time_taken": 26.932434797286987,
+                "avg_overhead": 0.04436402472238692,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 1.556640589571059,
+                "time_taken": 25.954540014266968,
+                "avg_overhead": 0.004465712441338433,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 1.8376672528722164,
+                "time_taken": 26.8176589012146,
+                "avg_overhead": 0.04382132727002341,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 1.1209914512723786,
+                "time_taken": 26.17783498764038,
+                "avg_overhead": 0.005421646057613312,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.6296845519479923,
+                "time_taken": 28.12782311439514,
+                "avg_overhead": 0.06246496003771585,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.7032634381042852,
+                "time_taken": 26.341559886932373,
+                "avg_overhead": 0.006442035947527204,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.6292056950568331,
+                "time_taken": 27.973929166793823,
+                "avg_overhead": 0.06188755565219455,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.6861216870941046,
+                "time_taken": 26.171222686767578,
+                "avg_overhead": 0.006521122796194894,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.6240183365833115,
+                "time_taken": 27.90433168411255,
+                "avg_overhead": 0.061103404514373294,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.6931948097831576,
+                "time_taken": 26.259135007858276,
+                "avg_overhead": 0.006397690091814313,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.6463570794568968,
+                "time_taken": 27.879257917404175,
+                "avg_overhead": 0.060763608841668995,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.5949975757945617,
+                "time_taken": 26.104964017868042,
+                "avg_overhead": 0.0065353938511439735,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.6450125752762895,
+                "time_taken": 28.08814001083374,
+                "avg_overhead": 0.06290687455071343,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.5920350516676806,
+                "time_taken": 26.03914713859558,
+                "avg_overhead": 0.007013646383134145,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.08820009276566027,
+                "time_taken": 31.626622915267944,
+                "avg_overhead": 0.10927445926363506,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.6991752151117772,
+                "time_taken": 26.473761081695557,
+                "avg_overhead": 0.010434737281193809,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.09669651650364414,
+                "time_taken": 31.41818904876709,
+                "avg_overhead": 0.10779848174443321,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.7761242116917143,
+                "time_taken": 26.518062829971313,
+                "avg_overhead": 0.011655731806679377,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.11064421620515352,
+                "time_taken": 31.52868390083313,
+                "avg_overhead": 0.10798245006137425,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.8596535605286035,
+                "time_taken": 26.497071266174316,
+                "avg_overhead": 0.010686605695694212,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.11280026276688586,
+                "time_taken": 31.170291900634766,
+                "avg_overhead": 0.10556623292347742,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.954265266556776,
+                "time_taken": 26.447360038757324,
+                "avg_overhead": 0.010690999409509084,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.12027966274875097,
+                "time_taken": 31.239651918411255,
+                "avg_overhead": 0.10694872008429633,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 1.007669002818101,
+                "time_taken": 26.484029054641724,
+                "avg_overhead": 0.01089870362054734,
+                "seed": 0
+            }
+        ],
+        "distilbert-base-uncased": [
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.9121730009943011,
+                "time_taken": 10.6717848777771,
+                "avg_overhead": 9.131053137400794e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.7152513596373163,
+                "time_taken": 11.940598011016846,
+                "avg_overhead": 0.00010450681050618489,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 2.128113523032967,
+                "time_taken": 10.672048807144165,
+                "avg_overhead": 9.220743936205667e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.9920392095108646,
+                "time_taken": 12.040746927261353,
+                "avg_overhead": 5.718639918736049e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 3.3661405802264905,
+                "time_taken": 11.88723874092102,
+                "avg_overhead": 9.069745502774678e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 3.1526642620933307,
+                "time_taken": 12.473856925964355,
+                "avg_overhead": 5.6857154482886906e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 3.6645358185133605,
+                "time_taken": 11.939153909683228,
+                "avg_overhead": 9.26918453640408e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 3.4087407304063286,
+                "time_taken": 12.211771011352539,
+                "avg_overhead": 5.024198501829117e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 3.9936246184216055,
+                "time_taken": 11.683271884918213,
+                "avg_overhead": 9.27107674734933e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 3.691507179066236,
+                "time_taken": 12.129544973373413,
+                "avg_overhead": 5.078315734863281e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.7767903804779053,
+                "time_taken": 11.874199151992798,
+                "avg_overhead": 9.142406403072297e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.6101260185241699,
+                "time_taken": 12.48547887802124,
+                "avg_overhead": 5.297433762323289e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 1.7018625736236572,
+                "time_taken": 11.806098222732544,
+                "avg_overhead": 8.777209690638951e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.5825999975204468,
+                "time_taken": 12.897659063339233,
+                "avg_overhead": 4.581042698451451e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 2.6564602851867676,
+                "time_taken": 11.806828737258911,
+                "avg_overhead": 8.763207329644097e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 2.482142448425293,
+                "time_taken": 12.215348958969116,
+                "avg_overhead": 4.6775454566592265e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 3.312178611755371,
+                "time_taken": 11.760690212249756,
+                "avg_overhead": 8.801808432927208e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 3.089918851852417,
+                "time_taken": 12.477722883224487,
+                "avg_overhead": 4.941698104616195e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 3.3241100311279297,
+                "time_taken": 11.809744834899902,
+                "avg_overhead": 8.80899883451916e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 3.072265625,
+                "time_taken": 12.104012727737427,
+                "avg_overhead": 4.4069592914884054e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 17.160980224609375,
+                "time_taken": 11.736342191696167,
+                "avg_overhead": 8.517598348950583e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 3.5471763610839844,
+                "time_taken": 12.218821048736572,
+                "avg_overhead": 4.304023016066778e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 36.870426177978516,
+                "time_taken": 11.937879085540771,
+                "avg_overhead": 8.399524385966952e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 7.891707897186279,
+                "time_taken": 12.16280198097229,
+                "avg_overhead": 4.314619397360181e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 58.26213836669922,
+                "time_taken": 11.78194785118103,
+                "avg_overhead": 8.807485065762959e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 12.976358413696289,
+                "time_taken": 12.260547876358032,
+                "avg_overhead": 4.5413062686011906e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 64.96224975585938,
+                "time_taken": 11.740218877792358,
+                "avg_overhead": 8.88657948327443e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 14.805150985717773,
+                "time_taken": 13.078375101089478,
+                "avg_overhead": 5.2115273854089164e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 71.11151123046875,
+                "time_taken": 11.767860174179077,
+                "avg_overhead": 8.69887215750558e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 15.99473762512207,
+                "time_taken": 12.162243127822876,
+                "avg_overhead": 4.374791705419147e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.30049416422843933,
+                "time_taken": 11.81301498413086,
+                "avg_overhead": 9.351684933617002e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.3604900538921356,
+                "time_taken": 12.432194948196411,
+                "avg_overhead": 7.66572498139881e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.8118143081665039,
+                "time_taken": 11.78041386604309,
+                "avg_overhead": 9.394070458790613e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.1872450113296509,
+                "time_taken": 12.265522003173828,
+                "avg_overhead": 8.019946870349703e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 1.2344250679016113,
+                "time_taken": 11.88361382484436,
+                "avg_overhead": 9.547339545355903e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 1.808650255203247,
+                "time_taken": 12.237590074539185,
+                "avg_overhead": 4.632510836162264e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 1.3753201961517334,
+                "time_taken": 11.864135265350342,
+                "avg_overhead": 9.138621981181795e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 2.0126240253448486,
+                "time_taken": 12.312855958938599,
+                "avg_overhead": 5.3738790845114086e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 1.5228184461593628,
+                "time_taken": 11.789196968078613,
+                "avg_overhead": 9.42169673859127e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 2.1795051097869873,
+                "time_taken": 12.02687406539917,
+                "avg_overhead": 5.0862630208333336e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.08291375637054443,
+                "time_taken": 11.89021897315979,
+                "avg_overhead": 8.800294664171006e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.1970069408416748,
+                "time_taken": 12.116251945495605,
+                "avg_overhead": 4.836112733871218e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.45778799057006836,
+                "time_taken": 11.783780097961426,
+                "avg_overhead": 8.5849610586015e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.8057712912559509,
+                "time_taken": 12.208482027053833,
+                "avg_overhead": 0.00013109237428695437,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.7207279205322266,
+                "time_taken": 11.803598880767822,
+                "avg_overhead": 8.3938477531312e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 1.322597861289978,
+                "time_taken": 12.45823621749878,
+                "avg_overhead": 4.554173303028894e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 1.032771348953247,
+                "time_taken": 11.854591131210327,
+                "avg_overhead": 8.491485837906126e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 1.6673178672790527,
+                "time_taken": 12.447751760482788,
+                "avg_overhead": 4.618130032978361e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.8718504905700684,
+                "time_taken": 11.782656908035278,
+                "avg_overhead": 8.544089302184089e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 1.530593991279602,
+                "time_taken": 12.139300107955933,
+                "avg_overhead": 0.00010903297908722408,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 117.19868469238281,
+                "time_taken": 11.793178796768188,
+                "avg_overhead": 9.19046856108166e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 37.858856201171875,
+                "time_taken": 12.096039772033691,
+                "avg_overhead": 3.7950182717943946e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 213.06967163085938,
+                "time_taken": 11.694667100906372,
+                "avg_overhead": 5.7129632859002977e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 43.32710647583008,
+                "time_taken": 11.992027759552002,
+                "avg_overhead": 4.566283453078497e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 270.7364501953125,
+                "time_taken": 11.673902034759521,
+                "avg_overhead": 7.335344950358073e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 43.995216369628906,
+                "time_taken": 11.851850986480713,
+                "avg_overhead": 3.5380560254293774e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 301.5946044921875,
+                "time_taken": 11.503087282180786,
+                "avg_overhead": 4.834977407304067e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 43.36830520629883,
+                "time_taken": 11.953989744186401,
+                "avg_overhead": 3.978562733483693e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 303.7469177246094,
+                "time_taken": 11.619352102279663,
+                "avg_overhead": 5.104806688096788e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 44.391868591308594,
+                "time_taken": 11.745918989181519,
+                "avg_overhead": 7.40270766000899e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 3.671442932003782,
+                "time_taken": 13.862457036972046,
+                "avg_overhead": 0.04616270368061368,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 3.7035249974637967,
+                "time_taken": 12.196655988693237,
+                "avg_overhead": 0.0030157717447432263,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 3.502737773730082,
+                "time_taken": 13.735973119735718,
+                "avg_overhead": 0.04641007998633006,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 3.9154808082393333,
+                "time_taken": 12.248265027999878,
+                "avg_overhead": 0.0032007542867509143,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 3.6908155895464048,
+                "time_taken": 13.788042068481445,
+                "avg_overhead": 0.046913268074156744,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 3.606516840125556,
+                "time_taken": 12.076113224029541,
+                "avg_overhead": 0.0033406454419332835,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 3.6185010002763156,
+                "time_taken": 13.778422117233276,
+                "avg_overhead": 0.04638718044947064,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 3.653930141512163,
+                "time_taken": 12.58834981918335,
+                "avg_overhead": 0.003223975499471029,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 3.627009906707805,
+                "time_taken": 13.745152950286865,
+                "avg_overhead": 0.04623251869564965,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 4.125544162321095,
+                "time_taken": 12.143330097198486,
+                "avg_overhead": 0.0034945200360010542,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.16093485628319157,
+                "time_taken": 14.264654159545898,
+                "avg_overhead": 0.05568683715093704,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.18061343757517548,
+                "time_taken": 13.351638078689575,
+                "avg_overhead": 0.0037936861552889385,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.1555121480814284,
+                "time_taken": 14.143269777297974,
+                "avg_overhead": 0.05556985688587976,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.1962452832418596,
+                "time_taken": 12.60854721069336,
+                "avg_overhead": 0.00433606571621365,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.16203803111334292,
+                "time_taken": 14.121775150299072,
+                "avg_overhead": 0.05505107319544232,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.17174372295449264,
+                "time_taken": 12.083290100097656,
+                "avg_overhead": 0.00407666630215115,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.16031143497616518,
+                "time_taken": 14.149266958236694,
+                "avg_overhead": 0.05554675677466014,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.16881417115444247,
+                "time_taken": 12.044776916503906,
+                "avg_overhead": 0.003765984187050471,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.16582107581556058,
+                "time_taken": 14.169538021087646,
+                "avg_overhead": 0.05621215653797937,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.1715206810332954,
+                "time_taken": 12.1769437789917,
+                "avg_overhead": 0.00357682742769756,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.44604011331670024,
+                "time_taken": 13.85616397857666,
+                "avg_overhead": 0.048152412687029154,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.4666500345019773,
+                "time_taken": 12.344738006591797,
+                "avg_overhead": 0.00317571655152336,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.44105279664340663,
+                "time_taken": 13.753947019577026,
+                "avg_overhead": 0.046645088801308285,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.4421026578266959,
+                "time_taken": 12.292037010192871,
+                "avg_overhead": 0.0032070856245737227,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.4488852400380788,
+                "time_taken": 13.77825403213501,
+                "avg_overhead": 0.047002364718724814,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.48268183551978844,
+                "time_taken": 12.143422842025757,
+                "avg_overhead": 0.0033125688159276567,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.44094137628116165,
+                "time_taken": 13.805830955505371,
+                "avg_overhead": 0.04724242573692685,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.4479404177274492,
+                "time_taken": 12.265079975128174,
+                "avg_overhead": 0.0031935449630495103,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.4409903255708876,
+                "time_taken": 13.724528074264526,
+                "avg_overhead": 0.045630413388449045,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.4456893277400069,
+                "time_taken": 12.468648910522461,
+                "avg_overhead": 0.003335880854773143,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.235226682464445,
+                "time_taken": 13.73303508758545,
+                "avg_overhead": 0.046787848548283655,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.264128983393709,
+                "time_taken": 12.282797813415527,
+                "avg_overhead": 0.003305787131899879,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.22900826007078343,
+                "time_taken": 13.762495040893555,
+                "avg_overhead": 0.04629742531549363,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.24196987812994794,
+                "time_taken": 12.06897783279419,
+                "avg_overhead": 0.0028669115096803697,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.22691938674378,
+                "time_taken": 13.785335063934326,
+                "avg_overhead": 0.04683659568665519,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.2343141736854919,
+                "time_taken": 12.686256170272827,
+                "avg_overhead": 0.003070437718951513,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.24160401875886098,
+                "time_taken": 13.71904730796814,
+                "avg_overhead": 0.04623612903413318,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.23357154686568993,
+                "time_taken": 12.032959938049316,
+                "avg_overhead": 0.0032627241952078684,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.23326362074844756,
+                "time_taken": 13.843203067779541,
+                "avg_overhead": 0.046375331424531485,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.2373056174219228,
+                "time_taken": 12.105018138885498,
+                "avg_overhead": 0.0030898177434527684,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.08487902155298736,
+                "time_taken": 14.614363193511963,
+                "avg_overhead": 0.06591273111010355,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.10820109724622914,
+                "time_taken": 12.333760976791382,
+                "avg_overhead": 0.004057740408276755,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.08408196289682886,
+                "time_taken": 14.540235996246338,
+                "avg_overhead": 0.06683191798982166,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.0991106858888507,
+                "time_taken": 12.41573977470398,
+                "avg_overhead": 0.004510171829708039,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.08434087227942276,
+                "time_taken": 14.62729287147522,
+                "avg_overhead": 0.06728582155136835,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.10311893825858572,
+                "time_taken": 12.151735067367554,
+                "avg_overhead": 0.004588043878948878,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.08904890350529653,
+                "time_taken": 14.633669137954712,
+                "avg_overhead": 0.06744324214874751,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.10067714377986428,
+                "time_taken": 12.033868074417114,
+                "avg_overhead": 0.004254428167191762,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.08477122746205197,
+                "time_taken": 14.618428945541382,
+                "avg_overhead": 0.06691905051942855,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.09431445913460937,
+                "time_taken": 12.449346780776978,
+                "avg_overhead": 0.004331846085805741,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.04061428616446986,
+                "time_taken": 17.707231998443604,
+                "avg_overhead": 0.11841393652416411,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.13136457642844537,
+                "time_taken": 12.316853046417236,
+                "avg_overhead": 0.007856758814009409,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.060133692926393256,
+                "time_taken": 17.698503971099854,
+                "avg_overhead": 0.1178643022264753,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.20331869943752115,
+                "time_taken": 12.147185325622559,
+                "avg_overhead": 0.007606589604937841,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.08127779997173434,
+                "time_taken": 17.735728979110718,
+                "avg_overhead": 0.11839832956828768,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.2820810631054542,
+                "time_taken": 13.162434101104736,
+                "avg_overhead": 0.007546186447143555,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.0943138066255385,
+                "time_taken": 17.697377920150757,
+                "avg_overhead": 0.11871796562558129,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.3255897638778219,
+                "time_taken": 12.282510042190552,
+                "avg_overhead": 0.007312142659747411,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.09694133772595519,
+                "time_taken": 17.707921981811523,
+                "avg_overhead": 0.118034147080921,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.33866170965932113,
+                "time_taken": 12.405087947845459,
+                "avg_overhead": 0.0074539752233596076,
+                "seed": 0
+            }
+        ],
+        "google/mobilebert-uncased": [
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 79.54518745875386,
+                "time_taken": 9.543447017669678,
+                "avg_overhead": 0.00010079807705349392,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 16.204574650968024,
+                "time_taken": 9.422938108444214,
+                "avg_overhead": 6.36880359952412e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 219.9105740841757,
+                "time_taken": 8.69605302810669,
+                "avg_overhead": 9.375905233716208e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 19.222012818558092,
+                "time_taken": 9.612357139587402,
+                "avg_overhead": 7.984373304578994e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 269.73629011676877,
+                "time_taken": 8.779719114303589,
+                "avg_overhead": 0.00010597895062158978,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 20.41018360177177,
+                "time_taken": 9.62216591835022,
+                "avg_overhead": 6.334365360320561e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 281.0953870073112,
+                "time_taken": 8.780264854431152,
+                "avg_overhead": 9.871664501371838e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 28.930547988399532,
+                "time_taken": 9.541054964065552,
+                "avg_overhead": 6.592841375441778e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 303.6572119780182,
+                "time_taken": 8.770103693008423,
+                "avg_overhead": 9.716124761672247e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "mahalanobis",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 28.700962271262636,
+                "time_taken": 9.463142156600952,
+                "avg_overhead": 6.382427518329923e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 6542216.5,
+                "time_taken": 8.731225967407227,
+                "avg_overhead": 8.865765162876674e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 6542137.0,
+                "time_taken": 9.415593385696411,
+                "avg_overhead": 5.967654879131014e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 18292474.0,
+                "time_taken": 8.837258100509644,
+                "avg_overhead": 0.00010362125578380766,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 18292390.0,
+                "time_taken": 12.097901105880737,
+                "avg_overhead": 5.5797516353546625e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 26726940.0,
+                "time_taken": 8.765836954116821,
+                "avg_overhead": 0.0001018425774952722,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 26726854.0,
+                "time_taken": 10.512018918991089,
+                "avg_overhead": 6.40929691375248e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 22488054.0,
+                "time_taken": 8.705589056015015,
+                "avg_overhead": 9.07996344187903e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 22487964.0,
+                "time_taken": 10.314958095550537,
+                "avg_overhead": 6.106543162512401e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 28157322.0,
+                "time_taken": 8.705291986465454,
+                "avg_overhead": 8.69773683093843e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "euclidean",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 28157242.0,
+                "time_taken": 9.507282972335815,
+                "avg_overhead": 5.979008144802517e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 89749832.0,
+                "time_taken": 8.666051864624023,
+                "avg_overhead": 7.994969685872395e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 7226700.5,
+                "time_taken": 9.411203145980835,
+                "avg_overhead": 5.6066210307772196e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 265265824.0,
+                "time_taken": 8.7081298828125,
+                "avg_overhead": 7.671780056423611e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 20089376.0,
+                "time_taken": 9.444592237472534,
+                "avg_overhead": 5.5509900289868554e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 320030784.0,
+                "time_taken": 8.723296880722046,
+                "avg_overhead": 8.869171142578125e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 24098560.0,
+                "time_taken": 9.621238946914673,
+                "avg_overhead": 5.694419618636843e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 354825856.0,
+                "time_taken": 8.717331886291504,
+                "avg_overhead": 8.499811566065228e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 27692602.0,
+                "time_taken": 9.502743005752563,
+                "avg_overhead": 5.554774450877356e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 437674432.0,
+                "time_taken": 8.734264850616455,
+                "avg_overhead": 8.161862691243489e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "manhattan",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 33627212.0,
+                "time_taken": 9.73729920387268,
+                "avg_overhead": 5.624029371473524e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 2960962.75,
+                "time_taken": 8.700025081634521,
+                "avg_overhead": 8.740122356112041e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 6505822.5,
+                "time_taken": 9.568441152572632,
+                "avg_overhead": 6.473253643701947e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 7873378.5,
+                "time_taken": 8.684116840362549,
+                "avg_overhead": 8.563389853825645e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 17407460.0,
+                "time_taken": 9.518676042556763,
+                "avg_overhead": 6.516396053253658e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 11377161.0,
+                "time_taken": 8.71484899520874,
+                "avg_overhead": 9.017142038496714e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 25143156.0,
+                "time_taken": 9.567199945449829,
+                "avg_overhead": 6.525100223601811e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 12760730.0,
+                "time_taken": 8.671499013900757,
+                "avg_overhead": 9.445538596501426e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 28190120.0,
+                "time_taken": 9.395140171051025,
+                "avg_overhead": 6.335122244698661e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 11015485.0,
+                "time_taken": 8.732962846755981,
+                "avg_overhead": 9.858040582566034e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "minkowski",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 24207762.0,
+                "time_taken": 9.38233232498169,
+                "avg_overhead": 6.451303996737041e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 1143272.0,
+                "time_taken": 8.656376123428345,
+                "avg_overhead": 7.526836698017423e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 6502938.5,
+                "time_taken": 9.416754007339478,
+                "avg_overhead": 5.941542368086558e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 3389000.0,
+                "time_taken": 8.737040996551514,
+                "avg_overhead": 7.688809954930866e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 19125618.0,
+                "time_taken": 9.589860200881958,
+                "avg_overhead": 6.29197983514695e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 4999368.0,
+                "time_taken": 8.710930109024048,
+                "avg_overhead": 8.145589677114336e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 28250394.0,
+                "time_taken": 9.587125062942505,
+                "avg_overhead": 5.9604644775390625e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 4381696.0,
+                "time_taken": 8.66618013381958,
+                "avg_overhead": 7.480666750953311e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 24880548.0,
+                "time_taken": 9.721965789794922,
+                "avg_overhead": 5.817413330078125e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 4374408.0,
+                "time_taken": 8.72275710105896,
+                "avg_overhead": 8.907772245861234e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "chebyshev",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 24882814.0,
+                "time_taken": 9.433817863464355,
+                "avg_overhead": 5.999822465200273e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 9.623170852661133,
+                "time_taken": 8.687083959579468,
+                "avg_overhead": 8.47218528626457e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 31.356863021850586,
+                "time_taken": 9.838511943817139,
+                "avg_overhead": 6.29425048828125e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 16.076135635375977,
+                "time_taken": 8.66201114654541,
+                "avg_overhead": 8.292803688654824e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 30.689659118652344,
+                "time_taken": 9.454201936721802,
+                "avg_overhead": 6.33285159156436e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 22.220577239990234,
+                "time_taken": 8.710147142410278,
+                "avg_overhead": 8.782886323474703e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 31.123491287231445,
+                "time_taken": 9.474242210388184,
+                "avg_overhead": 6.462278820219494e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 30.495132446289062,
+                "time_taken": 8.693306684494019,
+                "avg_overhead": 9.285835992722284e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 34.254512786865234,
+                "time_taken": 9.354876041412354,
+                "avg_overhead": 6.438058520120288e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 33.15310287475586,
+                "time_taken": 8.687304973602295,
+                "avg_overhead": 8.733688838898189e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "vector",
+                "distance_name": "canberra",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 37.986175537109375,
+                "time_taken": 9.592977046966553,
+                "avg_overhead": 6.380535307384672e-05,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 3.3025501107626223,
+                "time_taken": 10.1609787940979,
+                "avg_overhead": 0.027436491042848617,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 6.7471931700686625,
+                "time_taken": 9.875553131103516,
+                "avg_overhead": 0.005992768302796379,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 4.095686529970656,
+                "time_taken": 10.103937149047852,
+                "avg_overhead": 0.026401137548779683,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 4.431462070599948,
+                "time_taken": 9.991091012954712,
+                "avg_overhead": 0.006129938458639478,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 3.0664148411840655,
+                "time_taken": 10.163473844528198,
+                "avg_overhead": 0.027525932069808717,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 6.559129482903988,
+                "time_taken": 9.876374959945679,
+                "avg_overhead": 0.006129363226512122,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 4.549659386837762,
+                "time_taken": 10.106443881988525,
+                "avg_overhead": 0.02671525970337883,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 5.504641071170159,
+                "time_taken": 9.960910081863403,
+                "avg_overhead": 0.005993725761534676,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 3.771072594277201,
+                "time_taken": 10.08658504486084,
+                "avg_overhead": 0.02648540148659358,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "kl",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 7.758130665257271,
+                "time_taken": 10.023105144500732,
+                "avg_overhead": 0.006026124197339255,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.1662304003822516,
+                "time_taken": 10.40951681137085,
+                "avg_overhead": 0.031710238683791386,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.3392158267676359,
+                "time_taken": 9.979583263397217,
+                "avg_overhead": 0.007219189689272926,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.1605068916720549,
+                "time_taken": 10.387780904769897,
+                "avg_overhead": 0.03143011955987839,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.31898739091483974,
+                "time_taken": 9.923319101333618,
+                "avg_overhead": 0.007217009862263997,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.1611395466180104,
+                "time_taken": 10.357419729232788,
+                "avg_overhead": 0.030353035245622908,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.31670847966916066,
+                "time_taken": 9.932985782623291,
+                "avg_overhead": 0.007111004420689174,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.1841429301558235,
+                "time_taken": 10.43861198425293,
+                "avg_overhead": 0.03159936269124349,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.2931943956289604,
+                "time_taken": 9.95805311203003,
+                "avg_overhead": 0.007185761890714131,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.18682000776809227,
+                "time_taken": 10.412754774093628,
+                "avg_overhead": 0.03153494804624527,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "js",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.3559579863426901,
+                "time_taken": 10.177808284759521,
+                "avg_overhead": 0.007138725311037094,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.4499103305555778,
+                "time_taken": 10.17342734336853,
+                "avg_overhead": 0.027138903027489072,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.6474954552399133,
+                "time_taken": 9.71844482421875,
+                "avg_overhead": 0.006109839393979027,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.4987557190233197,
+                "time_taken": 10.13288688659668,
+                "avg_overhead": 0.027355194091796875,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.6293423445629763,
+                "time_taken": 10.034485101699829,
+                "avg_overhead": 0.005878857203892299,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.43620257958951525,
+                "time_taken": 9.932398796081543,
+                "avg_overhead": 0.025523473346044146,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.6205062087208004,
+                "time_taken": 11.026700019836426,
+                "avg_overhead": 0.005910865844242157,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.45970172376878626,
+                "time_taken": 10.1147940158844,
+                "avg_overhead": 0.02746882514348106,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.6602551566824545,
+                "time_taken": 10.98290205001831,
+                "avg_overhead": 0.005944399606613885,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.5328627682737223,
+                "time_taken": 10.133259057998657,
+                "avg_overhead": 0.027376772865416513,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "hellinger",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.6414190762153528,
+                "time_taken": 11.444067001342773,
+                "avg_overhead": 0.005783773603893462,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.24342316538879002,
+                "time_taken": 10.12245798110962,
+                "avg_overhead": 0.027753602890741257,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.7310934976655764,
+                "time_taken": 10.805423736572266,
+                "avg_overhead": 0.006053398525904095,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.27193287099915875,
+                "time_taken": 10.12524700164795,
+                "avg_overhead": 0.02697414443606422,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 1.1186788336810718,
+                "time_taken": 11.259127140045166,
+                "avg_overhead": 0.005769725829835922,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.23591454723677224,
+                "time_taken": 10.13438892364502,
+                "avg_overhead": 0.02685102583870055,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.7193755454323599,
+                "time_taken": 11.581911087036133,
+                "avg_overhead": 0.00581918822394477,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.23321989769875717,
+                "time_taken": 10.102129936218262,
+                "avg_overhead": 0.02686930459643167,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.7864277160015122,
+                "time_taken": 10.781983852386475,
+                "avg_overhead": 0.005880049296787807,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.2674860802462479,
+                "time_taken": 10.076725006103516,
+                "avg_overhead": 0.02703924027700273,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "bhattacharyya",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.8923706256285112,
+                "time_taken": 9.980459928512573,
+                "avg_overhead": 0.005880189320397755,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 0.0985065762602568,
+                "time_taken": 10.586565971374512,
+                "avg_overhead": 0.0361330130743602,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 0.37898264921892943,
+                "time_taken": 10.345120906829834,
+                "avg_overhead": 0.008276697189088852,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 0.11460597908563622,
+                "time_taken": 10.596296787261963,
+                "avg_overhead": 0.03602274637373667,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 0.37112983455179444,
+                "time_taken": 10.077455043792725,
+                "avg_overhead": 0.008417095456804548,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 0.07819729332682587,
+                "time_taken": 10.640607118606567,
+                "avg_overhead": 0.03631102471124558,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 0.39260089143188254,
+                "time_taken": 10.125838041305542,
+                "avg_overhead": 0.008450451351347425,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 0.11365490674497093,
+                "time_taken": 10.611740827560425,
+                "avg_overhead": 0.03592822665259952,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 0.39573826605679036,
+                "time_taken": 10.136275291442871,
+                "avg_overhead": 0.008234145149352059,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 0.07860034607538563,
+                "time_taken": 10.589181900024414,
+                "avg_overhead": 0.0356961242736332,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "mmd",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 0.3853375611920499,
+                "time_taken": 10.210319757461548,
+                "avg_overhead": 0.008115870612008231,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": false,
+                "final_similarity": 144563.72043598746,
+                "time_taken": 12.371224880218506,
+                "avg_overhead": 0.06401736774141827,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.0,
+                "pca_applied": true,
+                "final_similarity": 108641.00493715775,
+                "time_taken": 10.330976963043213,
+                "avg_overhead": 0.011261830254206582,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": false,
+                "final_similarity": 477595.10331952537,
+                "time_taken": 12.406089067459106,
+                "avg_overhead": 0.06412945853339301,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.25,
+                "pca_applied": true,
+                "final_similarity": 409160.8861429397,
+                "time_taken": 10.537744045257568,
+                "avg_overhead": 0.010631864033048116,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": false,
+                "final_similarity": 627254.3088515926,
+                "time_taken": 12.401049852371216,
+                "avg_overhead": 0.06398266837710426,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.5,
+                "pca_applied": true,
+                "final_similarity": 475985.9621750523,
+                "time_taken": 10.779706001281738,
+                "avg_overhead": 0.011124951498849052,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": false,
+                "final_similarity": 581150.2484019047,
+                "time_taken": 12.379683017730713,
+                "avg_overhead": 0.06386165391831171,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 0.75,
+                "pca_applied": true,
+                "final_similarity": 481367.40569634584,
+                "time_taken": 10.54512095451355,
+                "avg_overhead": 0.01107892914423867,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": false,
+                "final_similarity": 533862.3592545071,
+                "time_taken": 12.397098064422607,
+                "avg_overhead": 0.06409567499917651,
+                "seed": 0
+            },
+            {
+                "distance_type": "distribution",
+                "distance_name": "wasserstein",
+                "drift_strength": 1.0,
+                "pca_applied": true,
+                "final_similarity": 420650.06283390475,
+                "time_taken": 10.69311809539795,
+                "avg_overhead": 0.01088782719203404,
+                "seed": 0
+            }
+        ]
+    }
+}

@@ -18,7 +18,7 @@ def canberra_distance(x, y):
     denominator = np.abs(x) + np.abs(y) + 1e-12
     return np.sum(numerator / denominator)
 
-LEGACY_DISTANCE_FUNCTIONS = {
+VECTOR_DISTANCE_FUNCTIONS = {
     "euclidean": euclidean_distance,
     "manhattan": manhattan_distance,
     "minkowski": lambda u, v: minkowski_distance(u, v, p=3),
@@ -65,9 +65,8 @@ DISTRIBUTION_METRICS = {
     "js": jensen_shannon,
     "hellinger": hellinger_distance,
     "bhattacharyya": bhattacharyya_distance,
-    # TODO: handle "wasserstein" and "mmd" separately since they require different computations.
+    # "wasserstein" and "mmd" handled separately
 }
-
 
 def approx_wasserstein_1d(bin_edges1, pmf1, bin_edges2, pmf2):
     """
@@ -82,11 +81,10 @@ def approx_wasserstein_1d(bin_edges1, pmf1, bin_edges2, pmf2):
     cdf2 = np.cumsum(pmf2)
 
     # Combine and sort all edges
-    all_edges = np.unique(np.concatenate([bin_edges1, bin_edges2]))
+    all_edges = np.union1d(bin_edges1, bin_edges2)
     all_edges.sort()
 
     def cdf_lookup(edges, cdf, x):
-        # For x < edges[0], cdf=0; for x >= edges[-1], cdf=1
         idx = np.searchsorted(edges, x, side='right') - 1
         if idx < 0:
             return 0.0
@@ -94,8 +92,6 @@ def approx_wasserstein_1d(bin_edges1, pmf1, bin_edges2, pmf2):
             return 1.0
         return cdf[idx]
 
-    # We'll sample midpoints of each sub-interval in the unified edge grid
-    # and integrate the difference in stepwise fashion.
     distance = 0.0
     for i in range(len(all_edges) - 1):
         left = all_edges[i]
@@ -108,33 +104,55 @@ def approx_wasserstein_1d(bin_edges1, pmf1, bin_edges2, pmf2):
 
     return distance
 
-def _mmd_1d_from_hist(p, q, kernel='rbf', sigma=1.0):
+# CHANGED: new helper for RBF kernel on 1D points
+def _rbf_kernel_1d(x, y, sigma):
     """
-    A naive 1D MMD approximation from discrete PMFs p, q.
-    We treat each bin index as a "point" and weight by p, q.
-    This is purely illustrative; real MMD is often computed on samples directly.
+    x, y: arrays of shape (n,) each
+    Return the (n x m) kernel matrix.
     """
-    p /= (p.sum() + 1e-12)
-    q /= (q.sum() + 1e-12)
+    X = x.reshape(-1, 1)
+    Y = y.reshape(-1, 1)
+    XX = (X*X).sum(axis=1, keepdims=True)
+    YY = (Y*Y).sum(axis=1, keepdims=True)
+    dists = XX + YY.T - 2 * np.dot(X, Y.T)
+    return np.exp(-dists / (2 * sigma**2))
 
-    # Indices as "points"
-    N = len(p)
-    idx = np.arange(N).reshape(-1, 1).astype(float)
+# CHANGED: improved MMD that uses bin centers
+def _mmd_1d_from_bins(bin_edges, pmf1, pmf2, kernel='rbf', sigma=1.0):
+    """
+    Improved 1D MMD approximation using the bin centers as "points".
+    pmf1, pmf2: discrete distributions over bin_edges.
+    """
+    pmf1 /= (pmf1.sum() + 1e-12)
+    pmf2 /= (pmf2.sum() + 1e-12)
 
-    def rbf_kernel(X, Y, s):
-        XX = (X*X).sum(axis=1, keepdims=True)
-        YY = (Y*Y).sum(axis=1, keepdims=True)
-        dists = XX + YY.T - 2 * np.dot(X, Y.T)
-        return np.exp(-dists / (2 * s**2))
+    # Compute bin centers
+    centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
 
-    Kxx = rbf_kernel(idx, idx, sigma)
-    Exx = (p.reshape(-1, 1) * p.reshape(1, -1) * Kxx).sum()
+    # Weighted MMD on these centers
+    # We'll treat each center as repeated pmf[i] times conceptually, but more efficiently,
+    # we can do a weighted kernel sum.
 
-    Kyy = rbf_kernel(idx, idx, sigma)
-    Eyy = (q.reshape(-1, 1) * q.reshape(1, -1) * Kyy).sum()
+    # Kernel matrices
+    Kxx = _rbf_kernel_1d(centers, centers, sigma)
+    Exx = 0.0
+    # Weighted sum for p vs p
+    for i in range(len(centers)):
+        for j in range(len(centers)):
+            Exx += pmf1[i] * pmf1[j] * Kxx[i, j]
 
-    Kxy = rbf_kernel(idx, idx, sigma)
-    Exy = (p.reshape(-1, 1) * q.reshape(1, -1) * Kxy).sum()
+    Kyy = _rbf_kernel_1d(centers, centers, sigma)
+    Eyy = 0.0
+    for i in range(len(centers)):
+        for j in range(len(centers)):
+            Eyy += pmf2[i] * pmf2[j] * Kyy[i, j]
+
+    # Weighted sum for p vs q
+    Kxy = _rbf_kernel_1d(centers, centers, sigma)
+    Exy = 0.0
+    for i in range(len(centers)):
+        for j in range(len(centers)):
+            Exy += pmf1[i] * pmf2[j] * Kxy[i, j]
 
     return Exx + Eyy - 2 * Exy
 
@@ -144,11 +162,10 @@ class EmbeddingTracker:
     1) Legacy vector-based mode (mean/var + Euclidean, Mahalanobis, etc.), or
     2) Distribution-based mode using KLL sketches for each dimension.
 
-    The mode is decided by `distance_name`:
-      - If distance_name in LEGACY_DISTANCE_FUNCTIONS or "mahalanobis", legacy mode.
-      - Otherwise, if distance_name is in DISTRIBUTION_METRICS or is "wasserstein"/"mmd",
-        we switch to KLL-based distribution mode.
-    """
+    NOTE: This implementation computes univariate distributions per dimension
+    and then averages the distance across dimensions. This does NOT capture
+    cross-dimensional (joint) correlations. Use with care if correlations matter.
+    """  # NEW docstring note above
     def __init__(
         self,
         embedding_dim,
@@ -233,20 +250,21 @@ class EmbeddingTracker:
                 epsilon = 1e-12
                 return float(np.sqrt(np.sum(diff**2 / (self.var_diag + epsilon))))
 
-            elif self.distance_name in LEGACY_DISTANCE_FUNCTIONS:
-                dist_fn = LEGACY_DISTANCE_FUNCTIONS[self.distance_name]
+            elif self.distance_name in VECTOR_DISTANCE_FUNCTIONS:
+                dist_fn = VECTOR_DISTANCE_FUNCTIONS[self.distance_name]
                 return float(dist_fn(self.mean, embeddings.mean(axis=0)))
 
             else:
                 raise ValueError(f"Unknown legacy distance: {self.distance_name}")
 
+        # 2) Distribution-based distances
+        # Build a KLL for the new data
         new_sketches = [kll_floats_sketch(self.k) for _ in range(self.embedding_dim)]
         for dim_idx in range(self.embedding_dim):
             col_vals = embeddings[:, dim_idx]
             for val in col_vals:
                 new_sketches[dim_idx].update(val)
 
-        # dimension-wise distances
         dim_distances = []
         for dim_idx in range(self.embedding_dim):
             base_sketch = self.kll_sketches[dim_idx]
@@ -255,24 +273,29 @@ class EmbeddingTracker:
             bin_edges_b, pmf_b = self._sketch_to_hist(base_sketch, self.num_bins)
             bin_edges_n, pmf_n = self._sketch_to_hist(new_sketch, self.num_bins)
 
+            # CHANGED: unify bin edges for ALL distribution metrics
+            all_edges = np.union1d(bin_edges_b, bin_edges_n)
+            all_edges.sort()
+
+            # Resample each distribution onto all_edges
+            pmf_b = self._resample_pmf(base_sketch, all_edges)
+            pmf_n = self._resample_pmf(new_sketch, all_edges)
+
             if self.distance_name in DISTRIBUTION_METRICS:
                 # e.g. KL, JS, Hellinger, Bhattacharyya
                 dist_fn = DISTRIBUTION_METRICS[self.distance_name]
-                pmf_b /= (pmf_b.sum() + 1e-12)
-                pmf_n /= (pmf_n.sum() + 1e-12)
-                dim_dist = dist_fn(pmf_b, pmf_n)
+                dim_dist = dist_fn(pmf_b, pmf_n)  # pmfs are normalized inside dist_fn
                 dim_distances.append(dim_dist)
 
             elif self.distance_name == "wasserstein":
-                # 1D univariate Wasserstein
-                dim_dist = approx_wasserstein_1d(bin_edges_b, pmf_b, bin_edges_n, pmf_n)
+                # 1D univariate Wasserstein, using the same unified edges approach
+                dim_dist = approx_wasserstein_1d(all_edges[:-1], pmf_b,
+                                                 all_edges[:-1], pmf_n)
                 dim_distances.append(dim_dist)
 
             elif self.distance_name == "mmd":
-                # Naive 1D MMD approach
-                pmf_b /= (pmf_b.sum() + 1e-12)
-                pmf_n /= (pmf_n.sum() + 1e-12)
-                dim_dist = _mmd_1d_from_hist(pmf_b, pmf_n, kernel='rbf', sigma=1.0)
+                # NEW: improved MMD using bin centers
+                dim_dist = _mmd_1d_from_bins(all_edges, pmf_b, pmf_n, kernel='rbf', sigma=1.0)
                 dim_distances.append(dim_dist)
             else:
                 raise ValueError(f"Unknown distribution-based metric: {self.distance_name}")
@@ -284,11 +307,11 @@ class EmbeddingTracker:
     def _sketch_to_hist(self, sketch, num_bins):
         """
         Convert a KLL sketch to a histogram: (bin_edges, pmf).
-        - If the sketch is empty or has effectively the same min/max, handle gracefully.
-        - We query rank() at each bin edge to approximate the CDF, then diff -> pmf.
+
+        This function is still used internally to get a first-pass binning.
+        We later unify edges if needed for distribution comparisons.
         """
         if sketch.is_empty():
-            # Return dummy single bin so we don't break the distance computation
             return np.array([0, 1]), np.array([1.0])
 
         min_val = sketch.get_min_value()
@@ -303,3 +326,19 @@ class EmbeddingTracker:
         pmf = np.diff(cdf_vals)
         pmf = np.clip(pmf, 0, 1.0)
         return bin_edges, pmf
+
+    # CHANGED: new helper to resample PMF on a given set of bin edges
+    def _resample_pmf(self, sketch, edges):
+        """
+        Compute the PMF for 'sketch' on the specified bin 'edges'.
+        edges is an array of length M, so resulting PMF has length (M-1).
+        """
+        if sketch.is_empty():
+            # return a single bin as fallback
+            return np.array([1.0]) if len(edges) > 1 else np.array([])
+
+        cdf_vals = [sketch.get_rank(e) for e in edges]
+        cdf_vals = np.array(cdf_vals)
+        pmf = np.diff(cdf_vals)
+        pmf = np.clip(pmf, 0, 1.0)
+        return pmf
