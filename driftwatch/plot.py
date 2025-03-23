@@ -260,7 +260,7 @@ def plot_relative_log_increase(df, output_dir):
         ax.grid(True)
         if i % 2 == 0:
             ax.set_ylabel("Normalized Relative Log Increase")
-        if i == 3:
+        if i in (1, 3):
             ax.legend(title="Metric", fontsize=9)
 
     fig.suptitle("Relative Log Increase vs Drift Strength", fontsize=16, fontweight='bold')
