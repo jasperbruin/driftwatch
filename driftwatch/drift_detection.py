@@ -1,4 +1,5 @@
 import time
+import tracemalloc
 from tqdm import tqdm
 
 from embedding_tracker import EmbeddingTracker, VECTOR_DISTANCE_FUNCTIONS, DISTRIBUTION_METRICS
@@ -22,9 +23,6 @@ def run_distance_tracking(
     """
     Main entry point for distance tracking experiments.
     """
-
-    # 1) Choose approaches based on whether the distance is distribution-based or vector-based.
-    #    We now add "histogram" and "pca_histogram" for distribution-based cases.
     if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
         approaches = ["kll_sketch", "histogram", "pca_kll_sketch", "pca_histogram"]
     else:
@@ -33,18 +31,14 @@ def run_distance_tracking(
     all_results = []
     tracker_dict = {}
 
-    # 2) Build an EmbeddingTracker for each approach.
     for method in approaches:
-        # Pick embedding dim based on whether we're applying PCA
         if method in ["pca", "pca_kll_sketch", "pca_histogram"]:
             embedding_dim = pca_components
         else:
             embedding_dim = baseline_embs.shape[1]
 
-        # Decide distribution_impl based on the method
         if method in ["no_pca", "pca"]:
-            # Vector-based
-            distribution_impl = "none"  # or "kll" is fine if is_distribution_mode is False
+            distribution_impl = "none"
         elif method in ["kll_sketch", "pca_kll_sketch"]:
             distribution_impl = "kll"
         elif method in ["histogram", "pca_histogram"]:
@@ -52,7 +46,6 @@ def run_distance_tracking(
         else:
             raise ValueError(f"Unknown method: {method}")
 
-        # Instantiate tracker
         tracker_dict[method] = EmbeddingTracker(
             embedding_dim=embedding_dim,
             alpha=0.01,
@@ -62,7 +55,6 @@ def run_distance_tracking(
             distribution_impl=distribution_impl
         )
 
-    # 3) Feed baseline data to each approach to initialize stats / distribution
     for method in approaches:
         tracker = tracker_dict[method]
         for batch in batch_generator(baseline_texts, batch_size):
@@ -71,11 +63,13 @@ def run_distance_tracking(
                 emb = pca.transform(emb)
             tracker.update(emb)
 
-    # 4) For each approach, compute distances on the test set (and optionally update in real-time)
+    tracemalloc.start()
+
     for method in approaches:
         tracker = tracker_dict[method]
         distance_scores = []
         overhead_times = []
+        memory_usages = []
 
         start_time = time.time()
         for batch in tqdm(batch_generator(test_texts, batch_size), leave=False):
@@ -87,10 +81,12 @@ def run_distance_tracking(
             dist = tracker.compute_distance(emb)
             overhead_end = time.time()
 
+            current_mem, peak_mem = tracemalloc.get_traced_memory()
+            memory_usages.append(current_mem)
+
             distance_scores.append(dist)
             overhead_times.append(overhead_end - overhead_start)
 
-            # Real-time update, if desired
             if realtime_update:
                 tracker.update(emb)
 
@@ -98,8 +94,11 @@ def run_distance_tracking(
         final_dist = distance_scores[-1] if distance_scores else 0.0
         total_time = end_time - start_time
         avg_overhead = np.mean(overhead_times) if overhead_times else 0.0
+        avg_memory = np.mean(memory_usages) / 1024**2  # MB
 
-        all_results.append((method, final_dist, total_time, avg_overhead))
+        all_results.append((method, final_dist, total_time, avg_overhead, avg_memory))
+
+    tracemalloc.stop()
 
     return all_results
 
@@ -118,7 +117,6 @@ def run_experiments_for_model(
 ):
     partial_results = []
 
-    # Combine your vector-based distances + distribution-based distances
     all_distance_names = (
         ["mahalanobis"]
         + list(VECTOR_DISTANCE_FUNCTIONS.keys())
@@ -151,7 +149,7 @@ def run_experiments_for_model(
                 device,
             )
 
-            for (method, final_dist, total_time, avg_overhead) in results:
+            for (method, final_dist, total_time, avg_overhead, avg_memory) in results:
                 partial_results.append({
                     "distance_type": distance_type,
                     "distance_name": distance_name,
@@ -161,11 +159,11 @@ def run_experiments_for_model(
                     "final_similarity": final_dist,
                     "time_taken": total_time,
                     "avg_overhead": avg_overhead,
+                    "avg_memory_mb": avg_memory,
                     "seed": seed,
                 })
 
     return partial_results
-
 
 def collect_data_single_seed(seed, args):
     set_seed(seed)

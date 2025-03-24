@@ -28,6 +28,7 @@ def flatten_data(results_data):
                     "final_similarity": r["final_similarity"],
                     "avg_overhead": r.get("avg_overhead", float('nan')),
                     "time_taken": r.get("time_taken", float('nan')),
+                    "avg_memory_mb": r.get("avg_memory_mb", float('nan'))
                 })
     return pd.DataFrame(records_list)
 
@@ -440,6 +441,28 @@ def plot_avg_overhead_merged(df, output_dir):
     print(f"[Saved] {out_path}")
 
 
+def plot_avg_memory_merged(df, output_dir):
+    if not {"method", "avg_memory_mb", "distance_type"}.issubset(df.columns):
+        raise ValueError("DataFrame must include 'method', 'avg_memory_mb', and 'distance_type' columns.")
+
+    method_means = df.groupby(["method", "distance_type"], as_index=False)["avg_memory_mb"].mean()
+    method_means_sorted = method_means.sort_values("avg_memory_mb", ascending=False)
+
+    plt.figure(figsize=(12, 6))
+    sns.barplot(data=method_means_sorted, x="method", y="avg_memory_mb", hue="distance_type", palette="Set2")
+
+    plt.xlabel("Method", fontsize=12)
+    plt.ylabel("Avg Memory Overhead (MB)", fontsize=12)
+    plt.title("Average Memory Overhead per Method", fontsize=14, fontweight='bold')
+    plt.xticks(rotation=30, ha="right")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.legend(title="Distance Type")
+    plt.tight_layout()
+
+    out_path = os.path.join(output_dir, "plot_avg_memory_colored_by_type.png")
+    plt.savefig(out_path, dpi=300)
+    plt.close()
+    print(f"[Saved] {out_path}")
 
 
 def generate_all_plots(json_path, output_dir):
@@ -452,6 +475,7 @@ def generate_all_plots(json_path, output_dir):
     plot_overhead_vs_size(df, output_dir)
     plot_final_similarity_separate(df, output_dir)
     plot_avg_overhead_merged(df, output_dir)
+    plot_avg_memory_merged(df, output_dir)
 
 def run_all_results(data_dir):
     """
