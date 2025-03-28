@@ -2,11 +2,11 @@ import os
 
 args = {
     "models": [
-        # "bigscience/bloomz-560m",  # A reduced-size BLOOM model with 560 million parameters.
-        # "facebook/opt-125m",        # A compact version of OPT with 125 million parameters.
-        # "layonsan/google-t5-small", # The small version of T5 with 60 million parameters.
-        # "openai-community/gpt2",    # GPT-2 model with 117 million parameters.
-        # "distilbert-base-uncased",  # A distilled version of BERT with 66 million parameters.
+        "bigscience/bloomz-560m",  # A reduced-size BLOOM model with 560 million parameters.
+        "facebook/opt-125m",        # A compact version of OPT with 125 million parameters.
+        "layonsan/google-t5-small", # The small version of T5 with 60 million parameters.
+        "openai-community/gpt2",    # GPT-2 model with 117 million parameters.
+        "distilbert-base-uncased",  # A distilled version of BERT with 66 million parameters.
         "google/mobilebert-uncased",# MobileBERT optimized for mobile devices with 25 million parameters.
     ],
     "datasets": [
@@ -29,10 +29,10 @@ args = {
         #     "text_column": "text"
         # },
     ],
-    "max_texts": 500,
+    "max_texts": 1000,
     "batch_size": 64,
     "drift_strengths": [0.0, 0.25, 0.5, 0.75, 1.0],
-    "pca_components": 2,
+    "pca_components": 50,
     "output_dir": "data",
     "num_seeds": 1,
     "kll_k": 8,

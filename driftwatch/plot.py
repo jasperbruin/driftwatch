@@ -442,24 +442,57 @@ def plot_avg_overhead_merged(df, output_dir):
 
 
 def plot_avg_memory_merged(df, output_dir):
+    # Validate required columns
     if not {"method", "avg_memory_mb", "distance_type"}.issubset(df.columns):
         raise ValueError("DataFrame must include 'method', 'avg_memory_mb', and 'distance_type' columns.")
 
-    method_means = df.groupby(["method", "distance_type"], as_index=False)["avg_memory_mb"].mean()
+    # Create PCA status column
+    df = df.copy()
+    df["pca_status"] = df["method"].apply(lambda x: "PCA" if "pca" in x else "No PCA")
+
+    # Optional: shorten method labels for clarity
+    label_map = {
+        "pca_histogram": "Hist (PCA)",
+        "pca_kll_sketch": "KLL (PCA)",
+        "histogram": "Hist",
+        "kll_sketch": "KLL",
+        "pca": "Vector (PCA)",
+        "no_pca": "Vector (No PCA)",
+    }
+    df["method_short"] = df["method"].map(label_map).fillna(df["method"])
+
+    # Average and sort
+    method_means = df.groupby(["method_short", "distance_type", "pca_status"], as_index=False)["avg_memory_mb"].mean()
     method_means_sorted = method_means.sort_values("avg_memory_mb", ascending=False)
 
-    plt.figure(figsize=(12, 6))
-    sns.barplot(data=method_means_sorted, x="method", y="avg_memory_mb", hue="distance_type", palette="Set2")
+    # Plot setup
+    g = sns.catplot(
+        data=method_means_sorted,
+        kind="bar",
+        x="method_short",
+        y="avg_memory_mb",
+        hue="pca_status",
+        col="distance_type",
+        palette="Set2",
+        height=5,
+        aspect=1.2,
+        sharey=True
+    )
 
-    plt.xlabel("Method", fontsize=12)
-    plt.ylabel("Avg Memory Overhead (MB)", fontsize=12)
-    plt.title("Average Memory Overhead per Method", fontsize=14, fontweight='bold')
-    plt.xticks(rotation=30, ha="right")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
-    plt.legend(title="Distance Type")
-    plt.tight_layout()
+    g.set_titles("{col_name} Distance")
+    g.set_axis_labels("Method", "Avg Memory Overhead (MB)")
+    g.set_xticklabels(rotation=30, ha="right")
+    g.fig.suptitle("Average Memory Overhead per Method", fontsize=16, fontweight="bold")
+    g.fig.tight_layout()
+    g.fig.subplots_adjust(top=0.85)
 
-    out_path = os.path.join(output_dir, "plot_avg_memory_colored_by_type.png")
+    # Annotate bars
+    for ax in g.axes.flatten():
+        for c in ax.containers:
+            ax.bar_label(c, fmt="%.2f", label_type="edge", fontsize=8)
+
+    # Save
+    out_path = os.path.join(output_dir, "plot_avg_memory_faceted_by_distance_pca.png")
     plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"[Saved] {out_path}")
