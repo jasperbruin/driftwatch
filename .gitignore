@@ -13,3 +13,5 @@ LAB-experiments/experiment_1/product_id_mapper.json
 LAB-experiments/experiment_2/model_formatted_music_v2_cpu
 
 *.jsonl
+
+driftwatch/baseline-experiment/product_id_mapper.json

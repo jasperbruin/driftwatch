@@ -70,7 +70,11 @@ class DriftMetricsAnalyzer:
         # Plot vector-based distances (right)
         self._plot_distance_growth_rate_by_type(ax2, vector_based, "Vector-based Distances")
         
-        plt.tight_layout()
+        # Add main title for the figure
+        fig.suptitle("DeepFM Model Drift Detection: Comparative Analysis of Distance Metrics", 
+                    fontsize=16, fontweight='bold', y=0.98)
+        
+        plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust layout to make room for the title
         plt.savefig(os.path.join(self.results_folder, "drift_metrics_comparison.png"))
         plt.show()
     
@@ -214,33 +218,7 @@ def main():
         print("Loaded existing experiment results.")
         analyzer.plot_comparative_analysis()
         return
-    
-    print("No existing results found. Creating demo data for visualization...")
-    # Only use example data if no real data exists
-    drift_strengths = [0.0, 0.25, 0.5, 0.75, 1.0]
-    
-    # Simulated results for demonstration
-    euclidean_scores = [0.05, 0.12, 0.26, 0.48, 0.73]
-    euclidean_preds = [0.65, 0.63, 0.59, 0.54, 0.49]
-    analyzer.save_experiment_results("euclidean", drift_strengths, euclidean_scores, euclidean_preds)
-    
-    mahalanobis_scores = [0.12, 0.35, 0.72, 1.45, 2.31]
-    mahalanobis_preds = [0.65, 0.62, 0.57, 0.52, 0.47]
-    analyzer.save_experiment_results("mahalanobis", drift_strengths, mahalanobis_scores, mahalanobis_preds)
-    
-    js_scores = [0.02, 0.08, 0.19, 0.34, 0.52]
-    js_preds = [0.65, 0.62, 0.58, 0.53, 0.48]
-    analyzer.save_experiment_results("js", drift_strengths, js_scores, js_preds)
-    
-    wasserstein_scores = [0.03, 0.11, 0.24, 0.45, 0.69]
-    wasserstein_preds = [0.65, 0.63, 0.58, 0.52, 0.46]
-    analyzer.save_experiment_results("wasserstein", drift_strengths, wasserstein_scores, wasserstein_preds)
-    
-    # Generate comparative analysis
-    analyzer.plot_comparative_analysis()
-    
-    print("Analysis complete! Check the drift_results folder for outputs.")
+
 
 if __name__ == "__main__":
     main()
-
