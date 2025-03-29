@@ -63,3 +63,14 @@ DISTRIBUTION_METRICS = {
     "wasserstein": approx_wasserstein_1d,
     "mmd": _mmd_1d_from_bins
 }
+
+def get_available_metrics():
+    """
+    Returns a list of all available distance metrics.
+    
+    Returns:
+        list: Names of all available distance metrics (both vector-based and distribution-based)
+    """
+    # Combine all available metrics from vector and distribution metrics
+    all_metrics = list(VECTOR_DISTANCE_FUNCTIONS.keys()) + list(DISTRIBUTION_METRICS.keys())
+    return all_metrics
