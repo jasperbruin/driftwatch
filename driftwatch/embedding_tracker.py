@@ -1,6 +1,6 @@
-from datasketches import kll_floats_sketch
-from metrics import approx_wasserstein_1d, _mmd_1d_from_bins, DISTRIBUTION_METRICS, VECTOR_DISTANCE_FUNCTIONS
 import numpy as np
+from driftwatch.metrics import approx_wasserstein_1d, _mmd_1d_from_bins, DISTRIBUTION_METRICS, VECTOR_DISTANCE_FUNCTIONS
+from datasketches import kll_floats_sketch
 
 class EmbeddingTracker:
     def __init__(
@@ -241,3 +241,4 @@ class EmbeddingTracker:
         self.cached_baseline_pmfs[dim_idx] = pmf
         self.cached_bin_edges[dim_idx] = edges
         return pmf, edges
+
