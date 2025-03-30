@@ -2,30 +2,35 @@ import os
 import pandas as pd
 import numpy as np
 import torch
+import time
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from deepctr_torch.inputs import SparseFeat, get_feature_names
 from deepctr_torch.models import DeepFM
 from driftwatch.embedding_tracker import EmbeddingTracker
 from driftwatch.metrics import get_available_metrics
+from plot_drift_results import plot_drift_results, create_comparison_plot
 
 # Configuration constants
-THRESHOLD_MULTIPLIER = 3.0
+THRESHOLD_MULTIPLIER = 2.5
 AVAILABLE_DISTANCE_METRICS = get_available_metrics()  # Get all metrics from the metrics module
-OUTPUT_DIR = "baseline_results"
+BASE_OUTPUT_DIR = "baseline_results"
 N_WINDOWS = 300
 BASELINE_FRACTION = 0.3
 EMBEDDING_DIM = 64
 EPOCHS = 2
 BATCH_SIZE = 1024
-THRESHOLD_WINDOW = 50
+THRESHOLD_WINDOW = 30
 ADAPTIVE_UPDATE = False
 
-def create_output_directory():
-    """Create the output directory for results if it doesn't exist."""
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-        print(f"Created output directory: {OUTPUT_DIR}")
+def create_output_directory(base_dir=BASE_OUTPUT_DIR):
+    """Create a timestamped output directory for results."""
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    output_dir = os.path.join(base_dir, timestamp)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created output directory: {output_dir}")
+    return output_dir
 
 def load_and_preprocess_data(filepath: str):
     """Load Amazon reviews data from JSON lines and preprocess for drift detection."""
@@ -208,8 +213,8 @@ def detect_drift(embedding_tracker: EmbeddingTracker, windows: list, baseline_co
         "labels": drift_labels
     }
 
-def plot_and_save_results(window_times, all_distances, all_thresholds, all_labels, distance_metric):
-    """Plot and save the drift detection results."""
+def save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric):
+    """Save drift detection results to CSV."""
     # Save drift distances and thresholds to disk as a CSV
     results_df = pd.DataFrame({
         "window_time": window_times,
@@ -218,52 +223,42 @@ def plot_and_save_results(window_times, all_distances, all_thresholds, all_label
         "drift_detected": all_labels
     })
     
-    output_file = os.path.join(OUTPUT_DIR, f"drift_detection_results_{distance_metric}.csv")
+    output_file = os.path.join(output_dir, f"drift_detection_results_{distance_metric}.csv")
     results_df.to_csv(output_file, index=False)
     print(f"Drift results saved to '{output_file}'.")
+    return output_file
 
-    # Plot drift distance and threshold over window index
-    plt.figure(figsize=(12, 6))
-    plt.plot(all_distances, label="Drift Distance", color='blue')
-    plt.plot(all_thresholds, label=f"Threshold (x{THRESHOLD_MULTIPLIER} STD)", color='red', linestyle="--")
-    plt.title(f"Embedding Drift Distance per Window ({distance_metric})")
-    plt.xlabel("Window Index")
-    plt.ylabel("Drift Distance")
-    plt.legend()
-    plt.grid(alpha=0.3)
-    plt.tight_layout()
+def save_hyperparameters(output_dir):
+    """Save all hyperparameters to a config.txt file in the results directory."""
+    hyperparams = {
+        "THRESHOLD_MULTIPLIER": THRESHOLD_MULTIPLIER,
+        "AVAILABLE_DISTANCE_METRICS": ", ".join(AVAILABLE_DISTANCE_METRICS),
+        "BASE_OUTPUT_DIR": BASE_OUTPUT_DIR,
+        "N_WINDOWS": N_WINDOWS,
+        "BASELINE_FRACTION": BASELINE_FRACTION,
+        "EMBEDDING_DIM": EMBEDDING_DIM,
+        "EPOCHS": EPOCHS,
+        "BATCH_SIZE": BATCH_SIZE,
+        "THRESHOLD_WINDOW": THRESHOLD_WINDOW,
+        "ADAPTIVE_UPDATE": ADAPTIVE_UPDATE,
+        "EMBEDDING_TRACKER_ALPHA": 0.01,  # Alpha value used in EmbeddingTracker
+        "MODEL_OPTIMIZER": "adam",
+        "MODEL_LOSS": "binary_crossentropy",
+        "SPARSE_FEATURES": ", ".join(sparse_features) if 'sparse_features' in globals() else "Not yet defined",
+        "DATA_FILEPATH": "Amazon_Fashion.jsonl"
+    }
     
-    output_image = os.path.join(OUTPUT_DIR, f"drift_distance_by_index_{distance_metric}.png")
-    plt.savefig(output_image)
-    plt.close()
+    config_path = os.path.join(output_dir, "config.txt")
+    with open(config_path, "w") as f:
+        f.write("# Drift Detection Experiment Configuration\n")
+        f.write(f"# Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        
+        for key, value in hyperparams.items():
+            f.write(f"{key} = {value}\n")
+    
+    print(f"Hyperparameters saved to {config_path}")
 
-    # Plot drift distance over time with threshold and detected drift points
-    plt.figure(figsize=(12, 6))
-    plt.plot(window_times, all_distances, label="Drift Score", color="blue")
-    plt.plot(window_times, all_thresholds, label="Threshold", color="red", linestyle="--")
-    
-    # Highlight detected drift windows on the plot
-    drift_times = [t for t, lbl in zip(window_times, all_labels) if lbl == 1]
-    drift_scores = [d for d, lbl in zip(all_distances, all_labels) if lbl == 1]
-    if drift_times:
-        plt.scatter(drift_times, drift_scores, color="red", marker="o", s=50, label="Detected Drift")
-    
-    # Optionally highlight a known drift period (if relevant)
-    plt.axvspan(pd.Timestamp("2021-01-01"), pd.Timestamp("2023-01-01"), color="purple", alpha=0.1, 
-                label="Observed Drift (2021-2023)")
-                
-    plt.title(f"Drift Scores Over Time ({distance_metric})", fontsize=14)
-    plt.xlabel("Time", fontsize=12)
-    plt.ylabel("Drift Score", fontsize=12)
-    plt.legend()
-    plt.grid(alpha=0.3)
-    plt.tight_layout()
-    
-    output_image = os.path.join(OUTPUT_DIR, f"drift_score_over_time_{distance_metric}.png")
-    plt.savefig(output_image)
-    plt.close()
-
-def run_experiment_for_metric(distance_metric, windows, baseline_window_count, embedding_dim, sparse_features, model):
+def run_experiment_for_metric(distance_metric, windows, baseline_window_count, embedding_dim, sparse_features, model, output_dir):
     """Run the drift detection experiment for a specific distance metric."""
     print(f"\nRunning drift detection with {distance_metric} distance metric...")
     
@@ -295,20 +290,24 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
     # Calculate timestamps for visualization
     window_times = [win.index.mean() for win in windows]
     
-    # Plot and save results
-    plot_and_save_results(window_times, all_distances, all_thresholds, all_labels, distance_metric)
+    # Save results to CSV
+    results_file = save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric)
+    
+    # Use imported plotting function instead of internal one
+    plot_drift_results(results_file, output_dir)
     
     return {
+        "metric": distance_metric,
+        "window_times": window_times,
         "distances": all_distances,
         "thresholds": all_thresholds,
-        "labels": all_labels,
-        "window_times": window_times
+        "labels": all_labels
     }
 
 def main():
     """Main function to run the drift detection experiment."""
-    # Create output directory if it doesn't exist
-    create_output_directory()
+    # Create timestamped output directory
+    output_dir = create_output_directory()
     
     # Load and preprocess data
     data_filepath = "Amazon_Fashion.jsonl"
@@ -319,6 +318,10 @@ def main():
     global sparse_features, model
     sparse_features = ["asin", "parent_asin", "user_id"]
     target = "rating"
+    
+    # Save hyperparameters to config file
+    save_hyperparameters(output_dir)
+    
     model = train_deepfm_model(
         data, sparse_features, target, 
         embedding_dim=EMBEDDING_DIM, 
@@ -332,34 +335,23 @@ def main():
     print(f"Total windows: {len(windows)}; Using first {baseline_window_count} windows as baseline.")
     
     # Run experiments for each distance metric
-    all_results = {}
+    all_results = []
     print(f"Running experiments with the following metrics: {AVAILABLE_DISTANCE_METRICS}")
     for metric in AVAILABLE_DISTANCE_METRICS:
         try:
             result = run_experiment_for_metric(
                 metric, windows, baseline_window_count, 
-                EMBEDDING_DIM, sparse_features, model
+                EMBEDDING_DIM, sparse_features, model, output_dir
             )
-            all_results[metric] = result
+            all_results.append(result)
             print(f"Successfully completed experiment for {metric}")
         except Exception as e:
             print(f"Error running experiment for {metric}: {str(e)}")
     
-    # Create a summary plot comparing drift scores across metrics
-    plt.figure(figsize=(14, 8))
-    for metric, result in all_results.items():
-        plt.plot(result["window_times"], result["distances"], label=f"{metric}")
+    # Generate comparison plot using imported function
+    create_comparison_plot(all_results, output_dir)
     
-    plt.title("Comparison of Drift Scores Across Distance Metrics", fontsize=16)
-    plt.xlabel("Time", fontsize=14)
-    plt.ylabel("Drift Score", fontsize=14)
-    plt.legend()
-    plt.grid(alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "drift_score_comparison.png"))
-    plt.close()
-    
-    print(f"\nAll experiments completed. Results saved to {OUTPUT_DIR}/")
+    print(f"\nAll experiments completed. Results saved to {output_dir}/")
 
 if __name__ == "__main__":
     main()

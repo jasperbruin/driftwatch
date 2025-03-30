@@ -1,0 +1,18 @@
+# Drift Detection Experiment Configuration
+# Timestamp: 2025-03-30 09:16:42
+
+THRESHOLD_MULTIPLIER = 2.5
+AVAILABLE_DISTANCE_METRICS = euclidean, cosine, mahalanobis, manhattan, minkowski, chebyshev, canberra, kl, js, hellinger, bhattacharyya, wasserstein, mmd
+BASE_OUTPUT_DIR = baseline_results
+N_WINDOWS = 300
+BASELINE_FRACTION = 0.3
+EMBEDDING_DIM = 64
+EPOCHS = 2
+BATCH_SIZE = 1024
+THRESHOLD_WINDOW = 30
+ADAPTIVE_UPDATE = False
+EMBEDDING_TRACKER_ALPHA = 0.01
+MODEL_OPTIMIZER = adam
+MODEL_LOSS = binary_crossentropy
+SPARSE_FEATURES = asin, parent_asin, user_id
+DATA_FILEPATH = Amazon_Fashion.jsonl
