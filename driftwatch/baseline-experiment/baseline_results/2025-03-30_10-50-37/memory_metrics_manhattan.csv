@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+manhattan,0.011043548583984375,0.1598834991455078,0.21377849578857422,16.966147422790527

@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+kl,0.0332183837890625,0.27570629119873047,0.5525941848754883,17.095123291015625

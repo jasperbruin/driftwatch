@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+minkowski,0.011043548583984375,0.033141136169433594,0.18021202087402344,16.85016632080078

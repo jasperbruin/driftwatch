@@ -4,12 +4,13 @@ import numpy as np
 import torch
 import time
 import matplotlib.pyplot as plt
+import tracemalloc
 from sklearn.preprocessing import LabelEncoder
 from deepctr_torch.inputs import SparseFeat, get_feature_names
 from deepctr_torch.models import DeepFM
 from driftwatch.embedding_tracker import EmbeddingTracker
 from driftwatch.metrics import get_available_metrics
-from plot_drift_results import plot_drift_results, create_comparison_plot
+from plot_drift_results import plot_drift_results, create_comparison_plot, plot_memory_usage
 
 # Configuration constants
 THRESHOLD_MULTIPLIER = 2.5
@@ -22,6 +23,37 @@ EPOCHS = 2
 BATCH_SIZE = 1024
 THRESHOLD_WINDOW = 30
 ADAPTIVE_UPDATE = False
+
+# Memory profiling functions
+def start_memory_tracking():
+    """Start tracking memory usage."""
+    tracemalloc.start()
+    return tracemalloc.take_snapshot()
+
+def get_memory_usage(baseline_snapshot=None):
+    """
+    Take a memory snapshot and return statistics.
+    If baseline_snapshot is provided, return difference from baseline.
+    """
+    snapshot = tracemalloc.take_snapshot()
+    if baseline_snapshot:
+        stats = snapshot.compare_to(baseline_snapshot, 'lineno')
+    else:
+        stats = snapshot.statistics('lineno')
+    
+    # Get current and peak memory usage
+    current, peak = tracemalloc.get_traced_memory()
+    
+    return {
+        'snapshot': snapshot,
+        'stats': stats,
+        'current_memory': current / (1024 * 1024),  # MB
+        'peak_memory': peak / (1024 * 1024)  # MB
+    }
+
+def stop_memory_tracking():
+    """Stop memory tracking."""
+    tracemalloc.stop()
 
 def create_output_directory(base_dir=BASE_OUTPUT_DIR):
     """Create a timestamped output directory for results."""
@@ -213,8 +245,8 @@ def detect_drift(embedding_tracker: EmbeddingTracker, windows: list, baseline_co
         "labels": drift_labels
     }
 
-def save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric):
-    """Save drift detection results to CSV."""
+def save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric, memory_metrics=None):
+    """Save drift detection results to CSV with memory metrics."""
     # Save drift distances and thresholds to disk as a CSV
     results_df = pd.DataFrame({
         "window_time": window_times,
@@ -226,6 +258,20 @@ def save_drift_results(output_dir, window_times, all_distances, all_thresholds, 
     output_file = os.path.join(output_dir, f"drift_detection_results_{distance_metric}.csv")
     results_df.to_csv(output_file, index=False)
     print(f"Drift results saved to '{output_file}'.")
+    
+    # Save memory metrics
+    if memory_metrics:
+        memory_file = os.path.join(output_dir, f"memory_metrics_{distance_metric}.csv")
+        memory_df = pd.DataFrame({
+            "metric": [distance_metric],
+            "init_memory_mb": [memory_metrics["init_memory"]],
+            "baseline_memory_mb": [memory_metrics["baseline_memory"]],
+            "final_memory_mb": [memory_metrics["final_memory"]],
+            "peak_memory_mb": [memory_metrics["peak_memory"]]
+        })
+        memory_df.to_csv(memory_file, index=False)
+        print(f"Memory metrics saved to '{memory_file}'.")
+    
     return output_file
 
 def save_hyperparameters(output_dir):
@@ -259,8 +305,11 @@ def save_hyperparameters(output_dir):
     print(f"Hyperparameters saved to {config_path}")
 
 def run_experiment_for_metric(distance_metric, windows, baseline_window_count, embedding_dim, sparse_features, model, output_dir):
-    """Run the drift detection experiment for a specific distance metric."""
+    """Run the drift detection experiment for a specific distance metric with memory profiling."""
     print(f"\nRunning drift detection with {distance_metric} distance metric...")
+    
+    # Start memory tracking
+    baseline_snapshot = start_memory_tracking()
     
     # Initialize EmbeddingTracker with the specific distance metric
     tracker = EmbeddingTracker(
@@ -269,10 +318,18 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
         alpha=0.01
     )
     
+    # Measure memory after tracker initialization
+    init_memory = get_memory_usage(baseline_snapshot)
+    print(f"Memory after tracker initialization: {init_memory['current_memory']:.2f} MB")
+    
     # Establish baseline distribution
     baseline_result = establish_baseline(tracker, windows, baseline_window_count)
     initial_threshold = baseline_result["initial_threshold"]
     print(f"Initial drift threshold (baseline): {initial_threshold:.4f}")
+    
+    # Measure memory after baseline establishment
+    baseline_memory = get_memory_usage(baseline_snapshot)
+    print(f"Memory after baseline establishment: {baseline_memory['current_memory']:.2f} MB")
     
     # Run drift detection on remaining windows
     drift_result = detect_drift(
@@ -282,6 +339,10 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
         adaptive_update=ADAPTIVE_UPDATE
     )
     
+    # Measure memory after drift detection
+    drift_memory = get_memory_usage(baseline_snapshot)
+    print(f"Memory after drift detection: {drift_memory['current_memory']:.2f} MB (Peak: {drift_memory['peak_memory']:.2f} MB)")
+    
     # Combine baseline and detection results
     all_distances = baseline_result["distances"] + drift_result["distances"]
     all_thresholds = baseline_result["thresholds"] + drift_result["thresholds"]
@@ -290,18 +351,30 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
     # Calculate timestamps for visualization
     window_times = [win.index.mean() for win in windows]
     
-    # Save results to CSV
-    results_file = save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric)
+    # Store memory metrics
+    memory_metrics = {
+        "init_memory": init_memory['current_memory'],
+        "baseline_memory": baseline_memory['current_memory'],
+        "final_memory": drift_memory['current_memory'],
+        "peak_memory": drift_memory['peak_memory']
+    }
     
-    # Use imported plotting function instead of internal one
+    # Save results to CSV (including memory metrics)
+    results_file = save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric, memory_metrics)
+    
+    # Use imported plotting function
     plot_drift_results(results_file, output_dir)
+    
+    # Stop memory tracking
+    stop_memory_tracking()
     
     return {
         "metric": distance_metric,
         "window_times": window_times,
         "distances": all_distances,
         "thresholds": all_thresholds,
-        "labels": all_labels
+        "labels": all_labels,
+        "memory_metrics": memory_metrics
     }
 
 def main():
@@ -348,8 +421,9 @@ def main():
         except Exception as e:
             print(f"Error running experiment for {metric}: {str(e)}")
     
-    # Generate comparison plot using imported function
+    # Generate comparison plots
     create_comparison_plot(all_results, output_dir)
+    plot_memory_usage(output_dir)  # New memory usage plot
     
     print(f"\nAll experiments completed. Results saved to {output_dir}/")
 

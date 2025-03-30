@@ -151,47 +151,6 @@ def plot_final_similarity(df, output_dir):
     print(f"[Saved] {out_path}")
 
 
-def plot_avg_overhead(df, output_dir):
-    """
-    Plots the average overhead per model, with separate bars for each method,
-    including histogram and kll-based approaches (with/without PCA),
-    sorted by descending overall overhead.
-    """
-    if "model_name" not in df.columns or "method" not in df.columns:
-        raise ValueError("DataFrame must include 'model_name' and 'method' columns.")
-
-    # Step 1: Aggregate average overhead by model and method
-    df_grouped = df.groupby(["model_name", "method"], as_index=False)["avg_overhead"].mean()
-
-    # Step 2: Pivot: rows = model_name, columns = method
-    pivot_df = df_grouped.pivot(index="model_name", columns="method", values="avg_overhead").fillna(0)
-
-    # Step 3: Sort columns (methods) by descending mean overhead
-    method_means = pivot_df.mean(axis=0).sort_values(ascending=False)
-    sorted_methods = method_means.index.tolist()
-    pivot_df = pivot_df[sorted_methods]
-
-    # Step 4: Plot
-    fig, ax = plt.subplots(figsize=(14, 6))
-    colors = sns.color_palette("husl", n_colors=len(sorted_methods))
-    pivot_df.plot(kind='bar', ax=ax, logy=True, color=colors)
-
-    ax.set_xlabel("Model Name", fontsize=12)
-    ax.set_ylabel("Avg Overhead (s) [log scale]", fontsize=12)
-    ax.set_title("Average Overhead per Model by Method (Sorted)", fontsize=14, fontweight='bold')
-    plt.xticks(rotation=30, ha="right", fontsize=10)
-    plt.yticks(fontsize=10)
-    ax.legend(title="Method", fontsize=10)
-    ax.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.tight_layout()
-
-    path_overhead = os.path.join(output_dir, "plot_model_avg_overhead_by_method_sorted.png")
-    plt.savefig(path_overhead, dpi=300)
-    plt.close()
-    print(f"[Saved] {path_overhead}")
-
-
-
 
 def plot_relative_log_increase(df, output_dir):
     plot_data = []
@@ -260,11 +219,11 @@ def plot_relative_log_increase(df, output_dir):
         ax.set_xlabel("Drift Strength")
         ax.grid(True)
         if i % 2 == 0:
-            ax.set_ylabel("Normalized Relative Log Increase")
+            ax.set_ylabel("Relative Increase")
         if i in (1, 3):
             ax.legend(title="Metric", fontsize=9)
 
-    fig.suptitle("Relative Log Increase vs Drift Strength", fontsize=16, fontweight='bold')
+    fig.suptitle("Relative Increase vs Drift Strength", fontsize=16, fontweight='bold')
     plt.tight_layout(rect=[0, 0, 1, 0.96])
 
     path_out = os.path.join(output_dir, "plot_relative_log_increase_4subplots.png")
@@ -442,15 +401,31 @@ def plot_avg_overhead_merged(df, output_dir):
 
 
 def plot_avg_memory_merged(df, output_dir):
+    """
+    Creates a single figure with two subplots sharing the same y-axis:
+      - Left subplot: distribution-based methods
+      - Right subplot: vector-based methods
+
+    By using sharey=True, both subplots have the same vertical scale.
+    """
     # Validate required columns
-    if not {"method", "avg_memory_mb", "distance_type"}.issubset(df.columns):
-        raise ValueError("DataFrame must include 'method', 'avg_memory_mb', and 'distance_type' columns.")
+    required_cols = {"method", "avg_memory_mb", "distance_type"}
+    if not required_cols.issubset(df.columns):
+        raise ValueError(f"DataFrame must include columns: {required_cols}")
 
-    # Create PCA status column
+    # Copy the DataFrame to avoid modifying the original
     df = df.copy()
-    df["pca_status"] = df["method"].apply(lambda x: "PCA" if "pca" in x else "No PCA")
 
-    # Optional: shorten method labels for clarity
+    # Define which methods are distribution-based vs. vector-based
+    vector_methods = ["pca", "no_pca"]
+    distribution_methods = ["histogram", "kll_sketch", "pca_histogram", "pca_kll_sketch"]
+
+    # Correct distance_type to override if necessary
+    df["corrected_distance_type"] = df["distance_type"]
+    df.loc[df["method"].isin(vector_methods), "corrected_distance_type"] = "vector"
+    df.loc[df["method"].isin(distribution_methods), "corrected_distance_type"] = "distribution"
+
+    # Create shorter labels for the plot
     label_map = {
         "pca_histogram": "Hist (PCA)",
         "pca_kll_sketch": "KLL (PCA)",
@@ -461,40 +436,70 @@ def plot_avg_memory_merged(df, output_dir):
     }
     df["method_short"] = df["method"].map(label_map).fillna(df["method"])
 
-    # Average and sort
-    method_means = df.groupby(["method_short", "distance_type", "pca_status"], as_index=False)["avg_memory_mb"].mean()
-    method_means_sorted = method_means.sort_values("avg_memory_mb", ascending=False)
-
-    # Plot setup
-    g = sns.catplot(
-        data=method_means_sorted,
-        kind="bar",
-        x="method_short",
-        y="avg_memory_mb",
-        hue="pca_status",
-        col="distance_type",
-        palette="Set2",
-        height=5,
-        aspect=1.2,
-        sharey=True
+    # Calculate mean memory usage per method
+    method_means = (
+        df
+        .groupby(["method_short", "corrected_distance_type"], as_index=False)["avg_memory_mb"]
+        .mean()
     )
 
-    g.set_titles("{col_name} Distance")
-    g.set_axis_labels("Method", "Avg Memory Overhead (MB)")
-    g.set_xticklabels(rotation=30, ha="right")
-    g.fig.suptitle("Average Memory Overhead per Method", fontsize=16, fontweight="bold")
-    g.fig.tight_layout()
-    g.fig.subplots_adjust(top=0.85)
+    # Separate distribution-based and vector-based
+    dist_df = method_means[method_means["corrected_distance_type"] == "distribution"].copy()
+    vec_df  = method_means[method_means["corrected_distance_type"] == "vector"].copy()
 
-    # Annotate bars
-    for ax in g.axes.flatten():
-        for c in ax.containers:
-            ax.bar_label(c, fmt="%.2f", label_type="edge", fontsize=8)
+    # Sort by descending memory usage for clarity
+    dist_df.sort_values(by="avg_memory_mb", ascending=False, inplace=True)
+    vec_df.sort_values(by="avg_memory_mb", ascending=False, inplace=True)
 
-    # Save
-    out_path = os.path.join(output_dir, "plot_avg_memory_faceted_by_distance_pca.png")
+    # Create figure with two subplots that share the same y-axis
+    fig, (ax_dist, ax_vec) = plt.subplots(
+        nrows=1, ncols=2, figsize=(12, 5), sharey=True
+    )
+
+    # --- Distribution-based subplot ---
+    if not dist_df.empty:
+        x_dist = range(len(dist_df))
+        y_dist = dist_df["avg_memory_mb"].values
+        labels_dist = dist_df["method_short"].values
+
+        ax_dist.bar(x_dist, y_dist, color="C0")
+        ax_dist.set_title("Distribution-based Methods", fontsize=12, fontweight="bold")
+        ax_dist.set_xlabel("Method")
+        ax_dist.set_ylabel("Avg Memory (MB)")
+        ax_dist.set_xticks(x_dist)
+        ax_dist.set_xticklabels(labels_dist, rotation=30, ha="right")
+
+        # Annotate each bar with its value
+        for i, val in enumerate(y_dist):
+            ax_dist.text(i, val, f"{val:.2f}", ha="center", va="bottom", fontsize=9)
+
+    # --- Vector-based subplot ---
+    if not vec_df.empty:
+        x_vec = range(len(vec_df))
+        y_vec = vec_df["avg_memory_mb"].values
+        labels_vec = vec_df["method_short"].values
+
+        ax_vec.bar(x_vec, y_vec, color="C1")
+        ax_vec.set_title("Vector-based Methods", fontsize=12, fontweight="bold")
+        ax_vec.set_xlabel("Method")
+        # We do NOT set ax_vec.set_ylabel here since sharey=True
+        ax_vec.set_xticks(x_vec)
+        ax_vec.set_xticklabels(labels_vec, rotation=30, ha="right")
+
+        # Annotate each bar with its value
+        for i, val in enumerate(y_vec):
+            ax_vec.text(i, val, f"{val:.2f}", ha="center", va="bottom", fontsize=9)
+
+    # Add a main title
+    fig.suptitle("Average Memory Overhead by Method", fontsize=14, fontweight="bold")
+
+    # Adjust spacing
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+
+    # Save to output
+    out_path = os.path.join(output_dir, "plot_avg_memory_single_figure_subplots.png")
     plt.savefig(out_path, dpi=300)
-    plt.close()
+    plt.close(fig)
     print(f"[Saved] {out_path}")
 
 
@@ -502,7 +507,6 @@ def generate_all_plots(json_path, output_dir):
     results_data = load_json_data(json_path)
     df = flatten_data(results_data)
     plot_final_similarity(df, output_dir)
-    plot_avg_overhead(df, output_dir)
     plot_relative_log_increase(df, output_dir)
     plot_avg_time(df, output_dir)
     plot_overhead_vs_size(df, output_dir)

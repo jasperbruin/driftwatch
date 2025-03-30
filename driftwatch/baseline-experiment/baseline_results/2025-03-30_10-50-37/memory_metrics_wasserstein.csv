@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+wasserstein,0.0332183837890625,0.2163238525390625,0.4772071838378906,17.02843189239502

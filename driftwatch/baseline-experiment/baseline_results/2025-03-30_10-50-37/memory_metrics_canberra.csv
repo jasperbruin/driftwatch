@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+canberra,0.011043548583984375,0.037837982177734375,0.06976890563964844,16.854032516479492
