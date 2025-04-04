@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+wasserstein_histogram,0.10645675659179688,0.1307353973388672,0.5004673004150391,17.049894332885742

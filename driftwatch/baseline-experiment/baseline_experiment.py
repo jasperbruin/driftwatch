@@ -24,6 +24,13 @@ BATCH_SIZE = 1024
 THRESHOLD_WINDOW = 30
 ADAPTIVE_UPDATE = False
 
+# Define which metrics are vector-based vs distribution-based
+VECTOR_METRICS = ['cosine', 'euclidean', 'manhattan', 'minkowski', 'mahalanobis', 'chebyshev', 'canberra']
+DISTRIBUTION_METRICS = ['wasserstein', 'ks', 'kl', 'js', 'hellinger', 'bhattacharyya', 'mmd']
+
+# Distribution implementations to test
+DIST_IMPLEMENTATIONS = ["kll", "histogram"]
+
 # Memory profiling functions
 def start_memory_tracking():
     """Start tracking memory usage."""
@@ -306,76 +313,96 @@ def save_hyperparameters(output_dir):
 
 def run_experiment_for_metric(distance_metric, windows, baseline_window_count, embedding_dim, sparse_features, model, output_dir):
     """Run the drift detection experiment for a specific distance metric with memory profiling."""
-    print(f"\nRunning drift detection with {distance_metric} distance metric...")
+    # Check if this is a distribution-based metric
+    is_distribution_metric = any(dm.lower() in distance_metric.lower() for dm in DISTRIBUTION_METRICS)
     
-    # Start memory tracking
-    baseline_snapshot = start_memory_tracking()
+    # For vector-based metrics, run once; for distribution-based metrics, run for each implementation
+    implementations_to_run = DIST_IMPLEMENTATIONS if is_distribution_metric else ["default"]
     
-    # Initialize EmbeddingTracker with the specific distance metric
-    tracker = EmbeddingTracker(
-        embedding_dim=embedding_dim * len(sparse_features),
-        distance_name=distance_metric,
-        alpha=0.01
-    )
+    results = []
     
-    # Measure memory after tracker initialization
-    init_memory = get_memory_usage(baseline_snapshot)
-    print(f"Memory after tracker initialization: {init_memory['current_memory']:.2f} MB")
+    for impl in implementations_to_run:
+        # For distribution metrics, include implementation in the metric name
+        metric_name = distance_metric
+        if is_distribution_metric:
+            metric_name = f"{distance_metric}_{impl}"
+        
+        print(f"\nRunning drift detection with {metric_name} distance metric...")
+        
+        # Start memory tracking
+        baseline_snapshot = start_memory_tracking()
+        
+        # Initialize EmbeddingTracker with the specific distance metric and implementation
+        distribution_impl = impl if is_distribution_metric else "kll"  # Default to KLL for vector metrics
+        
+        tracker = EmbeddingTracker(
+            embedding_dim=embedding_dim * len(sparse_features),
+            distance_name=distance_metric,
+            alpha=0.01,
+            distribution_impl=distribution_impl
+        )
+        
+        # Measure memory after tracker initialization
+        init_memory = get_memory_usage(baseline_snapshot)
+        print(f"Memory after tracker initialization: {init_memory['current_memory']:.2f} MB")
+        
+        # Establish baseline distribution
+        baseline_result = establish_baseline(tracker, windows, baseline_window_count)
+        initial_threshold = baseline_result["initial_threshold"]
+        print(f"Initial drift threshold (baseline): {initial_threshold:.4f}")
+        
+        # Measure memory after baseline establishment
+        baseline_memory = get_memory_usage(baseline_snapshot)
+        print(f"Memory after baseline establishment: {baseline_memory['current_memory']:.2f} MB")
+        
+        # Run drift detection on remaining windows
+        drift_result = detect_drift(
+            tracker, windows, baseline_window_count, initial_threshold,
+            threshold_window=THRESHOLD_WINDOW, 
+            threshold_multiplier=THRESHOLD_MULTIPLIER, 
+            adaptive_update=ADAPTIVE_UPDATE
+        )
+        
+        # Measure memory after drift detection
+        drift_memory = get_memory_usage(baseline_snapshot)
+        print(f"Memory after drift detection: {drift_memory['current_memory']:.2f} MB (Peak: {drift_memory['peak_memory']:.2f} MB)")
+        
+        # Combine baseline and detection results
+        all_distances = baseline_result["distances"] + drift_result["distances"]
+        all_thresholds = baseline_result["thresholds"] + drift_result["thresholds"]
+        all_labels = baseline_result["labels"] + drift_result["labels"]
+        
+        # Calculate timestamps for visualization
+        window_times = [win.index.mean() for win in windows]
+        
+        # Store memory metrics
+        memory_metrics = {
+            "init_memory": init_memory['current_memory'],
+            "baseline_memory": baseline_memory['current_memory'],
+            "final_memory": drift_memory['current_memory'],
+            "peak_memory": drift_memory['peak_memory']
+        }
+        
+        # Save results to CSV (including memory metrics)
+        results_file = save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, metric_name, memory_metrics)
+        
+        # Use imported plotting function
+        plot_drift_results(results_file, output_dir)
+        
+        # Stop memory tracking
+        stop_memory_tracking()
+        
+        results.append({
+            "metric": metric_name,
+            "window_times": window_times,
+            "distances": all_distances,
+            "thresholds": all_thresholds,
+            "labels": all_labels,
+            "memory_metrics": memory_metrics,
+            "distribution_impl": distribution_impl if is_distribution_metric else "vector-based"
+        })
     
-    # Establish baseline distribution
-    baseline_result = establish_baseline(tracker, windows, baseline_window_count)
-    initial_threshold = baseline_result["initial_threshold"]
-    print(f"Initial drift threshold (baseline): {initial_threshold:.4f}")
-    
-    # Measure memory after baseline establishment
-    baseline_memory = get_memory_usage(baseline_snapshot)
-    print(f"Memory after baseline establishment: {baseline_memory['current_memory']:.2f} MB")
-    
-    # Run drift detection on remaining windows
-    drift_result = detect_drift(
-        tracker, windows, baseline_window_count, initial_threshold,
-        threshold_window=THRESHOLD_WINDOW, 
-        threshold_multiplier=THRESHOLD_MULTIPLIER, 
-        adaptive_update=ADAPTIVE_UPDATE
-    )
-    
-    # Measure memory after drift detection
-    drift_memory = get_memory_usage(baseline_snapshot)
-    print(f"Memory after drift detection: {drift_memory['current_memory']:.2f} MB (Peak: {drift_memory['peak_memory']:.2f} MB)")
-    
-    # Combine baseline and detection results
-    all_distances = baseline_result["distances"] + drift_result["distances"]
-    all_thresholds = baseline_result["thresholds"] + drift_result["thresholds"]
-    all_labels = baseline_result["labels"] + drift_result["labels"]
-    
-    # Calculate timestamps for visualization
-    window_times = [win.index.mean() for win in windows]
-    
-    # Store memory metrics
-    memory_metrics = {
-        "init_memory": init_memory['current_memory'],
-        "baseline_memory": baseline_memory['current_memory'],
-        "final_memory": drift_memory['current_memory'],
-        "peak_memory": drift_memory['peak_memory']
-    }
-    
-    # Save results to CSV (including memory metrics)
-    results_file = save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric, memory_metrics)
-    
-    # Use imported plotting function
-    plot_drift_results(results_file, output_dir)
-    
-    # Stop memory tracking
-    stop_memory_tracking()
-    
-    return {
-        "metric": distance_metric,
-        "window_times": window_times,
-        "distances": all_distances,
-        "thresholds": all_thresholds,
-        "labels": all_labels,
-        "memory_metrics": memory_metrics
-    }
+    return results
 
 def main():
     """Main function to run the drift detection experiment."""
@@ -412,18 +439,18 @@ def main():
     print(f"Running experiments with the following metrics: {AVAILABLE_DISTANCE_METRICS}")
     for metric in AVAILABLE_DISTANCE_METRICS:
         try:
-            result = run_experiment_for_metric(
+            results = run_experiment_for_metric(
                 metric, windows, baseline_window_count, 
                 EMBEDDING_DIM, sparse_features, model, output_dir
             )
-            all_results.append(result)
+            all_results.extend(results)
             print(f"Successfully completed experiment for {metric}")
         except Exception as e:
             print(f"Error running experiment for {metric}: {str(e)}")
     
     # Generate comparison plots
     create_comparison_plot(all_results, output_dir)
-    plot_memory_usage(output_dir)  # New memory usage plot
+    plot_memory_usage(output_dir)  # Memory usage plot
     
     print(f"\nAll experiments completed. Results saved to {output_dir}/")
 

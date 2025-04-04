@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+hellinger_histogram,0.10645675659179688,0.12984752655029297,0.49565601348876953,17.04638385772705
