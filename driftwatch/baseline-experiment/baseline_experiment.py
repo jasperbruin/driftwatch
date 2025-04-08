@@ -6,6 +6,7 @@ import time
 import matplotlib.pyplot as plt
 import tracemalloc
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, roc_auc_score
 from deepctr_torch.inputs import SparseFeat, get_feature_names
 from deepctr_torch.models import DeepFM
 from driftwatch.embedding_tracker import EmbeddingTracker
@@ -89,7 +90,7 @@ def train_deepfm_model(data: pd.DataFrame, sparse_features: list, target: str,
                        embedding_dim: int = 64, epochs: int = 2, batch_size: int = 1024):
     """
     Train a DeepFM model on the given data for the binary classification task.
-    Returns the trained model.
+    Returns the trained model and feature columns.
     """
     # Label encode categorical features
     for feat in sparse_features:
@@ -123,7 +124,7 @@ def train_deepfm_model(data: pd.DataFrame, sparse_features: list, target: str,
     
     # Switch model to evaluation mode for inference
     model.eval()
-    return model
+    return model, linear_feature_columns, dnn_feature_columns
 
 def split_into_windows(data: pd.DataFrame, n_windows: int):
     """
@@ -165,18 +166,58 @@ def extract_embeddings(model, batch_df: pd.DataFrame, sparse_features: list):
     embeddings = np.concatenate(embeddings_list, axis=1)
     return embeddings
 
-def establish_baseline(embedding_tracker: EmbeddingTracker, windows: list, baseline_count: int):
+def evaluate_model_accuracy(model, window_df, sparse_features, target, linear_feature_columns, dnn_feature_columns):
+    """
+    Evaluate the model's prediction accuracy on a window of data.
+    Returns accuracy score and AUC score.
+    """
+    # Prepare model input
+    feature_names = get_feature_names(linear_feature_columns + dnn_feature_columns)
+    model_input = {name: window_df[name].values for name in feature_names}
+    
+    # Get predictions
+    with torch.no_grad():
+        y_pred = model.predict(model_input)
+    
+    # Convert to binary predictions (threshold at 0.5)
+    y_pred_binary = (y_pred > 0.5).astype(int)
+    
+    # Calculate metrics
+    accuracy = accuracy_score(window_df[target].values, y_pred_binary)
+    
+    # Calculate AUC if possible (requires both classes to be present)
+    try:
+        auc = roc_auc_score(window_df[target].values, y_pred)
+    except ValueError:
+        # If only one class is present in the window, AUC is undefined
+        auc = np.nan
+    
+    return accuracy, auc
+
+def establish_baseline(embedding_tracker: EmbeddingTracker, windows: list, baseline_count: int, model=None, 
+                      sparse_features=None, target=None, linear_feature_columns=None, dnn_feature_columns=None):
     """
     Use the first baseline_count windows to establish the baseline distribution in the embedding tracker.
     Returns a dictionary with baseline drift distances and the initial threshold.
     """
     baseline_distances = []
+    baseline_accuracies = []
+    baseline_aucs = []
+    
     # Iterate over baseline windows
     for i in range(baseline_count):
         window_df = windows[i]
         emb = extract_embeddings(model, window_df, sparse_features)
         # If using vector-based distance, use the mean embedding; if distribution-based, use full embeddings
         emb_input = emb if embedding_tracker.is_distribution_mode else np.mean(emb, axis=0)
+        
+        # Evaluate model accuracy if model and target are provided
+        if model is not None and target is not None:
+            accuracy, auc = evaluate_model_accuracy(model, window_df, sparse_features, target, 
+                                                   linear_feature_columns, dnn_feature_columns)
+            baseline_accuracies.append(float(accuracy))
+            baseline_aucs.append(float(auc))
+        
         if i == 0:
             # Initialize baseline in tracker with the first window
             embedding_tracker.update(emb_input)
@@ -204,11 +245,14 @@ def establish_baseline(embedding_tracker: EmbeddingTracker, windows: list, basel
         "distances": baseline_distances,
         "thresholds": baseline_thresholds,
         "labels": baseline_labels,
-        "initial_threshold": initial_threshold
+        "initial_threshold": initial_threshold,
+        "accuracies": baseline_accuracies,
+        "aucs": baseline_aucs
     }
 
 def detect_drift(embedding_tracker: EmbeddingTracker, windows: list, baseline_count: int, initial_threshold: float,
-                 threshold_window: int = 50, threshold_multiplier: float = 3.0, adaptive_update: bool = False):
+                 threshold_window: int = 50, threshold_multiplier: float = 3.0, adaptive_update: bool = False,
+                 model=None, sparse_features=None, target=None, linear_feature_columns=None, dnn_feature_columns=None):
     """
     Compute drift distances for windows beyond the baseline period and detect drift events.
     Uses a rolling window of past `threshold_window` drift scores to update the threshold.
@@ -218,12 +262,21 @@ def detect_drift(embedding_tracker: EmbeddingTracker, windows: list, baseline_co
     drift_distances = []
     thresholds = []
     drift_labels = []
+    accuracies = []
+    aucs = []
     
     # Iterate through each window after the baseline period
     for j in range(baseline_count, len(windows)):
         window_df = windows[j]
         emb = extract_embeddings(model, window_df, sparse_features)
         emb_input = emb if embedding_tracker.is_distribution_mode else np.mean(emb, axis=0)
+        
+        # Evaluate model accuracy if model and target are provided
+        if model is not None and target is not None:
+            accuracy, auc = evaluate_model_accuracy(model, window_df, sparse_features, target,
+                                                   linear_feature_columns, dnn_feature_columns)
+            accuracies.append(float(accuracy))
+            aucs.append(float(auc))
         
         # Compute the embedding distance to baseline distribution
         drift_dist = embedding_tracker.compute_distance(emb_input)
@@ -249,18 +302,30 @@ def detect_drift(embedding_tracker: EmbeddingTracker, windows: list, baseline_co
     return {
         "distances": drift_distances,
         "thresholds": thresholds,
-        "labels": drift_labels
+        "labels": drift_labels,
+        "accuracies": accuracies,
+        "aucs": aucs
     }
 
-def save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, distance_metric, memory_metrics=None):
-    """Save drift detection results to CSV with memory metrics."""
-    # Save drift distances and thresholds to disk as a CSV
-    results_df = pd.DataFrame({
+def save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, 
+                       distance_metric, memory_metrics=None, all_accuracies=None, all_aucs=None):
+    """Save drift detection results to CSV with memory metrics and accuracy metrics."""
+    # Create base results dictionary
+    results_dict = {
         "window_time": window_times,
         "drift_distance": all_distances,
         "threshold": all_thresholds,
         "drift_detected": all_labels
-    })
+    }
+    
+    # Add accuracy metrics if provided
+    if all_accuracies is not None:
+        results_dict["accuracy"] = all_accuracies
+    if all_aucs is not None:
+        results_dict["auc"] = all_aucs
+    
+    # Save drift distances and thresholds to disk as a CSV
+    results_df = pd.DataFrame(results_dict)
     
     output_file = os.path.join(output_dir, f"drift_detection_results_{distance_metric}.csv")
     results_df.to_csv(output_file, index=False)
@@ -281,37 +346,8 @@ def save_drift_results(output_dir, window_times, all_distances, all_thresholds, 
     
     return output_file
 
-def save_hyperparameters(output_dir):
-    """Save all hyperparameters to a config.txt file in the results directory."""
-    hyperparams = {
-        "THRESHOLD_MULTIPLIER": THRESHOLD_MULTIPLIER,
-        "AVAILABLE_DISTANCE_METRICS": ", ".join(AVAILABLE_DISTANCE_METRICS),
-        "BASE_OUTPUT_DIR": BASE_OUTPUT_DIR,
-        "N_WINDOWS": N_WINDOWS,
-        "BASELINE_FRACTION": BASELINE_FRACTION,
-        "EMBEDDING_DIM": EMBEDDING_DIM,
-        "EPOCHS": EPOCHS,
-        "BATCH_SIZE": BATCH_SIZE,
-        "THRESHOLD_WINDOW": THRESHOLD_WINDOW,
-        "ADAPTIVE_UPDATE": ADAPTIVE_UPDATE,
-        "EMBEDDING_TRACKER_ALPHA": 0.01,  # Alpha value used in EmbeddingTracker
-        "MODEL_OPTIMIZER": "adam",
-        "MODEL_LOSS": "binary_crossentropy",
-        "SPARSE_FEATURES": ", ".join(sparse_features) if 'sparse_features' in globals() else "Not yet defined",
-        "DATA_FILEPATH": "Amazon_Fashion.jsonl"
-    }
-    
-    config_path = os.path.join(output_dir, "config.txt")
-    with open(config_path, "w") as f:
-        f.write("# Drift Detection Experiment Configuration\n")
-        f.write(f"# Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-        
-        for key, value in hyperparams.items():
-            f.write(f"{key} = {value}\n")
-    
-    print(f"Hyperparameters saved to {config_path}")
-
-def run_experiment_for_metric(distance_metric, windows, baseline_window_count, embedding_dim, sparse_features, model, output_dir):
+def run_experiment_for_metric(distance_metric, windows, baseline_window_count, embedding_dim, sparse_features, 
+                             model, output_dir, linear_feature_columns, dnn_feature_columns, target="rating"):
     """Run the drift detection experiment for a specific distance metric with memory profiling."""
     # Check if this is a distribution-based metric
     is_distribution_metric = any(dm.lower() in distance_metric.lower() for dm in DISTRIBUTION_METRICS)
@@ -347,7 +383,11 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
         print(f"Memory after tracker initialization: {init_memory['current_memory']:.2f} MB")
         
         # Establish baseline distribution
-        baseline_result = establish_baseline(tracker, windows, baseline_window_count)
+        baseline_result = establish_baseline(
+            tracker, windows, baseline_window_count, 
+            model=model, sparse_features=sparse_features, target=target,
+            linear_feature_columns=linear_feature_columns, dnn_feature_columns=dnn_feature_columns
+        )
         initial_threshold = baseline_result["initial_threshold"]
         print(f"Initial drift threshold (baseline): {initial_threshold:.4f}")
         
@@ -360,7 +400,9 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
             tracker, windows, baseline_window_count, initial_threshold,
             threshold_window=THRESHOLD_WINDOW, 
             threshold_multiplier=THRESHOLD_MULTIPLIER, 
-            adaptive_update=ADAPTIVE_UPDATE
+            adaptive_update=ADAPTIVE_UPDATE,
+            model=model, sparse_features=sparse_features, target=target,
+            linear_feature_columns=linear_feature_columns, dnn_feature_columns=dnn_feature_columns
         )
         
         # Measure memory after drift detection
@@ -371,6 +413,13 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
         all_distances = baseline_result["distances"] + drift_result["distances"]
         all_thresholds = baseline_result["thresholds"] + drift_result["thresholds"]
         all_labels = baseline_result["labels"] + drift_result["labels"]
+        
+        # Combine accuracy metrics if available
+        all_accuracies = None
+        all_aucs = None
+        if "accuracies" in baseline_result and "accuracies" in drift_result:
+            all_accuracies = baseline_result["accuracies"] + drift_result["accuracies"]
+            all_aucs = baseline_result["aucs"] + drift_result["aucs"]
         
         # Calculate timestamps for visualization
         window_times = [win.index.mean() for win in windows]
@@ -383,10 +432,13 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
             "peak_memory": drift_memory['peak_memory']
         }
         
-        # Save results to CSV (including memory metrics)
-        results_file = save_drift_results(output_dir, window_times, all_distances, all_thresholds, all_labels, metric_name, memory_metrics)
+        # Save results to CSV (including memory metrics and accuracy)
+        results_file = save_drift_results(
+            output_dir, window_times, all_distances, all_thresholds, all_labels, 
+            metric_name, memory_metrics, all_accuracies, all_aucs
+        )
         
-        # Use imported plotting function
+        # Use imported plotting functions
         plot_drift_results(results_file, output_dir)
         
         # Stop memory tracking
@@ -398,6 +450,8 @@ def run_experiment_for_metric(distance_metric, windows, baseline_window_count, e
             "distances": all_distances,
             "thresholds": all_thresholds,
             "labels": all_labels,
+            "accuracies": all_accuracies,
+            "aucs": all_aucs,
             "memory_metrics": memory_metrics,
             "distribution_impl": distribution_impl if is_distribution_metric else "vector-based"
         })
@@ -415,14 +469,13 @@ def main():
     print(f"Loaded {len(data)} records. Data columns: {list(data.columns)}")
     
     # Define features and train model
-    global sparse_features, model
     sparse_features = ["asin", "parent_asin", "user_id"]
     target = "rating"
     
     # Save hyperparameters to config file
-    save_hyperparameters(output_dir)
+    # save_hyperparameters(output_dir)
     
-    model = train_deepfm_model(
+    model, linear_feature_columns, dnn_feature_columns = train_deepfm_model(
         data, sparse_features, target, 
         embedding_dim=EMBEDDING_DIM, 
         epochs=EPOCHS, 
@@ -441,7 +494,8 @@ def main():
         try:
             results = run_experiment_for_metric(
                 metric, windows, baseline_window_count, 
-                EMBEDDING_DIM, sparse_features, model, output_dir
+                EMBEDDING_DIM, sparse_features, model, output_dir,
+                linear_feature_columns, dnn_feature_columns, target=target
             )
             all_results.extend(results)
             print(f"Successfully completed experiment for {metric}")

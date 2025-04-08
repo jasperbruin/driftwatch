@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+cosine,0.011043548583984375,0.09487247467041016,0.3278837203979492,16.894495010375977

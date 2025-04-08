@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+mahalanobis,0.011043548583984375,0.21541118621826172,0.3038311004638672,17.00368309020996

@@ -1,0 +1,2 @@
+metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
+chebyshev,0.011043548583984375,0.09264755249023438,0.30376529693603516,16.889397621154785
