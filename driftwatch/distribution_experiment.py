@@ -1,25 +1,58 @@
-# drift_detection.py
-
+import os
 import time
 import tracemalloc
-from tqdm import tqdm
 import numpy as np
+import argparse
+import torch
 from collections import defaultdict
-import os
+from tqdm import tqdm
 
-# 1. Import the KLL-Floats-Sketch
-from datasketches import kll_floats_sketch
+from driftwatch.embedding_tracker import EmbeddingTracker
+from driftwatch.utils import (
+    set_seed, 
+    extract_embeddings, 
+    batch_generator, 
+    introduce_gradual_drift,
+    get_device, 
+    load_and_split_texts, 
+    compute_baseline_embeddings_and_pca,
+    save_results
+)
+from driftwatch.metrics import DISTRIBUTION_METRICS
 
-from embedding_tracker import EmbeddingTracker, VECTOR_DISTANCE_FUNCTIONS, DISTRIBUTION_METRICS
-from utils import *
-from config import args
-from plot import *
+def parse_args():
+    """
+    Get configuration from config.py and allow command-line arguments to override
+    """
+    from driftwatch.config import args as config_args
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Distribution-based Drift Detection Experiment")
+    parser.add_argument("--models", nargs='+', default=config_args["models"], 
+                        help="List of model names to evaluate")
+    parser.add_argument("--datasets", nargs='+', default=[d["name"] for d in config_args["datasets"]], 
+                        help="Names of datasets to use")
+    parser.add_argument("--max_texts", type=int, default=config_args["max_texts"], 
+                        help="Maximum number of texts to process per dataset")
+    parser.add_argument("--batch_size", type=int, default=config_args["batch_size"], 
+                        help="Batch size for processing")
+    parser.add_argument("--pca_components", type=int, default=config_args["pca_components"], 
+                        help="Number of PCA components")
+    parser.add_argument("--kll_k", type=int, default=config_args.get("kll_k", 20), 
+                        help="KLL parameter k")
+    parser.add_argument("--num_bins", type=int, default=config_args.get("kll_bins", 20), 
+                        help="Number of histogram bins")
+    parser.add_argument("--drift_strengths", type=float, nargs='+', 
+                        default=config_args["drift_strengths"], 
+                        help="Drift strength values to test")
+    parser.add_argument("--output_dir", type=str, default=os.path.join(config_args["output_dir"], "distribution_experiment"), 
+                        help="Directory to save results")
+    parser.add_argument("--num_seeds", type=int, default=config_args["num_seeds"], 
+                        help="Number of random seeds to run")
+    
+    return parser.parse_args()
 
-
-
-
-
-def run_distance_tracking(
+def run_distribution_experiment(
     model,
     tokenizer,
     baseline_texts,
@@ -30,76 +63,55 @@ def run_distance_tracking(
     pca_components,
     batch_size,
     device,
-    realtime_update=False
+    kll_k,
+    num_bins
 ):
     """
-    Main entry point for distance tracking experiments.
-    This function demonstrates how to toggle between:
-      - No dimensionality reduction
-      - PCA-based dimensionality reduction
-      - KLL-based dimensionality reduction
-    and measure memory/time usage.
+    Run distribution-based distance tracking experiment with different approaches.
     """
-
-
-    # 2. Decide which "approaches" to run for a given distance_name.
-    if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
-        # Distribution-based approaches
-        approaches = ["kll_sketch", "histogram", "pca_kll_sketch", "pca_histogram"]
-    else:
-        # Vector-based approaches
-        approaches = ["no_pca", "pca", "kll_vector"]
+    # For distribution-based approaches
+    approaches = ["kll_distribution", "histogram", "pca_histogram"]
 
     all_results = []
     tracker_dict = {}
 
-    # 3. Initialize the trackers for each approach.
+    # Initialize the trackers for each approach
     for method in approaches:
-        if method in ["pca", "pca_kll_sketch", "pca_histogram"]:
+        if method in ["pca_kll_sketch", "pca_histogram"]:
             embedding_dim = pca_components
-        elif method == "kll_vector":
-            # Use the same dimension as the KLL 'k' parameter
-            embedding_dim = args.get("kll_k", 8)
         else:
             embedding_dim = baseline_embs.shape[1]
 
-        if method in ["no_pca", "pca", "kll_vector"]:
-            distribution_impl = "none"
-        elif method in ["kll_sketch", "pca_kll_sketch"]:
+        if method in ["kll_distribution"]:
             distribution_impl = "kll"
-        elif method in ["histogram", "pca_histogram"]:
+        else:  # histogram, pca_histogram
             distribution_impl = "histogram"
-        else:
-            raise ValueError(f"Unknown method: {method}")
 
         tracker_dict[method] = EmbeddingTracker(
             embedding_dim=embedding_dim,
             alpha=0.01,
             distance_name=distance_name,
-            k=args.get("kll_k", 20),
-            num_bins=args.get("kll_bins", 20),
+            k=kll_k,
+            num_bins=num_bins,
             distribution_impl=distribution_impl
         )
 
-    # 4. Update the tracker with baseline embeddings.
+    # Update the trackers with baseline embeddings
     for method in approaches:
         tracker = tracker_dict[method]
 
         for batch in batch_generator(baseline_texts, batch_size):
             emb = extract_embeddings(model, tokenizer, batch, device)
 
-            if method in ["pca", "pca_kll_sketch", "pca_histogram"]:
+            if method in ["pca_histogram"]:
                 emb = pca.transform(emb)
-
-            if method == "kll_vector":
-                # Convert to size-(k) vectors
-                emb = kll_transform(emb, k=args.get("kll_k", 8))
 
             tracker.update(emb)
 
+    # Start memory tracking
     tracemalloc.start()
 
-    # 5. Compute distance for the test data with each approach.
+    # Compute distance for test data with each approach
     for method in approaches:
         tracker = tracker_dict[method]
         distance_scores = []
@@ -111,16 +123,15 @@ def run_distance_tracking(
         for batch in tqdm(batch_generator(test_texts, batch_size), leave=False):
             emb = extract_embeddings(model, tokenizer, batch, device)
 
-            if method in ["pca", "pca_kll_sketch", "pca_histogram"]:
+            if method in ["pca_histogram"]:
                 emb = pca.transform(emb)
 
-            if method == "kll_vector":
-                emb = kll_transform(emb, k=args.get("kll_k", 8))
-
+            # Measure overhead time for distance computation
             overhead_start = time.time()
             dist = tracker.compute_distance(emb)
             overhead_end = time.time()
 
+            # Track memory usage
             current_mem, _ = tracemalloc.get_traced_memory()
             memory_usages.append(current_mem)
 
@@ -139,7 +150,6 @@ def run_distance_tracking(
 
     return all_results
 
-
 def run_experiments_for_model(
     model_name,
     baseline_texts,
@@ -150,22 +160,16 @@ def run_experiments_for_model(
     drift_strengths,
     baseline_embs,
     pca,
+    kll_k,
+    num_bins,
     seed=None
 ):
     partial_results = []
 
-    all_distance_names = (
-        ["mahalanobis"]
-        + list(VECTOR_DISTANCE_FUNCTIONS.keys())
-        + ["kl", "js", "hellinger", "bhattacharyya", "mmd", "wasserstein"]
-    )
+    # Only using distribution-based metrics for this experiment
+    distribution_metrics = list(DISTRIBUTION_METRICS.keys()) + ["wasserstein", "mmd"]
 
-    for distance_name in all_distance_names:
-        if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
-            distance_type = "distribution"
-        else:
-            distance_type = "vector"
-
+    for distance_name in distribution_metrics:
         for drift_strength in drift_strengths:
             drifted_texts = introduce_gradual_drift(
                 drift_texts,
@@ -173,7 +177,7 @@ def run_experiments_for_model(
             )
             test_texts = baseline_texts + drifted_texts
 
-            results = run_distance_tracking(
+            results = run_distribution_experiment(
                 model_name["model"],
                 model_name["tokenizer"],
                 baseline_texts,
@@ -184,14 +188,16 @@ def run_experiments_for_model(
                 pca_components,
                 batch_size,
                 device,
+                kll_k,
+                num_bins
             )
 
             for (method, final_dist, total_time, avg_overhead, avg_memory) in results:
                 partial_results.append({
-                    "distance_type": distance_type,
+                    "distance_type": "distribution",
                     "distance_name": distance_name,
                     "drift_strength": drift_strength,
-                    "pca_applied": method in ["pca", "pca_kll_sketch", "pca_histogram"],
+                    "pca_applied": "pca" in method,
                     "method": method,
                     "final_similarity": final_dist,
                     "time_taken": total_time,
@@ -202,28 +208,36 @@ def run_experiments_for_model(
 
     return partial_results
 
-
 def collect_data_single_seed(seed, args):
     set_seed(seed)
     device = get_device()
     print(f"[Seed={seed}] Using device:", device)
 
     results = defaultdict(list)
-    for dataset_info in args["datasets"]:
+    
+    for dataset_name in args.datasets:
+        # Create a dataset info structure for each dataset
+        dataset_info = {
+            "name": dataset_name,
+            "config": None,
+            "split": "train",
+            "text_column": "text"
+        }
+        
         dataset_name, baseline_texts, drift_texts = load_and_split_texts(
             dataset_info,
-            args["max_texts"]
+            args.max_texts
         )
 
-        for model_name in args["models"]:
+        for model_name in args.models:
             print(f"[Seed={seed}] --- Using Model: {model_name} ---")
 
             model, tokenizer, baseline_embs, pca = compute_baseline_embeddings_and_pca(
                 model_name,
                 baseline_texts,
                 device,
-                args["pca_components"],
-                args["batch_size"],
+                args.pca_components,
+                args.batch_size,
             )
 
             model_details = {
@@ -236,39 +250,55 @@ def collect_data_single_seed(seed, args):
                 baseline_texts,
                 drift_texts,
                 device,
-                args["pca_components"],
-                args["batch_size"],
-                args["drift_strengths"],
+                args.pca_components,
+                args.batch_size,
+                args.drift_strengths,
                 baseline_embs,
                 pca,
+                args.kll_k,
+                args.num_bins,
                 seed=seed
             )
+            
             for r in partial_results:
                 key = (dataset_name, model_name)
                 results[key].append(r)
 
     return results
 
-
-def collect_data_multiple_seeds():
+def collect_data_multiple_seeds(args):
     all_results = defaultdict(list)
-    for seed in range(args["num_seeds"]):
+    for seed in range(args.num_seeds):
         seed_results = collect_data_single_seed(seed, args)
         for key, records in seed_results.items():
             all_results[key].extend(records)
     print("\nAll seeds complete!")
     return all_results
 
-
 def main():
+    args = parse_args()
+    
+    # Create output directory
+    os.makedirs(args.output_dir, exist_ok=True)
+    
+    # Add timestamp to output directory
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-    output_dir = os.path.join(args["output_dir"], timestamp)
-
-    results = collect_data_multiple_seeds()
+    output_dir = os.path.join(args.output_dir, timestamp)
+    
+    print("Distribution-based Drift Detection Experiment")
+    print("==========================================")
+    print(f"Models: {args.models}")
+    print(f"Datasets: {args.datasets}")
+    print(f"Output directory: {output_dir}")
+    print(f"PCA components: {args.pca_components}")
+    print(f"KLL k: {args.kll_k}")
+    print(f"Number of bins: {args.num_bins}")
+    print(f"Drift strengths: {args.drift_strengths}")
+    
+    results = collect_data_multiple_seeds(args)
     save_results(results, output_dir)
-
-    run_all_results("data")
-
+    
+    print(f"Results saved to {output_dir}")
 
 if __name__ == "__main__":
     main()

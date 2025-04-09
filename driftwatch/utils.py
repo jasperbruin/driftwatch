@@ -162,3 +162,33 @@ def save_results(results, output_dir):
             f.write(f"{key}: {value}\n")
     print(f"Arguments saved to {args_path}")
 
+
+def kll_transform(embeddings, k=8, sketch_k=None):
+    """
+    Optimized KLL-based transform that converts each embedding vector
+    into k quantiles of its values. This yields a new embedding of size k
+    for every original row in 'embeddings'.
+
+    Parameters:
+    - embeddings: numpy array of shape (n_samples, n_features)
+    - k: number of quantiles to extract (output dimension)
+    - sketch_k: KLL accuracy parameter (if None, defaults to k*2)
+
+    Returns:
+    - transformed embeddings of shape (n_samples, k)
+    """
+    if sketch_k is None:
+        sketch_k = min(k * 2, 200)  # Higher accuracy for sketch, capped at reasonable value
+
+    n_samples = embeddings.shape[0]
+    transformed = np.zeros((n_samples, k), dtype=np.float32)
+    quantile_points = np.linspace(0, 1, k)
+
+    for i in range(n_samples):
+        # Create a new sketch for each embedding vector
+        sketch = kll_floats_sketch(sketch_k)
+        # Update with all values at once if supported
+        sketch.update(np.asarray(embeddings[i], dtype=np.float32))
+        transformed[i] = sketch.get_quantiles(quantile_points.tolist())
+
+    return transformed
