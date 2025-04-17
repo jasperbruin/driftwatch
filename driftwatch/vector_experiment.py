@@ -7,8 +7,8 @@ import torch
 from collections import defaultdict
 from tqdm import tqdm
 
-from driftwatch.embedding_tracker import EmbeddingTracker
-from driftwatch.utils import (
+from embedding_tracker import EmbeddingTracker
+from utils import (
     set_seed, 
     extract_embeddings, 
     batch_generator, 
@@ -18,14 +18,14 @@ from driftwatch.utils import (
     compute_baseline_embeddings_and_pca,
     save_results
 )
-from driftwatch.utils import kll_transform
-from driftwatch.metrics import VECTOR_DISTANCE_FUNCTIONS
+from utils import kll_transform
+from metrics import VECTOR_DISTANCE_FUNCTIONS
 
 def parse_args():
     """
     Get configuration from config.py and allow command-line arguments to override
     """
-    from driftwatch.config import args as config_args
+    from config import args as config_args
     import argparse
     
     parser = argparse.ArgumentParser(description="Vector-based Drift Detection Experiment")
@@ -39,7 +39,7 @@ def parse_args():
                         help="Batch size for processing")
     parser.add_argument("--pca_components", type=int, default=config_args["pca_components"], 
                         help="Number of PCA components")
-    parser.add_argument("--kll_k", type=int, default=config_args.get("kll_k", 8), 
+    parser.add_argument("--kll_k", type=int, default=config_args.get("kll_k", 50),
                         help="KLL parameter k (output dimension)")
     parser.add_argument("--drift_strengths", type=float, nargs='+', 
                         default=config_args["drift_strengths"], 
@@ -113,6 +113,7 @@ def run_vector_experiment(
         distance_scores = []
         overhead_times = []
         memory_usages = []
+        peak_memory_usages = []
 
         start_time = time.time()
 
@@ -124,14 +125,18 @@ def run_vector_experiment(
             elif method == "kll_vector":
                 emb = kll_transform(emb, k=kll_k)
 
+            # Clear tracemalloc statistics before distance computation
+            tracemalloc.clear_traces()
+            
             # Measure overhead time for distance computation
             overhead_start = time.time()
             dist = tracker.compute_distance(emb)
             overhead_end = time.time()
 
-            # Track memory usage
-            current_mem, _ = tracemalloc.get_traced_memory()
+            # Track memory usage - now getting both current and peak
+            current_mem, peak_mem = tracemalloc.get_traced_memory()
             memory_usages.append(current_mem)
+            peak_memory_usages.append(peak_mem)
 
             distance_scores.append(dist)
             overhead_times.append(overhead_end - overhead_start)
@@ -141,8 +146,9 @@ def run_vector_experiment(
         total_time = end_time - start_time
         avg_overhead = np.mean(overhead_times) if overhead_times else 0.0
         avg_memory = np.mean(memory_usages) / (1024**2)  # MB
+        avg_peak_memory = np.mean(peak_memory_usages) / (1024**2)  # MB
 
-        all_results.append((method, final_dist, total_time, avg_overhead, avg_memory))
+        all_results.append((method, final_dist, total_time, avg_overhead, avg_memory, avg_peak_memory))
 
     tracemalloc.stop()
 
@@ -188,7 +194,14 @@ def run_experiments_for_model(
                 kll_k
             )
 
-            for (method, final_dist, total_time, avg_overhead, avg_memory) in results:
+            for result_tuple in results:
+                if len(result_tuple) == 6:  # Updated version with peak memory
+                    method, final_dist, total_time, avg_overhead, avg_memory, avg_peak_memory = result_tuple
+                    peak_memory = avg_peak_memory
+                else:  # Backward compatibility
+                    method, final_dist, total_time, avg_overhead, avg_memory = result_tuple
+                    peak_memory = avg_memory
+
                 partial_results.append({
                     "distance_type": "vector",
                     "distance_name": distance_name,
@@ -200,6 +213,7 @@ def run_experiments_for_model(
                     "time_taken": total_time,
                     "avg_overhead": avg_overhead,
                     "avg_memory_mb": avg_memory,
+                    "peak_memory_mb": peak_memory,
                     "seed": seed,
                 })
 
@@ -297,3 +311,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

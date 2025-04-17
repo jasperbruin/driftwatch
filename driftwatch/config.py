@@ -10,29 +10,29 @@ args = {
         "google/mobilebert-uncased",# MobileBERT optimized for mobile devices with 25 million parameters.
     ],
     "datasets": [
-        {
-            "name": "yelp_review_full",
-            "config": None,
-            "split": "train",
-            "text_column": "text"
-        },
+        # {
+        #     "name": "yelp_review_full",
+        #     "config": None,
+        #     "split": "train",
+        #     "text_column": "text"
+        # },
         # {
         #     "name": "wikitext",
         #     "config": "wikitext-2-raw-v1",
         #     "split": "train",
         #     "text_column": "text"
         # },
-        # {
-        #     "name": "ag_news",
-        #     "config": None,
-        #     "split": "train",
-        #     "text_column": "text"
-        # },
+        {
+            "name": "ag_news",
+            "config": None,
+            "split": "train",
+            "text_column": "text"
+        },
     ],
-    "max_texts": 100,
+    "max_texts": 4000,
     "batch_size": 64,
     "drift_strengths": [0.0, 0.25, 0.5, 0.75, 1.0],
-    "pca_components": 50,
+    "pca_components": 2,
     "output_dir": "data",
     "num_seeds": 1,
     "kll_k": 8,

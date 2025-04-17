@@ -28,7 +28,8 @@ def flatten_data(results_data):
                     "final_similarity": r["final_similarity"],
                     "avg_overhead": r.get("avg_overhead", float('nan')),
                     "time_taken": r.get("time_taken", float('nan')),
-                    "avg_memory_mb": r.get("avg_memory_mb", float('nan'))
+                    "avg_memory_mb": r.get("avg_memory_mb", float('nan')),
+                    "peak_memory_mb": r.get("peak_memory_mb", r.get("avg_memory_mb", float('nan')))
                 })
     return pd.DataFrame(records_list)
 
@@ -161,7 +162,7 @@ def plot_relative_log_increase(df, output_dir):
             base_similarity = df[
                 (df["drift_strength"] == 0) &
                 (df["distance_name"] == row["distance_name"]) &
-                (df["pca_applied"] == row["pca_applied"])
+                (df["method"] == row["method"])  # Changed to use method instead of pca_applied
             ]["final_similarity"].mean()
 
             if base_similarity and base_similarity > 0:
@@ -169,16 +170,16 @@ def plot_relative_log_increase(df, output_dir):
                 plot_data.append({
                     "distance_name": row["distance_name"],
                     "drift_strength": row["drift_strength"],
-                    "pca_applied": row["pca_applied"],
+                    "method": row["method"],  # Store method
                     "distance_type": row["distance_type"],
                     "rel_log_increase": rel_log
                 })
 
     df_plot = pd.DataFrame(plot_data)
 
-    # Step 2: Normalize per (distance_name, pca_applied)
+    # Step 2: Normalize per (distance_name, method)
     df_normalized = []
-    for (dist_name, pca_flag), group in df_plot.groupby(["distance_name", "pca_applied"]):
+    for (dist_name, method), group in df_plot.groupby(["distance_name", "method"]):
         df_avg = group.groupby("drift_strength")["rel_log_increase"].mean().reset_index()
         min_val = df_avg["rel_log_increase"].min()
         max_val = df_avg["rel_log_increase"].max()
@@ -187,50 +188,72 @@ def plot_relative_log_increase(df, output_dir):
         else:
             df_avg["normalized"] = 0.0
         df_avg["distance_name"] = dist_name
-        df_avg["pca_applied"] = pca_flag
+        df_avg["method"] = method
         df_avg["distance_type"] = group["distance_type"].iloc[0]
         df_normalized.append(df_avg)
 
     df_final = pd.concat(df_normalized, ignore_index=True)
 
-    # Step 3: Create 4-subplot figure
-    fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharey=True)
-    axes = axes.flatten()
+    # Step 3: Create 2x3 subplot figure (vector methods on top, distribution on bottom)
+    fig, axes = plt.subplots(2, 3, figsize=(16, 10), sharey=True)
 
+    # Define which methods to show in each subplot position (row, column)
+    # Row 0: Vector methods, Row 1: Distribution methods
+    method_positions = {
+        (0, 0): "pca",          # Vector-based (top row)
+        (0, 1): "no_pca",       # Vector-based (top row)
+        (0, 2): "kll_vector",   # Vector-based (top row)
+        (1, 0): "kll_distribution",   # Distribution-based (bottom row)
+        (1, 1): "histogram",    # Distribution-based (bottom row)
+        (1, 2): "pca_histogram" # Distribution-based (bottom row)
+    }
+    
+    # Create titles for each subplot
     title_map = {
-        (False, "vector"): "Vector-Based (No PCA)",
-        (True, "vector"): "Vector-Based (PCA)",
-        (False, "distribution"): "Distribution-Based (No PCA)",
-        (True, "distribution"): "Distribution-Based (PCA)",
+        "pca": "Vector-Based (PCA)",
+        "no_pca": "Vector-Based (Full Embedding Size)",
+        "kll_vector": "Vector-Based (KLL Vector)",
+        "kll_distribution": "Distribution-Based (KLL Sketch)",
+        "histogram": "Distribution-Based (Histogram Full Embedding Size)",
+        "pca_histogram": "Distribution-Based (PCA Histogram)"
     }
 
-    for i, (pca_flag, dist_type) in enumerate(title_map.keys()):
-        ax = axes[i]
-        sub_df = df_final[
-            (df_final["pca_applied"] == pca_flag) &
-            (df_final["distance_type"] == dist_type)
-        ]
+    # Plot each subplot
+    for i in range(2):
+        for j in range(3):
+            ax = axes[i, j]
+            method = method_positions.get((i, j))
+            
+            if method:
+                sub_df = df_final[df_final["method"] == method]
+                
+                for dist_name in sub_df["distance_name"].unique():
+                    d = sub_df[sub_df["distance_name"] == dist_name]
+                    if not d.empty:
+                        ax.plot(d["drift_strength"], d["normalized"], marker='o', label=dist_name)
+                
+                ax.set_title(title_map.get(method, f"Method: {method}"), fontsize=12, fontweight='bold')
+                ax.set_xlabel("Drift Strength")
+                ax.grid(True)
+                
+                if j == 0:  # Left column gets y-axis label
+                    ax.set_ylabel("Normalized Relative Increase")
+                
+                # Add legend to the rightmost plot in each row
+                if j == 2:
+                    ax.legend(title="Distance Metric", fontsize=9)
 
-        for dist_name in sub_df["distance_name"].unique():
-            d = sub_df[sub_df["distance_name"] == dist_name]
-            ax.plot(d["drift_strength"], d["normalized"], marker='o', label=dist_name)
+    # Add row labels
+    fig.text(0.02, 0.75, "Vector-Based Methods", fontsize=14, fontweight='bold', rotation=90, va='center')
+    fig.text(0.02, 0.25, "Distribution-Based Methods", fontsize=14, fontweight='bold', rotation=90, va='center')
 
-        ax.set_title(title_map[(pca_flag, dist_type)], fontsize=12, fontweight='bold')
-        ax.set_xlabel("Drift Strength")
-        ax.grid(True)
-        if i % 2 == 0:
-            ax.set_ylabel("Relative Increase")
-        if i in (1, 3):
-            ax.legend(title="Metric", fontsize=9)
+    fig.suptitle("Relative Increase vs Drift Strength by Method", fontsize=16, fontweight='bold')
+    plt.tight_layout(rect=[0.04, 0, 1, 0.96])
 
-    fig.suptitle("Relative Increase vs Drift Strength", fontsize=16, fontweight='bold')
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-
-    path_out = os.path.join(output_dir, "plot_relative_log_increase_4subplots.png")
+    path_out = os.path.join(output_dir, "plot_relative_log_increase_6subplots.png")
     plt.savefig(path_out, dpi=300)
     plt.close()
     print(f"[Saved] {path_out}")
-
 
 
 
@@ -307,11 +330,11 @@ def plot_overhead_vs_size(df, output_dir):
 def plot_final_similarity_separate(df, output_dir):
     """
     Creates 12 subplots (3x4 grid), one per distance_name.
-    Each plot shows two lines: PCA applied vs not.
+    Each plot shows three lines: PCA, No PCA, and KLL (Vector or Distribution).
     """
 
     # Step 1: Compute mean final_similarity for each group
-    df_sim = df.groupby(["distance_name", "drift_strength", "pca_applied"], as_index=False)["final_similarity"].mean()
+    df_sim = df.groupby(["distance_name", "drift_strength", "method"], as_index=False)["final_similarity"].mean()
 
     # Step 2: Normalize final similarity within each distance metric
     df_sim["final_similarity_norm"] = 0.0
@@ -332,7 +355,15 @@ def plot_final_similarity_separate(df, output_dir):
     num_rows = int(np.ceil(num_dists / num_cols))
 
     fig, axes = plt.subplots(num_rows, num_cols, figsize=(5 * num_cols, 4 * num_rows), squeeze=False)
-    palette = sns.color_palette("Set2", 2)  # 2 colors: PCA applied vs not
+    palette = sns.color_palette("Set2", 3)  # 3 colors: PCA, No PCA, KLL
+
+    # Define method labels
+    method_labels = {
+        "pca": "Vector-Based (PCA)",
+        "no_pca": "Vector-Based (Full Embedding Size)",
+        "kll_vector": "Vector-Based (KLL Vector)",
+        "kll_sketch": "Distribution-Based (KLL Sketch)"
+    }
 
     # Step 4: Plot each distance
     for idx, dist_name in enumerate(unique_distances):
@@ -340,15 +371,14 @@ def plot_final_similarity_separate(df, output_dir):
         col = idx % num_cols
         ax = axes[row][col]
 
-        for i, pca_flag in enumerate([False, True]):
-            subset = df_sim[(df_sim["distance_name"] == dist_name) & (df_sim["pca_applied"] == pca_flag)]
+        for i, method in enumerate(["pca", "no_pca", "kll_vector"]):  # Adjust to "kll_sketch" if needed
+            subset = df_sim[(df_sim["distance_name"] == dist_name) & (df_sim["method"] == method)]
             if not subset.empty:
-                label = "PCA" if pca_flag else "No PCA"
                 ax.plot(
                     subset["drift_strength"],
                     subset["final_similarity_norm"],
                     marker='o',
-                    label=label,
+                    label=method_labels[method],
                     color=palette[i]
                 )
 
@@ -363,7 +393,7 @@ def plot_final_similarity_separate(df, output_dir):
         fig.delaxes(axes[i // num_cols][i % num_cols])
 
     plt.tight_layout()
-    path_sim = os.path.join(output_dir, "plot_final_similarity_pca_vs_no_pca_by_distance.png")
+    path_sim = os.path.join(output_dir, "plot_final_similarity_pca_vs_no_pca_kll_by_distance.png")
     plt.savefig(path_sim)
     plt.close()
     print(f"[Saved] {path_sim}")
@@ -503,6 +533,78 @@ def plot_avg_memory_merged(df, output_dir):
     print(f"[Saved] {out_path}")
 
 
+def plot_peak_vs_avg_memory(df, output_dir):
+    """
+    Creates a scatter plot comparing peak vs average memory usage
+    for different methods to visualize memory stability.
+    """
+    # Check if required columns exist
+    if "method" not in df.columns or "avg_memory_mb" not in df.columns:
+        print("Warning: Required columns for peak_vs_avg memory plot not found")
+        return
+        
+    # Use peak_memory_mb if available, otherwise fall back to avg_memory_mb
+    if "peak_memory_mb" not in df.columns:
+        print("Warning: peak_memory_mb not found, skipping peak vs avg memory plot")
+        return
+    
+    # Get mean values per method
+    method_metrics = df.groupby("method").agg({
+        "avg_memory_mb": "mean",
+        "peak_memory_mb": "mean"
+    }).reset_index()
+    
+    # Calculate ratio of peak to average memory
+    method_metrics["memory_ratio"] = method_metrics["peak_memory_mb"] / method_metrics["avg_memory_mb"]
+    
+    # Create the plot
+    plt.figure(figsize=(10, 8))
+    
+    # Main scatter plot
+    scatter = plt.scatter(
+        method_metrics["avg_memory_mb"], 
+        method_metrics["peak_memory_mb"],
+        s=100,  # marker size
+        c=method_metrics["memory_ratio"], 
+        cmap="viridis",
+        alpha=0.8,
+        edgecolors="black"
+    )
+    
+    # Add a diagonal line representing peak=avg
+    max_val = max(
+        method_metrics["avg_memory_mb"].max(),
+        method_metrics["peak_memory_mb"].max()
+    )
+    plt.plot([0, max_val], [0, max_val], 'k--', alpha=0.5, label="Peak = Average")
+    
+    # Add method labels
+    for i, row in method_metrics.iterrows():
+        plt.annotate(
+            row["method"], 
+            (row["avg_memory_mb"], row["peak_memory_mb"]),
+            xytext=(5, 5),
+            textcoords="offset points",
+            fontsize=9,
+            fontweight="bold"
+        )
+    
+    # Add colorbar to show ratio
+    cbar = plt.colorbar(scatter)
+    cbar.set_label("Peak/Average Memory Ratio")
+    
+    plt.title("Peak vs Average Memory Usage by Method", fontsize=14, fontweight="bold")
+    plt.xlabel("Average Memory (MB)", fontsize=12)
+    plt.ylabel("Peak Memory (MB)", fontsize=12)
+    plt.grid(True, linestyle="--", alpha=0.7)
+    
+    plt.tight_layout()
+    out_path = os.path.join(output_dir, "plot_peak_vs_avg_memory.png")
+    plt.savefig(out_path, dpi=300)
+    plt.close()
+    print(f"[Saved] {out_path}")
+
+
 def generate_all_plots(json_path, output_dir):
     results_data = load_json_data(json_path)
     df = flatten_data(results_data)
@@ -513,6 +615,7 @@ def generate_all_plots(json_path, output_dir):
     plot_final_similarity_separate(df, output_dir)
     plot_avg_overhead_merged(df, output_dir)
     plot_avg_memory_merged(df, output_dir)
+    plot_peak_vs_avg_memory(df, output_dir)  # Add the new plot
 
 def run_all_results(data_dir):
     """
@@ -528,3 +631,4 @@ def run_all_results(data_dir):
 if __name__ == '__main__':
     # Run the script on the data directory
     run_all_results("data")
+

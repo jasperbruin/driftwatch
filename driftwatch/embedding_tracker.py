@@ -1,5 +1,5 @@
 import numpy as np
-from driftwatch.metrics import approx_wasserstein_1d, _mmd_1d_from_bins, DISTRIBUTION_METRICS, VECTOR_DISTANCE_FUNCTIONS
+from metrics import approx_wasserstein_1d, _mmd_1d_from_bins, DISTRIBUTION_METRICS, VECTOR_DISTANCE_FUNCTIONS
 from datasketches import kll_floats_sketch
 
 class EmbeddingTracker:

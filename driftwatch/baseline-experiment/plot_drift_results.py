@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from glob import glob
 
 # Define metric categorization
-VECTOR_METRICS = ['cosine', 'euclidean', 'manhattan', 'minkowski', 'mahalanobis', 'chebyshev', 'canberra']
+VECTOR_METRICS = ['cosine', 'manhattan', 'minkowski', 'mahalanobis', 'chebyshev', 'canberra']
 DISTRIBUTION_METRICS = ['wasserstein', 'ks', 'kl', 'js', 'hellinger', 'bhattacharyya', 'mmd']
 DIST_IMPLEMENTATIONS = ["kll", "histogram"]
 

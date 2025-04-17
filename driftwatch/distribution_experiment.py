@@ -7,8 +7,8 @@ import torch
 from collections import defaultdict
 from tqdm import tqdm
 
-from driftwatch.embedding_tracker import EmbeddingTracker
-from driftwatch.utils import (
+from embedding_tracker import EmbeddingTracker
+from utils import (
     set_seed, 
     extract_embeddings, 
     batch_generator, 
@@ -18,13 +18,13 @@ from driftwatch.utils import (
     compute_baseline_embeddings_and_pca,
     save_results
 )
-from driftwatch.metrics import DISTRIBUTION_METRICS
+from metrics import DISTRIBUTION_METRICS
 
 def parse_args():
     """
     Get configuration from config.py and allow command-line arguments to override
     """
-    from driftwatch.config import args as config_args
+    from config import args as config_args
     import argparse
     
     parser = argparse.ArgumentParser(description="Distribution-based Drift Detection Experiment")
