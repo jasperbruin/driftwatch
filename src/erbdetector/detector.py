@@ -1,4 +1,3 @@
-import json
 from flask import Flask, request, jsonify
 import numpy as np
 
@@ -6,17 +5,14 @@ np.float = float
 from skmultiflow.drift_detection.adwin import ADWIN
 from collections import deque
 from opentelemetry import metrics
-from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import \
-    OTLPMetricExporter
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.metrics import CallbackOptions, Observation
 
 # configure OTLP service name
-resource = Resource(attributes={
-    "service.name": "erbdetector"
-})
+resource = Resource(attributes={"service.name": "erbdetector"})
 
 # configure server name
 app = Flask(__name__)
@@ -29,14 +25,14 @@ queue = deque(maxlen=1000)
 current_accuracy = 0
 
 
-@app.route('/', methods=['GET'])
+@app.route("/", methods=["GET"])
 def detection():
     # store argument
-    is_correct = int(request.args.get('value'))
+    is_correct = int(request.args.get("value"))
 
     # ensure only 0 and 1 are accepted
     if is_correct != 0 and is_correct != 1:
-        return jsonify({'error': 'only send the values 0 and 1'})
+        return jsonify({"error": "only send the values 0 and 1"})
 
     # append for accuracy calculation
     queue.append(is_correct)
@@ -54,7 +50,7 @@ def detection():
     signal.set_current_value(np.mean(queue))
 
     # success message
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
 # callback function for gauge metric
@@ -100,12 +96,11 @@ signal = Signal("accuracy_attribute")
 
 # callback function for gauge export
 def read_gauge(options: CallbackOptions):
-    yield Observation(signal.get_current_value(),
-                      {"attribute": signal.attribute})
+    yield Observation(signal.get_current_value(), {"attribute": signal.attribute})
 
 
 # create gauge metric for the accuracy
 ddb_gauge = meter.create_observable_gauge("accuracy", [read_gauge])
 
 # listen on all ips so that other containers can reach
-app.run(host='0.0.0.0')
+app.run(host="0.0.0.0")

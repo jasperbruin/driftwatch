@@ -1,14 +1,16 @@
+import json
+import os
 import random
+
 import numpy as np
 import torch
 from datasets import load_dataset
-from sklearn.decomposition import PCA
-from transformers import AutoTokenizer, AutoModel
-import os
-import json
 from datasketches import kll_floats_sketch
+from sklearn.decomposition import PCA
+from transformers import AutoModel, AutoTokenizer
 
 from config import args
+
 
 def set_seed(seed):
     random.seed(seed)
@@ -33,17 +35,31 @@ def extract_embeddings(model, tokenizer, texts, device):
             decoder_input_ids = torch.zeros(
                 (input_ids.shape[0], 1), dtype=torch.long, device=device
             )
-            outputs = model(input_ids, attention_mask=attention_mask, decoder_input_ids=decoder_input_ids)
+            outputs = model(
+                input_ids,
+                attention_mask=attention_mask,
+                decoder_input_ids=decoder_input_ids,
+            )
         else:
             outputs = model(input_ids, attention_mask=attention_mask)
 
-        if hasattr(outputs, 'last_hidden_state'):
+        if hasattr(outputs, "last_hidden_state"):
             hidden_states = outputs.last_hidden_state
-            if model.config.model_type in ["gpt2", "gpt_neo", "opt", "mistral", "falcon", "bloom"]:
+            if model.config.model_type in [
+                "gpt2",
+                "gpt_neo",
+                "opt",
+                "mistral",
+                "falcon",
+                "bloom",
+            ]:
                 return hidden_states[:, -1, :].cpu().numpy()
             elif model.config.model_type in ["t5", "mbart"]:
                 return hidden_states.mean(dim=1).cpu().numpy()
-            elif "bert" in model.config.model_type or "electra" in model.config.model_type:
+            elif (
+                "bert" in model.config.model_type
+                or "electra" in model.config.model_type
+            ):
                 return hidden_states[:, 0, :].cpu().numpy()
         return None
 
@@ -51,6 +67,7 @@ def extract_embeddings(model, tokenizer, texts, device):
 def batch_generator(data, batch_size=32):
     for i in range(0, len(data), batch_size):
         yield data[i : i + batch_size]
+
 
 def introduce_gradual_drift(text_list, fraction_shuffle=0.5):
     new_texts = []
@@ -73,13 +90,14 @@ def introduce_gradual_drift(text_list, fraction_shuffle=0.5):
         new_texts.append(" ".join(words))
     return new_texts
 
+
 def get_device():
     if torch.backends.mps.is_available():
         return torch.device("mps")  # Apple Silicon (Metal Performance Shaders)
     elif torch.cuda.is_available():
         return torch.device("cuda")  # NVIDIA GPU
     else:
-        return torch.device("cpu")   # Fallback to CPU
+        return torch.device("cpu")  # Fallback to CPU
 
 
 def load_and_split_texts(dataset_info, max_texts):
@@ -104,7 +122,9 @@ def load_and_split_texts(dataset_info, max_texts):
     return dataset_name, baseline_texts, drift_texts
 
 
-def compute_baseline_embeddings_and_pca(model_name, baseline_texts, device, pca_components, batch_size):
+def compute_baseline_embeddings_and_pca(
+    model_name, baseline_texts, device, pca_components, batch_size
+):
     """Compute baseline embeddings and fit PCA (if needed) on them."""
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name).to(device)
@@ -165,21 +185,25 @@ def save_results(results, output_dir):
 
 
 def kll_transform(embeddings, k=8, sketch_k=None):
-    """
-    Optimized KLL-based transform that converts each embedding vector
+    """Optimized KLL-based transform that converts each embedding vector
     into k quantiles of its values. This yields a new embedding of size k
     for every original row in 'embeddings'.
 
-    Parameters:
+    Parameters
+    ----------
     - embeddings: numpy array of shape (n_samples, n_features)
     - k: number of quantiles to extract (output dimension)
     - sketch_k: KLL accuracy parameter (if None, defaults to k*2)
 
-    Returns:
+    Returns
+    -------
     - transformed embeddings of shape (n_samples, k)
+
     """
     if sketch_k is None:
-        sketch_k = min(k * 2, 200)  # Higher accuracy for sketch, capped at reasonable value
+        sketch_k = min(
+            k * 2, 200
+        )  # Higher accuracy for sketch, capped at reasonable value
 
     n_samples = embeddings.shape[0]
     transformed = np.zeros((n_samples, k), dtype=np.float32)

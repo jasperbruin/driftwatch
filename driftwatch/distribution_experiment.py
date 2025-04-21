@@ -1,56 +1,97 @@
+import argparse
 import os
 import time
 import tracemalloc
-import numpy as np
-import argparse
-import torch
 from collections import defaultdict
+
+import numpy as np
 from tqdm import tqdm
 
 from embedding_tracker import EmbeddingTracker
-from utils import (
-    set_seed, 
-    extract_embeddings, 
-    batch_generator, 
-    introduce_gradual_drift,
-    get_device, 
-    load_and_split_texts, 
-    compute_baseline_embeddings_and_pca,
-    save_results
-)
 from metrics import DISTRIBUTION_METRICS
+from utils import (
+    batch_generator,
+    compute_baseline_embeddings_and_pca,
+    extract_embeddings,
+    get_device,
+    introduce_gradual_drift,
+    load_and_split_texts,
+    save_results,
+    set_seed,
+)
+
 
 def parse_args():
-    """
-    Get configuration from config.py and allow command-line arguments to override
-    """
+    """Get configuration from config.py and allow command-line arguments to override"""
     from config import args as config_args
-    import argparse
-    
-    parser = argparse.ArgumentParser(description="Distribution-based Drift Detection Experiment")
-    parser.add_argument("--models", nargs='+', default=config_args["models"], 
-                        help="List of model names to evaluate")
-    parser.add_argument("--datasets", nargs='+', default=[d["name"] for d in config_args["datasets"]], 
-                        help="Names of datasets to use")
-    parser.add_argument("--max_texts", type=int, default=config_args["max_texts"], 
-                        help="Maximum number of texts to process per dataset")
-    parser.add_argument("--batch_size", type=int, default=config_args["batch_size"], 
-                        help="Batch size for processing")
-    parser.add_argument("--pca_components", type=int, default=config_args["pca_components"], 
-                        help="Number of PCA components")
-    parser.add_argument("--kll_k", type=int, default=config_args.get("kll_k", 20), 
-                        help="KLL parameter k")
-    parser.add_argument("--num_bins", type=int, default=config_args.get("kll_bins", 20), 
-                        help="Number of histogram bins")
-    parser.add_argument("--drift_strengths", type=float, nargs='+', 
-                        default=config_args["drift_strengths"], 
-                        help="Drift strength values to test")
-    parser.add_argument("--output_dir", type=str, default=os.path.join(config_args["output_dir"], "distribution_experiment"), 
-                        help="Directory to save results")
-    parser.add_argument("--num_seeds", type=int, default=config_args["num_seeds"], 
-                        help="Number of random seeds to run")
-    
+
+    parser = argparse.ArgumentParser(
+        description="Distribution-based Drift Detection Experiment"
+    )
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        default=config_args["models"],
+        help="List of model names to evaluate",
+    )
+    parser.add_argument(
+        "--datasets",
+        nargs="+",
+        default=[d["name"] for d in config_args["datasets"]],
+        help="Names of datasets to use",
+    )
+    parser.add_argument(
+        "--max_texts",
+        type=int,
+        default=config_args["max_texts"],
+        help="Maximum number of texts to process per dataset",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=config_args["batch_size"],
+        help="Batch size for processing",
+    )
+    parser.add_argument(
+        "--pca_components",
+        type=int,
+        default=config_args["pca_components"],
+        help="Number of PCA components",
+    )
+    parser.add_argument(
+        "--kll_k",
+        type=int,
+        default=config_args.get("kll_k", 20),
+        help="KLL parameter k",
+    )
+    parser.add_argument(
+        "--num_bins",
+        type=int,
+        default=config_args.get("kll_bins", 20),
+        help="Number of histogram bins",
+    )
+    parser.add_argument(
+        "--drift_strengths",
+        type=float,
+        nargs="+",
+        default=config_args["drift_strengths"],
+        help="Drift strength values to test",
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default=os.path.join(config_args["output_dir"], "distribution_experiment"),
+        help="Directory to save results",
+    )
+    parser.add_argument(
+        "--num_seeds",
+        type=int,
+        default=config_args["num_seeds"],
+        help="Number of random seeds to run",
+    )
+
     return parser.parse_args()
+
 
 def run_distribution_experiment(
     model,
@@ -64,11 +105,9 @@ def run_distribution_experiment(
     batch_size,
     device,
     kll_k,
-    num_bins
+    num_bins,
 ):
-    """
-    Run distribution-based distance tracking experiment with different approaches.
-    """
+    """Run distribution-based distance tracking experiment with different approaches."""
     # For distribution-based approaches
     approaches = ["kll_distribution", "histogram", "pca_histogram"]
 
@@ -93,7 +132,7 @@ def run_distribution_experiment(
             distance_name=distance_name,
             k=kll_k,
             num_bins=num_bins,
-            distribution_impl=distribution_impl
+            distribution_impl=distribution_impl,
         )
 
     # Update the trackers with baseline embeddings
@@ -150,6 +189,7 @@ def run_distribution_experiment(
 
     return all_results
 
+
 def run_experiments_for_model(
     model_name,
     baseline_texts,
@@ -162,7 +202,7 @@ def run_experiments_for_model(
     pca,
     kll_k,
     num_bins,
-    seed=None
+    seed=None,
 ):
     partial_results = []
 
@@ -172,8 +212,7 @@ def run_experiments_for_model(
     for distance_name in distribution_metrics:
         for drift_strength in drift_strengths:
             drifted_texts = introduce_gradual_drift(
-                drift_texts,
-                fraction_shuffle=drift_strength
+                drift_texts, fraction_shuffle=drift_strength
             )
             test_texts = baseline_texts + drifted_texts
 
@@ -189,24 +228,27 @@ def run_experiments_for_model(
                 batch_size,
                 device,
                 kll_k,
-                num_bins
+                num_bins,
             )
 
-            for (method, final_dist, total_time, avg_overhead, avg_memory) in results:
-                partial_results.append({
-                    "distance_type": "distribution",
-                    "distance_name": distance_name,
-                    "drift_strength": drift_strength,
-                    "pca_applied": "pca" in method,
-                    "method": method,
-                    "final_similarity": final_dist,
-                    "time_taken": total_time,
-                    "avg_overhead": avg_overhead,
-                    "avg_memory_mb": avg_memory,
-                    "seed": seed,
-                })
+            for method, final_dist, total_time, avg_overhead, avg_memory in results:
+                partial_results.append(
+                    {
+                        "distance_type": "distribution",
+                        "distance_name": distance_name,
+                        "drift_strength": drift_strength,
+                        "pca_applied": "pca" in method,
+                        "method": method,
+                        "final_similarity": final_dist,
+                        "time_taken": total_time,
+                        "avg_overhead": avg_overhead,
+                        "avg_memory_mb": avg_memory,
+                        "seed": seed,
+                    }
+                )
 
     return partial_results
+
 
 def collect_data_single_seed(seed, args):
     set_seed(seed)
@@ -214,19 +256,18 @@ def collect_data_single_seed(seed, args):
     print(f"[Seed={seed}] Using device:", device)
 
     results = defaultdict(list)
-    
+
     for dataset_name in args.datasets:
         # Create a dataset info structure for each dataset
         dataset_info = {
             "name": dataset_name,
             "config": None,
             "split": "train",
-            "text_column": "text"
+            "text_column": "text",
         }
-        
+
         dataset_name, baseline_texts, drift_texts = load_and_split_texts(
-            dataset_info,
-            args.max_texts
+            dataset_info, args.max_texts
         )
 
         for model_name in args.models:
@@ -257,14 +298,15 @@ def collect_data_single_seed(seed, args):
                 pca,
                 args.kll_k,
                 args.num_bins,
-                seed=seed
+                seed=seed,
             )
-            
+
             for r in partial_results:
                 key = (dataset_name, model_name)
                 results[key].append(r)
 
     return results
+
 
 def collect_data_multiple_seeds(args):
     all_results = defaultdict(list)
@@ -275,16 +317,17 @@ def collect_data_multiple_seeds(args):
     print("\nAll seeds complete!")
     return all_results
 
+
 def main():
     args = parse_args()
-    
+
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
-    
+
     # Add timestamp to output directory
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
     output_dir = os.path.join(args.output_dir, timestamp)
-    
+
     print("Distribution-based Drift Detection Experiment")
     print("==========================================")
     print(f"Models: {args.models}")
@@ -294,11 +337,12 @@ def main():
     print(f"KLL k: {args.kll_k}")
     print(f"Number of bins: {args.num_bins}")
     print(f"Drift strengths: {args.drift_strengths}")
-    
+
     results = collect_data_multiple_seeds(args)
     save_results(results, output_dir)
-    
+
     print(f"Results saved to {output_dir}")
+
 
 if __name__ == "__main__":
     main()

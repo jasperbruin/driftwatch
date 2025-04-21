@@ -1,2 +1,0 @@
-metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
-bhattacharyya_histogram,0.10645675659179688,0.31119632720947266,0.5981235504150391,17.140581130981445

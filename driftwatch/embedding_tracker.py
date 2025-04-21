@@ -1,6 +1,13 @@
 import numpy as np
-from metrics import approx_wasserstein_1d, _mmd_1d_from_bins, DISTRIBUTION_METRICS, VECTOR_DISTANCE_FUNCTIONS
 from datasketches import kll_floats_sketch
+
+from metrics import (
+    DISTRIBUTION_METRICS,
+    VECTOR_DISTANCE_FUNCTIONS,
+    _mmd_1d_from_bins,
+    approx_wasserstein_1d,
+)
+
 
 class EmbeddingTracker:
     def __init__(
@@ -44,13 +51,14 @@ class EmbeddingTracker:
                 # Create one KLL sketch per dimension. We'll update them directly each time
                 self.kll_sketches = [kll_floats_sketch(k) for _ in range(embedding_dim)]
             elif self.distribution_impl == "histogram":
-                self.hist_counts = [np.zeros(num_bins, dtype=np.float64) for _ in range(embedding_dim)]
+                self.hist_counts = [
+                    np.zeros(num_bins, dtype=np.float64) for _ in range(embedding_dim)
+                ]
             else:
                 raise ValueError(f"Unsupported distribution_impl: {distribution_impl}")
 
     def update(self, embeddings):
-        """
-        Called once for each batch that belongs to the 'baseline' distribution,
+        """Called once for each batch that belongs to the 'baseline' distribution,
         or if you're doing real-time updates. We'll accumulate data in either
         KLL sketches or histograms. Also track per-dimension min/max for bin edges.
         """
@@ -75,9 +83,13 @@ class EmbeddingTracker:
                 for dim_idx in range(self.embedding_dim):
                     col_vals = embeddings[:, dim_idx]
                     # We'll update the histogram in place
-                    range_span = max(self.max_vals[dim_idx] - self.min_vals[dim_idx], 1e-12)
+                    range_span = max(
+                        self.max_vals[dim_idx] - self.min_vals[dim_idx], 1e-12
+                    )
                     bin_width = range_span / self.num_bins
-                    bin_indices = ((col_vals - self.min_vals[dim_idx]) / bin_width).astype(int)
+                    bin_indices = (
+                        (col_vals - self.min_vals[dim_idx]) / bin_width
+                    ).astype(int)
                     bin_indices = np.clip(bin_indices, 0, self.num_bins - 1)
                     np.add.at(self.hist_counts[dim_idx], bin_indices, 1.0)
 
@@ -95,13 +107,14 @@ class EmbeddingTracker:
 
             if self.distance_name == "mahalanobis":
                 diff = batch_mean - self.mean
-                self.var_diag = (1 - self.alpha) * self.var_diag + self.alpha * (diff ** 2)
+                self.var_diag = (1 - self.alpha) * self.var_diag + self.alpha * (
+                    diff**2
+                )
 
             self.count += 1
 
     def compute_distance(self, embeddings):
-        """
-        Compare a new batch's distribution to the baseline distribution
+        """Compare a new batch's distribution to the baseline distribution
         (which is stored in self.kll_sketches or self.hist_counts).
         """
         if embeddings.ndim == 1:
@@ -122,12 +135,17 @@ class EmbeddingTracker:
                 )
 
         else:  # histogram
-            new_counts = [np.zeros(self.num_bins, dtype=np.float64) for _ in range(self.embedding_dim)]
+            new_counts = [
+                np.zeros(self.num_bins, dtype=np.float64)
+                for _ in range(self.embedding_dim)
+            ]
             for dim_idx in range(self.embedding_dim):
                 col_vals = embeddings[:, dim_idx]
                 range_span = max(self.max_vals[dim_idx] - self.min_vals[dim_idx], 1e-12)
                 bin_width = range_span / self.num_bins
-                bin_indices = ((col_vals - self.min_vals[dim_idx]) / bin_width).astype(int)
+                bin_indices = ((col_vals - self.min_vals[dim_idx]) / bin_width).astype(
+                    int
+                )
                 bin_indices = np.clip(bin_indices, 0, self.num_bins - 1)
                 np.add.at(new_counts[dim_idx], bin_indices, 1.0)
 
@@ -154,7 +172,9 @@ class EmbeddingTracker:
             elif self.distance_name == "mmd":
                 dim_dist = _mmd_1d_from_bins(edges, baseline_pmf, new_pmf)
             else:
-                raise ValueError(f"Unknown distribution-based metric: {self.distance_name}")
+                raise ValueError(
+                    f"Unknown distribution-based metric: {self.distance_name}"
+                )
 
             dim_distances.append(dim_dist)
 
@@ -165,7 +185,7 @@ class EmbeddingTracker:
         if self.distance_name == "mahalanobis":
             diff = embeddings.mean(axis=0) - self.mean
             epsilon = 1e-12
-            return float(np.sqrt(np.sum(diff ** 2 / (self.var_diag + epsilon))))
+            return float(np.sqrt(np.sum(diff**2 / (self.var_diag + epsilon))))
         elif self.distance_name in VECTOR_DISTANCE_FUNCTIONS:
             dist_fn = VECTOR_DISTANCE_FUNCTIONS[self.distance_name]
             return float(dist_fn(self.mean, embeddings.mean(axis=0)))
@@ -173,8 +193,7 @@ class EmbeddingTracker:
             raise ValueError(f"Unknown vector-based distance: {self.distance_name}")
 
     def _get_baseline_pmf_kll(self, dim_idx):
-        """
-        Return the baseline PMF and the bin edges for dimension dim_idx,
+        """Return the baseline PMF and the bin edges for dimension dim_idx,
         caching them so we don't recompute each time.
         """
         if self.cached_baseline_pmfs[dim_idx] is not None:
@@ -197,8 +216,7 @@ class EmbeddingTracker:
         return pmf, edges
 
     def _kll_to_pmf(self, sketch, edges):
-        """
-        Convert a KLL sketch to a discrete PMF across the given edges in one call,
+        """Convert a KLL sketch to a discrete PMF across the given edges in one call,
         using sketch.get_pmf(split_points).
         We exclude the very first and last edges from 'split_points' because KLL
         will return an array of length len(split_points)+1.
@@ -221,8 +239,7 @@ class EmbeddingTracker:
         return pmf_array / (pmf_array.sum() + 1e-12)
 
     def _get_baseline_pmf_hist(self, dim_idx):
-        """
-        For histogram-based baseline, just build normalized counts and a matching edge array.
+        """For histogram-based baseline, just build normalized counts and a matching edge array.
         Cache it to avoid re-normalizing each time.
         """
         if self.cached_baseline_pmfs[dim_idx] is not None:
@@ -241,4 +258,3 @@ class EmbeddingTracker:
         self.cached_baseline_pmfs[dim_idx] = pmf
         self.cached_bin_edges[dim_idx] = edges
         return pmf, edges
-

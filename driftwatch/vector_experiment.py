@@ -1,55 +1,92 @@
+import argparse
 import os
 import time
 import tracemalloc
-import numpy as np
-import argparse
-import torch
 from collections import defaultdict
+
+import numpy as np
 from tqdm import tqdm
 
 from embedding_tracker import EmbeddingTracker
-from utils import (
-    set_seed, 
-    extract_embeddings, 
-    batch_generator, 
-    introduce_gradual_drift,
-    get_device, 
-    load_and_split_texts, 
-    compute_baseline_embeddings_and_pca,
-    save_results
-)
-from utils import kll_transform
 from metrics import VECTOR_DISTANCE_FUNCTIONS
+from utils import (
+    batch_generator,
+    compute_baseline_embeddings_and_pca,
+    extract_embeddings,
+    get_device,
+    introduce_gradual_drift,
+    kll_transform,
+    load_and_split_texts,
+    save_results,
+    set_seed,
+)
+
 
 def parse_args():
-    """
-    Get configuration from config.py and allow command-line arguments to override
-    """
+    """Get configuration from config.py and allow command-line arguments to override"""
     from config import args as config_args
-    import argparse
-    
-    parser = argparse.ArgumentParser(description="Vector-based Drift Detection Experiment")
-    parser.add_argument("--models", nargs='+', default=config_args["models"], 
-                        help="List of model names to evaluate")
-    parser.add_argument("--datasets", nargs='+', default=[d["name"] for d in config_args["datasets"]], 
-                        help="Names of datasets to use")
-    parser.add_argument("--max_texts", type=int, default=config_args["max_texts"], 
-                        help="Maximum number of texts to process per dataset")
-    parser.add_argument("--batch_size", type=int, default=config_args["batch_size"], 
-                        help="Batch size for processing")
-    parser.add_argument("--pca_components", type=int, default=config_args["pca_components"], 
-                        help="Number of PCA components")
-    parser.add_argument("--kll_k", type=int, default=config_args.get("kll_k", 50),
-                        help="KLL parameter k (output dimension)")
-    parser.add_argument("--drift_strengths", type=float, nargs='+', 
-                        default=config_args["drift_strengths"], 
-                        help="Drift strength values to test")
-    parser.add_argument("--output_dir", type=str, default=os.path.join(config_args["output_dir"], "vector_experiment"), 
-                        help="Directory to save results")
-    parser.add_argument("--num_seeds", type=int, default=config_args["num_seeds"], 
-                        help="Number of random seeds to run")
-    
+
+    parser = argparse.ArgumentParser(
+        description="Vector-based Drift Detection Experiment"
+    )
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        default=config_args["models"],
+        help="List of model names to evaluate",
+    )
+    parser.add_argument(
+        "--datasets",
+        nargs="+",
+        default=[d["name"] for d in config_args["datasets"]],
+        help="Names of datasets to use",
+    )
+    parser.add_argument(
+        "--max_texts",
+        type=int,
+        default=config_args["max_texts"],
+        help="Maximum number of texts to process per dataset",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=config_args["batch_size"],
+        help="Batch size for processing",
+    )
+    parser.add_argument(
+        "--pca_components",
+        type=int,
+        default=config_args["pca_components"],
+        help="Number of PCA components",
+    )
+    parser.add_argument(
+        "--kll_k",
+        type=int,
+        default=config_args.get("kll_k", 50),
+        help="KLL parameter k (output dimension)",
+    )
+    parser.add_argument(
+        "--drift_strengths",
+        type=float,
+        nargs="+",
+        default=config_args["drift_strengths"],
+        help="Drift strength values to test",
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default=os.path.join(config_args["output_dir"], "vector_experiment"),
+        help="Directory to save results",
+    )
+    parser.add_argument(
+        "--num_seeds",
+        type=int,
+        default=config_args["num_seeds"],
+        help="Number of random seeds to run",
+    )
+
     return parser.parse_args()
+
 
 def run_vector_experiment(
     model,
@@ -62,11 +99,9 @@ def run_vector_experiment(
     pca_components,
     batch_size,
     device,
-    kll_k
+    kll_k,
 ):
-    """
-    Run vector-based distance tracking experiment with different dimension reduction approaches.
-    """
+    """Run vector-based distance tracking experiment with different dimension reduction approaches."""
     # For vector-based approaches, we only use these methods
     approaches = ["no_pca", "pca", "kll_vector"]
 
@@ -87,7 +122,7 @@ def run_vector_experiment(
             alpha=0.01,
             distance_name=distance_name,
             k=kll_k,
-            distribution_impl="none"  # This is a vector-based approach
+            distribution_impl="none",  # This is a vector-based approach
         )
 
     # Update the trackers with baseline embeddings
@@ -127,7 +162,7 @@ def run_vector_experiment(
 
             # Clear tracemalloc statistics before distance computation
             tracemalloc.clear_traces()
-            
+
             # Measure overhead time for distance computation
             overhead_start = time.time()
             dist = tracker.compute_distance(emb)
@@ -148,11 +183,14 @@ def run_vector_experiment(
         avg_memory = np.mean(memory_usages) / (1024**2)  # MB
         avg_peak_memory = np.mean(peak_memory_usages) / (1024**2)  # MB
 
-        all_results.append((method, final_dist, total_time, avg_overhead, avg_memory, avg_peak_memory))
+        all_results.append(
+            (method, final_dist, total_time, avg_overhead, avg_memory, avg_peak_memory)
+        )
 
     tracemalloc.stop()
 
     return all_results
+
 
 def run_experiments_for_model(
     model_name,
@@ -165,7 +203,7 @@ def run_experiments_for_model(
     baseline_embs,
     pca,
     kll_k,
-    seed=None
+    seed=None,
 ):
     partial_results = []
 
@@ -175,8 +213,7 @@ def run_experiments_for_model(
     for distance_name in vector_distance_names:
         for drift_strength in drift_strengths:
             drifted_texts = introduce_gradual_drift(
-                drift_texts,
-                fraction_shuffle=drift_strength
+                drift_texts, fraction_shuffle=drift_strength
             )
             test_texts = baseline_texts + drifted_texts
 
@@ -191,33 +228,45 @@ def run_experiments_for_model(
                 pca_components,
                 batch_size,
                 device,
-                kll_k
+                kll_k,
             )
 
             for result_tuple in results:
                 if len(result_tuple) == 6:  # Updated version with peak memory
-                    method, final_dist, total_time, avg_overhead, avg_memory, avg_peak_memory = result_tuple
+                    (
+                        method,
+                        final_dist,
+                        total_time,
+                        avg_overhead,
+                        avg_memory,
+                        avg_peak_memory,
+                    ) = result_tuple
                     peak_memory = avg_peak_memory
                 else:  # Backward compatibility
-                    method, final_dist, total_time, avg_overhead, avg_memory = result_tuple
+                    method, final_dist, total_time, avg_overhead, avg_memory = (
+                        result_tuple
+                    )
                     peak_memory = avg_memory
 
-                partial_results.append({
-                    "distance_type": "vector",
-                    "distance_name": distance_name,
-                    "drift_strength": drift_strength,
-                    "pca_applied": method == "pca",
-                    "kll_applied": method == "kll_vector",
-                    "method": method,
-                    "final_similarity": final_dist,
-                    "time_taken": total_time,
-                    "avg_overhead": avg_overhead,
-                    "avg_memory_mb": avg_memory,
-                    "peak_memory_mb": peak_memory,
-                    "seed": seed,
-                })
+                partial_results.append(
+                    {
+                        "distance_type": "vector",
+                        "distance_name": distance_name,
+                        "drift_strength": drift_strength,
+                        "pca_applied": method == "pca",
+                        "kll_applied": method == "kll_vector",
+                        "method": method,
+                        "final_similarity": final_dist,
+                        "time_taken": total_time,
+                        "avg_overhead": avg_overhead,
+                        "avg_memory_mb": avg_memory,
+                        "peak_memory_mb": peak_memory,
+                        "seed": seed,
+                    }
+                )
 
     return partial_results
+
 
 def collect_data_single_seed(seed, args):
     set_seed(seed)
@@ -225,19 +274,18 @@ def collect_data_single_seed(seed, args):
     print(f"[Seed={seed}] Using device:", device)
 
     results = defaultdict(list)
-    
+
     for dataset_name in args.datasets:
         # Create a dataset info structure for each dataset
         dataset_info = {
             "name": dataset_name,
             "config": None,
             "split": "train",
-            "text_column": "text"
+            "text_column": "text",
         }
-        
+
         dataset_name, baseline_texts, drift_texts = load_and_split_texts(
-            dataset_info,
-            args.max_texts
+            dataset_info, args.max_texts
         )
 
         for model_name in args.models:
@@ -267,14 +315,15 @@ def collect_data_single_seed(seed, args):
                 baseline_embs,
                 pca,
                 args.kll_k,
-                seed=seed
+                seed=seed,
             )
-            
+
             for r in partial_results:
                 key = (dataset_name, model_name)
                 results[key].append(r)
 
     return results
+
 
 def collect_data_multiple_seeds(args):
     all_results = defaultdict(list)
@@ -285,16 +334,17 @@ def collect_data_multiple_seeds(args):
     print("\nAll seeds complete!")
     return all_results
 
+
 def main():
     args = parse_args()
-    
+
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
-    
+
     # Add timestamp to output directory
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
     output_dir = os.path.join(args.output_dir, timestamp)
-    
+
     print("Vector-based Drift Detection Experiment")
     print("======================================")
     print(f"Models: {args.models}")
@@ -303,12 +353,12 @@ def main():
     print(f"PCA components: {args.pca_components}")
     print(f"KLL k: {args.kll_k}")
     print(f"Drift strengths: {args.drift_strengths}")
-    
+
     results = collect_data_multiple_seeds(args)
     save_results(results, output_dir)
-    
+
     print(f"Results saved to {output_dir}")
+
 
 if __name__ == "__main__":
     main()
-

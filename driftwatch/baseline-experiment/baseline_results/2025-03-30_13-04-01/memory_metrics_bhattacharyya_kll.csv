@@ -1,2 +1,0 @@
-metric,init_memory_mb,baseline_memory_mb,final_memory_mb,peak_memory_mb
-bhattacharyya_kll,0.0332183837890625,0.06541252136230469,0.4284067153930664,16.97849941253662

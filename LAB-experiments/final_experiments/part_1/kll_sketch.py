@@ -81,14 +81,14 @@ class KLL:
         for h, c in enumerate(self.compactors):
             for item in c:
                 if item <= value:
-                    r += 2 ** h
+                    r += 2**h
         return r
 
     def cdf(self):
         """Computes the approximate CDF from the sketch."""
         items_and_weights = []
         for h, c in enumerate(self.compactors):
-            items_and_weights.extend((item, 2 ** h) for item in c)
+            items_and_weights.extend((item, 2**h) for item in c)
         items_and_weights.sort()
         total_weight = sum(weight for _, weight in items_and_weights)
         cumulative_weight = 0

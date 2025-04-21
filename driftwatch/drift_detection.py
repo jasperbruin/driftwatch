@@ -1,22 +1,23 @@
 # drift_detection.py
 
+import os
 import time
 import tracemalloc
-from tqdm import tqdm
-import numpy as np
 from collections import defaultdict
-import os
+
+import numpy as np
 
 # 1. Import the KLL-Floats-Sketch
-from datasketches import kll_floats_sketch
+from tqdm import tqdm
 
-from embedding_tracker import EmbeddingTracker, VECTOR_DISTANCE_FUNCTIONS, DISTRIBUTION_METRICS
-from utils import *
 from config import args
+from embedding_tracker import (
+    DISTRIBUTION_METRICS,
+    VECTOR_DISTANCE_FUNCTIONS,
+    EmbeddingTracker,
+)
 from plot import *
-
-
-
+from utils import *
 
 
 def run_distance_tracking(
@@ -30,18 +31,15 @@ def run_distance_tracking(
     pca_components,
     batch_size,
     device,
-    realtime_update=False
+    realtime_update=False,
 ):
-    """
-    Main entry point for distance tracking experiments.
+    """Main entry point for distance tracking experiments.
     This function demonstrates how to toggle between:
       - No dimensionality reduction
       - PCA-based dimensionality reduction
       - KLL-based dimensionality reduction
     and measure memory/time usage.
     """
-
-
     # 2. Decide which "approaches" to run for a given distance_name.
     if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
         # Distribution-based approaches
@@ -78,7 +76,7 @@ def run_distance_tracking(
             distance_name=distance_name,
             k=args.get("kll_k", 20),
             num_bins=args.get("kll_bins", 20),
-            distribution_impl=distribution_impl
+            distribution_impl=distribution_impl,
         )
 
     # 4. Update the tracker with baseline embeddings.
@@ -150,7 +148,7 @@ def run_experiments_for_model(
     drift_strengths,
     baseline_embs,
     pca,
-    seed=None
+    seed=None,
 ):
     partial_results = []
 
@@ -161,15 +159,17 @@ def run_experiments_for_model(
     )
 
     for distance_name in all_distance_names:
-        if distance_name in DISTRIBUTION_METRICS or distance_name in ("wasserstein", "mmd"):
+        if distance_name in DISTRIBUTION_METRICS or distance_name in (
+            "wasserstein",
+            "mmd",
+        ):
             distance_type = "distribution"
         else:
             distance_type = "vector"
 
         for drift_strength in drift_strengths:
             drifted_texts = introduce_gradual_drift(
-                drift_texts,
-                fraction_shuffle=drift_strength
+                drift_texts, fraction_shuffle=drift_strength
             )
             test_texts = baseline_texts + drifted_texts
 
@@ -186,19 +186,22 @@ def run_experiments_for_model(
                 device,
             )
 
-            for (method, final_dist, total_time, avg_overhead, avg_memory) in results:
-                partial_results.append({
-                    "distance_type": distance_type,
-                    "distance_name": distance_name,
-                    "drift_strength": drift_strength,
-                    "pca_applied": method in ["pca", "pca_kll_sketch", "pca_histogram"],
-                    "method": method,
-                    "final_similarity": final_dist,
-                    "time_taken": total_time,
-                    "avg_overhead": avg_overhead,
-                    "avg_memory_mb": avg_memory,
-                    "seed": seed,
-                })
+            for method, final_dist, total_time, avg_overhead, avg_memory in results:
+                partial_results.append(
+                    {
+                        "distance_type": distance_type,
+                        "distance_name": distance_name,
+                        "drift_strength": drift_strength,
+                        "pca_applied": method
+                        in ["pca", "pca_kll_sketch", "pca_histogram"],
+                        "method": method,
+                        "final_similarity": final_dist,
+                        "time_taken": total_time,
+                        "avg_overhead": avg_overhead,
+                        "avg_memory_mb": avg_memory,
+                        "seed": seed,
+                    }
+                )
 
     return partial_results
 
@@ -211,8 +214,7 @@ def collect_data_single_seed(seed, args):
     results = defaultdict(list)
     for dataset_info in args["datasets"]:
         dataset_name, baseline_texts, drift_texts = load_and_split_texts(
-            dataset_info,
-            args["max_texts"]
+            dataset_info, args["max_texts"]
         )
 
         for model_name in args["models"]:
@@ -241,7 +243,7 @@ def collect_data_single_seed(seed, args):
                 args["drift_strengths"],
                 baseline_embs,
                 pca,
-                seed=seed
+                seed=seed,
             )
             for r in partial_results:
                 key = (dataset_name, model_name)

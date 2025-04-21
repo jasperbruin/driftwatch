@@ -51,14 +51,16 @@ class EmbeddingTracker:
     - An optional KLL sketch for rank-based statistics of drift distances.
     """
 
-    def __init__(self,
-                 embedding_dim,
-                 alpha=0.01,
-                 distance_name="mahalanobis",
-                 use_kll=False,
-                 kll_k=200,
-                 cov_approx_mode="diagonal",
-                 block_size=32):
+    def __init__(
+        self,
+        embedding_dim,
+        alpha=0.01,
+        distance_name="mahalanobis",
+        use_kll=False,
+        kll_k=200,
+        cov_approx_mode="diagonal",
+        block_size=32,
+    ):
         """
         :param embedding_dim: Dimension of the embeddings
         :param alpha: Smoothing factor for EMA updates
@@ -125,7 +127,7 @@ class EmbeddingTracker:
 
         elif self.cov_approx_mode == "diagonal":
             safe_var = np.where(self.var_diag > 1e-12, self.var_diag, 1e-12)
-            return np.sqrt(np.sum((diff ** 2) / safe_var))
+            return np.sqrt(np.sum((diff**2) / safe_var))
 
         elif self.cov_approx_mode == "block":
             total = 0.0
@@ -164,13 +166,17 @@ class EmbeddingTracker:
                     self.cov = (1 - self.alpha) * self.cov + self.alpha * outer
 
                 elif self.cov_approx_mode == "diagonal":
-                    self.var_diag = (1 - self.alpha) * self.var_diag + self.alpha * (diff_new ** 2)
+                    self.var_diag = (1 - self.alpha) * self.var_diag + self.alpha * (
+                        diff_new**2
+                    )
 
                 elif self.cov_approx_mode == "block":
                     for i, (start, end) in enumerate(self.block_indices):
                         d_block = diff_new[start:end]
                         outer_block = np.outer(d_block, d_block)
-                        self.blocks[i] = (1 - self.alpha) * self.blocks[i] + self.alpha * outer_block
+                        self.blocks[i] = (1 - self.alpha) * self.blocks[
+                            i
+                        ] + self.alpha * outer_block
 
         self.count += 1
 
