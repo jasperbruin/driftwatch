@@ -200,22 +200,23 @@ def plot_relative_log_increase(df, output_dir):
     # Define which methods to show in each subplot position (row, column)
     # Row 0: Vector methods, Row 1: Distribution methods
     method_positions = {
-        (0, 0): "pca",          # Vector-based (top row)
-        (0, 1): "no_pca",       # Vector-based (top row)
-        (0, 2): "kll_vector",   # Vector-based (top row)
-        (1, 0): "kll_distribution",   # Distribution-based (bottom row)
-        (1, 1): "histogram",    # Distribution-based (bottom row)
-        (1, 2): "pca_histogram" # Distribution-based (bottom row)
+        (0, 0): "no_pca",  # Vector-based normal
+        (0, 1): "pca",  # Vector-based with PCA
+        (0, 2): "kll_vector",  # Vector-based with KLL sketch
+        (1, 0): "histogram",  # Distribution-based normal
+        (1, 1): "pca_histogram",  # Distribution-based with PCA
+        (1, 2): "kll_sketch"  # Distribution-based with KLL sketch
     }
     
     # Create titles for each subplot
     title_map = {
-        "pca": "Vector-Based (PCA)",
         "no_pca": "Vector-Based (Full Embedding Size)",
+        "pca": "Vector-Based (PCA)",
         "kll_vector": "Vector-Based (KLL Vector)",
-        "kll_distribution": "Distribution-Based (KLL Sketch)",
+
         "histogram": "Distribution-Based (Histogram Full Embedding Size)",
-        "pca_histogram": "Distribution-Based (PCA Histogram)"
+        "pca_histogram": "Distribution-Based (PCA Histogram)",
+        "kll_sketch": "Distribution-Based (KLL Sketch)"
     }
 
     # Plot each subplot

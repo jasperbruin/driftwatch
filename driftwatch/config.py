@@ -29,10 +29,10 @@ args = {
             "text_column": "text"
         },
     ],
-    "max_texts": 4000,
+    "max_texts": 100,
     "batch_size": 64,
     "drift_strengths": [0.0, 0.25, 0.5, 0.75, 1.0],
-    "pca_components": 2,
+    "pca_components": 8,
     "output_dir": "data",
     "num_seeds": 1,
     "kll_k": 8,
